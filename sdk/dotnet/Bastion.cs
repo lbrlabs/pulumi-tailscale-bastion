@@ -7,33 +7,27 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Pulumi.Serialization;
 
-namespace Pulumi.Xyz
+namespace Pulumi.AwsTailscale
 {
-    [XyzResourceType("xyz:index:StaticPage")]
-    public partial class StaticPage : Pulumi.ComponentResource
+    [AwsTailscaleResourceType("aws-tailscale:index:Bastion")]
+    public partial class Bastion : global::Pulumi.ComponentResource
     {
         /// <summary>
-        /// The bucket resource.
+        /// The name of the ASG that managed the bastion instances
         /// </summary>
-        [Output("bucket")]
-        public Output<Pulumi.Aws.S3.Bucket> Bucket { get; private set; } = null!;
-
-        /// <summary>
-        /// The website URL.
-        /// </summary>
-        [Output("websiteUrl")]
-        public Output<string> WebsiteUrl { get; private set; } = null!;
+        [Output("asgName")]
+        public Output<string> AsgName { get; private set; } = null!;
 
 
         /// <summary>
-        /// Create a StaticPage resource with the given unique name, arguments, and options.
+        /// Create a Bastion resource with the given unique name, arguments, and options.
         /// </summary>
         ///
         /// <param name="name">The unique name of the resource</param>
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public StaticPage(string name, StaticPageArgs args, ComponentResourceOptions? options = null)
-            : base("xyz:index:StaticPage", name, args ?? new StaticPageArgs(), MakeResourceOptions(options, ""), remote: true)
+        public Bastion(string name, BastionArgs args, ComponentResourceOptions? options = null)
+            : base("aws-tailscale:index:Bastion", name, args ?? new BastionArgs(), MakeResourceOptions(options, ""), remote: true)
         {
         }
 
@@ -50,16 +44,25 @@ namespace Pulumi.Xyz
         }
     }
 
-    public sealed class StaticPageArgs : Pulumi.ResourceArgs
+    public sealed class BastionArgs : global::Pulumi.ResourceArgs
     {
-        /// <summary>
-        /// The HTML content for index.html.
-        /// </summary>
-        [Input("indexContent", required: true)]
-        public Input<string> IndexContent { get; set; } = null!;
+        [Input("subnetIds")]
+        private InputList<string>? _subnetIds;
+        public InputList<string> SubnetIds
+        {
+            get => _subnetIds ?? (_subnetIds = new InputList<string>());
+            set => _subnetIds = value;
+        }
 
-        public StaticPageArgs()
+        /// <summary>
+        /// The VPC the Bastion should be created in
+        /// </summary>
+        [Input("vpcId", required: true)]
+        public Input<string> VpcId { get; set; } = null!;
+
+        public BastionArgs()
         {
         }
+        public static new BastionArgs Empty => new BastionArgs();
     }
 }

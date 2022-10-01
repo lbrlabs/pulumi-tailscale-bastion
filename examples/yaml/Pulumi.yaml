@@ -1,0 +1,7 @@
+name: yaml_aws_tailscalebastion
+description: A minimal Pulumi YAML program
+runtime: yaml
+configuration: {}
+variables: {}
+resources: {}
+outputs: {}

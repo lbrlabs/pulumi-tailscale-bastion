@@ -1,11 +1,13 @@
 {
-    "name": "@pulumi/xyz",
+    "name": "@pulumi/aws-tailscale",
     "version": "${VERSION}",
     "scripts": {
-        "build": "tsc"
+        "build": "tsc",
+        "install": "node scripts/install-pulumi-plugin.js resource aws-tailscale ${VERSION}"
     },
     "dependencies": {
-        "@pulumi/aws": "^4.0.0"
+        "@pulumi/aws": "^5.0.0",
+        "@pulumi/tailscale": "^0.11.0"
     },
     "devDependencies": {
         "typescript": "^3.7.0"
@@ -14,6 +16,7 @@
         "@pulumi/pulumi": "latest"
     },
     "pulumi": {
-        "resource": true
+        "resource": true,
+        "name": "aws-tailscale"
     }
 }

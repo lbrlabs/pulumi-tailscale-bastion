@@ -1,39 +1,52 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/pulumi/pulumi/master/pkg/codegen/schema/pulumi.json
 ---
-name: xyz
+name: aws-tailscale
 resources:
-  xyz:index:StaticPage:
+  aws-tailscale:index:Bastion:
     isComponent: true
     inputProperties:
-      indexContent:
+      vpcId:
         type: string
-        description: The HTML content for index.html.
+        description: "The VPC the Bastion should be created in"
+      subnetIds:
+        type: array
+        items:
+          type: string
+        description: "The subnet Ids to launch instances in"
+      route:
+        type: string
+        description: "The route you'd like to advertise via tailscale"
+      region:
+        type: string
+        description: "The AWS region you're using"
     requiredInputs:
-      - indexContent
+      - vpcId
+      - subnetIds
+      - route
+      - region
     properties:
-      bucket:
-        "$ref": "/aws/v4.0.0/schema.json#/resources/aws:s3%2Fbucket:Bucket"
-        description: The bucket resource.
-      websiteUrl:
+      asgName:
         type: string
-        description: The website URL.
+        description: "The name of the ASG that managed the bastion instances"
     required:
-      - bucket
-      - websiteUrl
+      - asgName
 language:
   csharp:
     packageReferences:
       Pulumi: 3.*
-      Pulumi.Aws: 4.*
+      Pulumi.Aws: 5.*
+      Pulumi.Tailscale: 0.*
   go:
     generateResourceContainerTypes: true
-    importBasePath: github.com/pulumi/pulumi-xyz/sdk/go/xyz
+    importBasePath: github.com/lbrlabs/pulumi-aws-tailscalebastion/sdk/go/bastion
   nodejs:
     dependencies:
-      "@pulumi/aws": "^4.0.0"
+      "@pulumi/aws": "^5.0.0"
+      "@pulumi/tailscale": "^0.11.0"
     devDependencies:
       typescript: "^3.7.0"
   python:
     requires:
       pulumi: ">=3.0.0,<4.0.0"
-      pulumi-aws: ">=4.0.0,<5.0.0"
+      pulumi-aws: ">=5.0.0,<6.0.0"
+      pulumi-tailscale: ">=0.0.0,<1.0.0"
