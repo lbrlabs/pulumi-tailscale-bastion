@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Pulumi.Serialization;
+using Pulumi;
 
-namespace Pulumi.AwsTailscale
+namespace Lbrlabs.PulumiPackage.AwsTailscale
 {
     [AwsTailscaleResourceType("aws-tailscale:index:Bastion")]
     public partial class Bastion : global::Pulumi.ComponentResource
@@ -36,6 +37,7 @@ namespace Pulumi.AwsTailscale
             var defaultOptions = new ComponentResourceOptions
             {
                 Version = Utilities.Version,
+                PluginDownloadURL = "github://api.github.com/lbrlabs",
             };
             var merged = ComponentResourceOptions.Merge(defaultOptions, options);
             // Override the ID if one was specified for consistency with other language SDKs.
@@ -46,8 +48,24 @@ namespace Pulumi.AwsTailscale
 
     public sealed class BastionArgs : global::Pulumi.ResourceArgs
     {
-        [Input("subnetIds")]
+        /// <summary>
+        /// The AWS region you're using
+        /// </summary>
+        [Input("region", required: true)]
+        public Input<string> Region { get; set; } = null!;
+
+        /// <summary>
+        /// The route you'd like to advertise via tailscale
+        /// </summary>
+        [Input("route", required: true)]
+        public Input<string> Route { get; set; } = null!;
+
+        [Input("subnetIds", required: true)]
         private InputList<string>? _subnetIds;
+
+        /// <summary>
+        /// The subnet Ids to launch instances in
+        /// </summary>
         public InputList<string> SubnetIds
         {
             get => _subnetIds ?? (_subnetIds = new InputList<string>());

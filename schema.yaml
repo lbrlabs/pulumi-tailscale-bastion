@@ -1,6 +1,9 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/pulumi/pulumi/master/pkg/codegen/schema/pulumi.json
 ---
 name: aws-tailscale
+pluginDownloadUrl: "github://api.github.com/lbrlabs"
+description: "A Pulumi package for creating a tailscale bastion in AWS."
+repository: "https://github.com/lbrlabs/pulumi-aws-tailscalebastion"
 resources:
   aws-tailscale:index:Bastion:
     isComponent: true
@@ -36,6 +39,7 @@ language:
       Pulumi: 3.*
       Pulumi.Aws: 5.*
       Pulumi.Tailscale: 0.*
+    rootNamespace: "Lbrlabs.PulumiPackage"
   go:
     generateResourceContainerTypes: true
     importBasePath: github.com/lbrlabs/pulumi-aws-tailscalebastion/sdk/go/bastion
@@ -45,7 +49,9 @@ language:
       "@pulumi/tailscale": "^0.11.0"
     devDependencies:
       typescript: "^3.7.0"
+    packageName: "@lbrlabs/pulumi-aws-tailscalebastion"
   python:
+    packageName: "lbrlabs_pulumi_aws_tailscalebastion"
     requires:
       pulumi: ">=3.0.0,<4.0.0"
       pulumi-aws: ">=5.0.0,<6.0.0"

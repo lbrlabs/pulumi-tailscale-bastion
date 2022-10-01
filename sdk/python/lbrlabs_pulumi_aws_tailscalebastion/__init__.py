@@ -13,7 +13,7 @@ _utilities.register(
  {
   "pkg": "aws-tailscale",
   "mod": "index",
-  "fqn": "pulumi_aws_tailscale",
+  "fqn": "lbrlabs_pulumi_aws_tailscalebastion",
   "classes": {
    "aws-tailscale:index:Bastion": "Bastion"
   }
@@ -25,7 +25,7 @@ _utilities.register(
  {
   "pkg": "aws-tailscale",
   "token": "pulumi:providers:aws-tailscale",
-  "fqn": "pulumi_aws_tailscale",
+  "fqn": "lbrlabs_pulumi_aws_tailscalebastion",
   "class": "Provider"
  }
 ]

@@ -15,7 +15,7 @@ class InstallPluginCommand(install):
     def run(self):
         install.run(self)
         try:
-            check_call(['pulumi', 'plugin', 'install', 'resource', 'aws-tailscale', PLUGIN_VERSION])
+            check_call(['pulumi', 'plugin', 'install', 'resource', 'aws-tailscale', PLUGIN_VERSION, '--server', 'github://api.github.com/lbrlabs'])
         except OSError as error:
             if error.errno == errno.ENOENT:
                 print(f"""
@@ -37,16 +37,20 @@ def readme():
         return "aws-tailscale Pulumi Package - Development Version"
 
 
-setup(name='pulumi_aws_tailscale',
+setup(name='lbrlabs_pulumi_aws_tailscalebastion',
       version=VERSION,
+      description="A Pulumi package for creating a tailscale bastion in AWS.",
       long_description=readme(),
       long_description_content_type='text/markdown',
       cmdclass={
           'install': InstallPluginCommand,
       },
+      project_urls={
+          'Repository': 'https://github.com/lbrlabs/pulumi-aws-tailscalebastion'
+      },
       packages=find_packages(),
       package_data={
-          'pulumi_aws_tailscale': [
+          'lbrlabs_pulumi_aws_tailscalebastion': [
               'py.typed',
               'pulumi-plugin.json',
           ]

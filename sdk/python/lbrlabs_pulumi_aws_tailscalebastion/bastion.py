@@ -14,15 +14,57 @@ __all__ = ['BastionArgs', 'Bastion']
 @pulumi.input_type
 class BastionArgs:
     def __init__(__self__, *,
-                 vpc_id: pulumi.Input[str],
-                 subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None):
+                 region: pulumi.Input[str],
+                 route: pulumi.Input[str],
+                 subnet_ids: pulumi.Input[Sequence[pulumi.Input[str]]],
+                 vpc_id: pulumi.Input[str]):
         """
         The set of arguments for constructing a Bastion resource.
+        :param pulumi.Input[str] region: The AWS region you're using
+        :param pulumi.Input[str] route: The route you'd like to advertise via tailscale
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] subnet_ids: The subnet Ids to launch instances in
         :param pulumi.Input[str] vpc_id: The VPC the Bastion should be created in
         """
+        pulumi.set(__self__, "region", region)
+        pulumi.set(__self__, "route", route)
+        pulumi.set(__self__, "subnet_ids", subnet_ids)
         pulumi.set(__self__, "vpc_id", vpc_id)
-        if subnet_ids is not None:
-            pulumi.set(__self__, "subnet_ids", subnet_ids)
+
+    @property
+    @pulumi.getter
+    def region(self) -> pulumi.Input[str]:
+        """
+        The AWS region you're using
+        """
+        return pulumi.get(self, "region")
+
+    @region.setter
+    def region(self, value: pulumi.Input[str]):
+        pulumi.set(self, "region", value)
+
+    @property
+    @pulumi.getter
+    def route(self) -> pulumi.Input[str]:
+        """
+        The route you'd like to advertise via tailscale
+        """
+        return pulumi.get(self, "route")
+
+    @route.setter
+    def route(self, value: pulumi.Input[str]):
+        pulumi.set(self, "route", value)
+
+    @property
+    @pulumi.getter(name="subnetIds")
+    def subnet_ids(self) -> pulumi.Input[Sequence[pulumi.Input[str]]]:
+        """
+        The subnet Ids to launch instances in
+        """
+        return pulumi.get(self, "subnet_ids")
+
+    @subnet_ids.setter
+    def subnet_ids(self, value: pulumi.Input[Sequence[pulumi.Input[str]]]):
+        pulumi.set(self, "subnet_ids", value)
 
     @property
     @pulumi.getter(name="vpcId")
@@ -36,21 +78,14 @@ class BastionArgs:
     def vpc_id(self, value: pulumi.Input[str]):
         pulumi.set(self, "vpc_id", value)
 
-    @property
-    @pulumi.getter(name="subnetIds")
-    def subnet_ids(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]:
-        return pulumi.get(self, "subnet_ids")
-
-    @subnet_ids.setter
-    def subnet_ids(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]):
-        pulumi.set(self, "subnet_ids", value)
-
 
 class Bastion(pulumi.ComponentResource):
     @overload
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 region: Optional[pulumi.Input[str]] = None,
+                 route: Optional[pulumi.Input[str]] = None,
                  subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  vpc_id: Optional[pulumi.Input[str]] = None,
                  __props__=None):
@@ -58,6 +93,9 @@ class Bastion(pulumi.ComponentResource):
         Create a Bastion resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[str] region: The AWS region you're using
+        :param pulumi.Input[str] route: The route you'd like to advertise via tailscale
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] subnet_ids: The subnet Ids to launch instances in
         :param pulumi.Input[str] vpc_id: The VPC the Bastion should be created in
         """
         ...
@@ -83,6 +121,8 @@ class Bastion(pulumi.ComponentResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 region: Optional[pulumi.Input[str]] = None,
+                 route: Optional[pulumi.Input[str]] = None,
                  subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  vpc_id: Optional[pulumi.Input[str]] = None,
                  __props__=None):
@@ -96,6 +136,14 @@ class Bastion(pulumi.ComponentResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = BastionArgs.__new__(BastionArgs)
 
+            if region is None and not opts.urn:
+                raise TypeError("Missing required property 'region'")
+            __props__.__dict__["region"] = region
+            if route is None and not opts.urn:
+                raise TypeError("Missing required property 'route'")
+            __props__.__dict__["route"] = route
+            if subnet_ids is None and not opts.urn:
+                raise TypeError("Missing required property 'subnet_ids'")
             __props__.__dict__["subnet_ids"] = subnet_ids
             if vpc_id is None and not opts.urn:
                 raise TypeError("Missing required property 'vpc_id'")
