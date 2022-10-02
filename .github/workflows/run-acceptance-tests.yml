@@ -5,7 +5,7 @@ env:
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}
-  PROVIDER: harness
+  PROVIDER: aws-tailscale
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   PULUMI_API: https://api.pulumi.com
   PULUMI_GO_DEP_ROOT: ${{ github.workspace }}/..
@@ -57,7 +57,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{matrix.pythonversion}}
-    - name: Download provider + tfgen binaries
+    - name: Download provider binary
       uses: actions/download-artifact@v2
       with:
         name: ${{ env.PROVIDER }}-provider.tar.gz
@@ -149,7 +149,7 @@ jobs:
       uses: jaxxstorm/action-install-gh-release@v1.2.0
       with:
         repo: mikhailshilkov/schema-tools
-    - name: Build tfgen & provider binaries
+    - name: Build provider binary
       run: make provider
     # - if: github.event_name == 'pull_request'
     #   name: Check Schema is Valid
@@ -167,9 +167,7 @@ jobs:
 
     #       ${{ env.SCHEMA_CHANGES }}
     - name: Tar provider binaries
-      run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace
-        }}/bin/ pulumi-resource-${{ env.PROVIDER }} pulumi-tfgen-${{ env.PROVIDER
-        }}
+      run: tar -zcf ${{ github.workspace }}/bin/provider.tar.gz -C ${{ github.workspace }}/bin/ pulumi-resource-${{ env.PROVIDER }}
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -228,7 +226,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{matrix.pythonversion}}
-    - name: Download provider + tfgen binaries
+    - name: Download provider binary
       uses: actions/download-artifact@v2
       with:
         name: ${{ env.PROVIDER }}-provider.tar.gz
