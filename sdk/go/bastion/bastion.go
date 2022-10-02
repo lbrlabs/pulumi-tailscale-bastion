@@ -25,9 +25,19 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
+	if args.Region == nil {
+		return nil, errors.New("invalid value for required argument 'Region'")
+	}
+	if args.Route == nil {
+		return nil, errors.New("invalid value for required argument 'Route'")
+	}
+	if args.SubnetIds == nil {
+		return nil, errors.New("invalid value for required argument 'SubnetIds'")
+	}
 	if args.VpcId == nil {
 		return nil, errors.New("invalid value for required argument 'VpcId'")
 	}
+	opts = pkgResourceDefaultOpts(opts)
 	var resource Bastion
 	err := ctx.RegisterRemoteComponentResource("aws-tailscale:index:Bastion", name, args, &resource, opts...)
 	if err != nil {
@@ -37,6 +47,11 @@ func NewBastion(ctx *pulumi.Context,
 }
 
 type bastionArgs struct {
+	// The AWS region you're using
+	Region string `pulumi:"region"`
+	// The route you'd like to advertise via tailscale
+	Route string `pulumi:"route"`
+	// The subnet Ids to launch instances in
 	SubnetIds []string `pulumi:"subnetIds"`
 	// The VPC the Bastion should be created in
 	VpcId string `pulumi:"vpcId"`
@@ -44,6 +59,11 @@ type bastionArgs struct {
 
 // The set of arguments for constructing a Bastion resource.
 type BastionArgs struct {
+	// The AWS region you're using
+	Region pulumi.StringInput
+	// The route you'd like to advertise via tailscale
+	Route pulumi.StringInput
+	// The subnet Ids to launch instances in
 	SubnetIds pulumi.StringArrayInput
 	// The VPC the Bastion should be created in
 	VpcId pulumi.StringInput
