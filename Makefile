@@ -14,14 +14,14 @@ GOPATH          := $(shell go env GOPATH)
 
 generate:: gen_go_sdk gen_dotnet_sdk gen_nodejs_sdk gen_python_sdk
 
-build:: build_provider build_dotnet_sdk build_nodejs_sdk build_python_sdk
+build:: provider build_dotnet_sdk build_nodejs_sdk build_python_sdk
 
 install:: install_provider install_dotnet_sdk install_nodejs_sdk
 
 
 # Provider
 
-build_provider::
+provider::
 	rm -rf ${WORKING_DIR}/bin/${PROVIDER}
 	cd provider/cmd/${PROVIDER} && VERSION=${VERSION} SCHEMA=${SCHEMA_PATH} go generate main.go
 	cd provider/cmd/${PROVIDER} && go build -o ${WORKING_DIR}/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" .
