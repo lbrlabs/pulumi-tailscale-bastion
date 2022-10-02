@@ -25,9 +25,10 @@ development:: install_plugins provider lint_provider build_sdks # Build the prov
 build:: install_plugins provider build_sdks install_sdks
 only_build:: build
 
-
-provider:: install_plugins # build the provider binary
+generate_schema::
 	cd provider/cmd/${PROVIDER} && VERSION=${VERSION} SCHEMA=${SCHEMA_PATH} go generate main.go
+
+provider:: install_plugins generate_schema # build the provider binary
 	cd provider/cmd/${PROVIDER} && go build -o ${WORKING_DIR}/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" .
 
 build_sdks:: install_plugins provider build_nodejs build_python build_go build_dotnet  # build all the sdks
