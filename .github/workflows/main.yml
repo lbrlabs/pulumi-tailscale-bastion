@@ -309,7 +309,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{matrix.pythonversion}}
-    - name: Download provider+ tfgen binary
+    - name: Download provider binary
       uses: actions/download-artifact@v2
       with:
         name: ${{ env.PROVIDER }}-provider.tar.gz
