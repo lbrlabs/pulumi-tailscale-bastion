@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/pkg/errors v0.9.1
+	github.com/pulumi/pulumi-aws/sdk/v5 v5.16.0
 	github.com/pulumi/pulumi-tailscale/sdk v0.11.0
 	github.com/pulumi/pulumi/pkg/v3 v3.40.2
 	github.com/pulumi/pulumi/sdk/v3 v3.40.2
@@ -114,7 +115,6 @@ require (
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/pkg/term v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/pulumi/pulumi-aws/sdk/v5 v5.16.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect

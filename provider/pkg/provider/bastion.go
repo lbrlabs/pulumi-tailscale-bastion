@@ -2,7 +2,7 @@ package provider
 
 import (
 	"bytes"
-	_ "embed"
+	_ "embed" // embed needs to be a blank import
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -23,7 +23,7 @@ var (
 
 // The set of arguments for creating a Bastion component resource.
 type BastionArgs struct {
-	VpcId     pulumi.StringInput      `pulumi:"vpcId"`
+	VpcID     pulumi.StringInput      `pulumi:"vpcId"`
 	SubnetIds pulumi.StringArrayInput `pulumi:"subnetIds"`
 	Route     pulumi.StringInput      `pulumi:"route"`
 	Region    pulumi.StringInput      `pulumi:"region"`
@@ -160,7 +160,7 @@ func NewBastion(ctx *pulumi.Context,
 	}
 
 	sg, err := ec2.NewSecurityGroup(ctx, name, &ec2.SecurityGroupArgs{
-		VpcId: args.VpcId,
+		VpcId: args.VpcID,
 		Ingress: ec2.SecurityGroupIngressArray{
 			ec2.SecurityGroupIngressArgs{
 				Protocol: pulumi.String("icmp"),
@@ -215,7 +215,10 @@ func NewBastion(ctx *pulumi.Context,
 			var userDataBytes bytes.Buffer
 
 			userDataTemplate := template.New("userdata")
-			userDataTemplate.Parse(userData)
+			userDataTemplate, err = userDataTemplate.Parse(userData)
+			if err != nil {
+				return "", err
+			}
 			err := userDataTemplate.Execute(&userDataBytes, d)
 			if err != nil {
 				return "", err

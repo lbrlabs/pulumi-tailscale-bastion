@@ -1,3 +1,3 @@
-// Package bastion exports types, functions, subpackages for provisioning bastion resources.
+// A Pulumi package for creating a tailscale bastion in AWS.
 
 package bastion
