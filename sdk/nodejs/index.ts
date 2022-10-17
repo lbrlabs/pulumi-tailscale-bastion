@@ -8,13 +8,13 @@ import * as utilities from "./utilities";
 export { BastionArgs } from "./bastion";
 export type Bastion = import("./bastion").Bastion;
 export const Bastion: typeof import("./bastion").Bastion = null as any;
+utilities.lazyLoad(exports, ["Bastion"], () => require("./bastion"));
 
 export { ProviderArgs } from "./provider";
 export type Provider = import("./provider").Provider;
 export const Provider: typeof import("./provider").Provider = null as any;
-
-utilities.lazyLoad(exports, ["Bastion"], () => require("./bastion"));
 utilities.lazyLoad(exports, ["Provider"], () => require("./provider"));
+
 
 const _module = {
     version: utilities.getVersion(),
