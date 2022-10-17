@@ -1,17 +1,2 @@
 name: yaml_aws_tailscalebastion
-runtime: yaml
-resources:
-  vpc:
-    type: awsx:ec2:Vpc
-    properties:
-      cidrBlock: "172.20.0.0/22"
-  bastion:
-    type: "aws-tailscale:index:Bastion"
-    properties:
-      vpcId: ${vpc.vpcId}
-      subnetIds: ${vpc.privateSubnetIds}
-      route: "172.20.0.0/22"
-      region: "us-west-2"
-      
-outputs:
-  url: ${vpc.vpcId}
+runtime: dotnet

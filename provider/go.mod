@@ -1,4 +1,4 @@
-module github.com/lbrlabs/pulumi-aws-tailscalebastion
+module github.com/lbrlabs/pulumi-aws-tailscale
 
 go 1.19
 
