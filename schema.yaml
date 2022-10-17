@@ -4,24 +4,29 @@ name: aws-tailscale
 pluginDownloadUrl: "github://api.github.com/lbrlabs"
 description: "A Pulumi package for creating a tailscale bastion in AWS."
 repository: "https://github.com/lbrlabs/pulumi-aws-tailscalebastion"
+publisher: "lbrlabs"
+displayname: "aws-tailscale-bastion"
 resources:
   aws-tailscale:index:Bastion:
     isComponent: true
     inputProperties:
       vpcId:
         type: string
-        description: "The VPC the Bastion should be created in"
+        description: "The VPC the Bastion should be created in."
       subnetIds:
         type: array
         items:
           type: string
-        description: "The subnet Ids to launch instances in"
+        description: "The subnet Ids to launch instances in."
       route:
         type: string
-        description: "The route you'd like to advertise via tailscale"
+        description: "The route you'd like to advertise via tailscale."
       region:
         type: string
-        description: "The AWS region you're using"
+        description: "The AWS region you're using."
+      instanceType:
+        type: string
+        description: "The EC2 instance type to use for the bastion."
     requiredInputs:
       - vpcId
       - subnetIds

@@ -23,10 +23,11 @@ var (
 
 // The set of arguments for creating a Bastion component resource.
 type BastionArgs struct {
-	VpcID     pulumi.StringInput      `pulumi:"vpcId"`
-	SubnetIds pulumi.StringArrayInput `pulumi:"subnetIds"`
-	Route     pulumi.StringInput      `pulumi:"route"`
-	Region    pulumi.StringInput      `pulumi:"region"`
+	VpcID        pulumi.StringInput      `pulumi:"vpcId"`
+	SubnetIds    pulumi.StringArrayInput `pulumi:"subnetIds"`
+	Route        pulumi.StringInput      `pulumi:"route"`
+	Region       pulumi.StringInput      `pulumi:"region"`
+	InstanceType pulumi.StringInput      `pulumi:"instanceType"`
 }
 
 type UserDataArgs struct {
@@ -50,6 +51,11 @@ func NewBastion(ctx *pulumi.Context,
 	}
 
 	component := &Bastion{}
+
+	err := ctx.RegisterComponentResource("aws-tailscale:index:Bastion", name, component, opts...)
+	if err != nil {
+		return nil, err
+	}
 
 	// create a tailnet key to auth devices
 	tailnetKey, err := tailscale.NewTailnetKey(ctx, name, &tailscale.TailnetKeyArgs{
@@ -195,6 +201,12 @@ func NewBastion(ctx *pulumi.Context,
 				},
 			},
 			ec2.GetAmiFilterArgs{
+				Name: pulumi.String("virtualization-type"),
+				Values: pulumi.StringArray{
+					pulumi.String("hvm"),
+				},
+			},
+			ec2.GetAmiFilterArgs{
 				Name: pulumi.String("name"),
 				Values: pulumi.StringArray{
 					pulumi.String("amzn2-ami-hvm*"),
@@ -229,8 +241,15 @@ func NewBastion(ctx *pulumi.Context,
 		},
 	).(pulumi.StringOutput)
 
+	var instanceType pulumi.String
+	if args.InstanceType == nil {
+		instanceType = pulumi.String("t3.micro")
+	} else {
+		instanceType = args.InstanceType.(pulumi.String)
+	}
+
 	launchConfiguration, err := ec2.NewLaunchConfiguration(ctx, name, &ec2.LaunchConfigurationArgs{
-		InstanceType:             pulumi.String("t3.micro"),
+		InstanceType:             instanceType,
 		AssociatePublicIpAddress: pulumi.Bool(false),
 		ImageId:                  ami.Id(),
 		SecurityGroups: pulumi.StringArray{
@@ -250,14 +269,16 @@ func NewBastion(ctx *pulumi.Context,
 		HealthCheckType:        pulumi.String("EC2"),
 		HealthCheckGracePeriod: pulumi.Int(30),
 		VpcZoneIdentifiers:     args.SubnetIds,
+		Tags: autoscaling.GroupTagArray{
+			autoscaling.GroupTagArgs{
+				Key:               pulumi.String("Name"),
+				Value:             pulumi.String(fmt.Sprintf("%s-tailscale-bastion", name)),
+				PropagateAtLaunch: pulumi.Bool(true),
+			},
+		},
 	}, pulumi.Parent(launchConfiguration))
 	if err != nil {
 		return nil, fmt.Errorf("error creating asg: %v", err)
-	}
-
-	err = ctx.RegisterComponentResource("aws-tailscale:index:Bastion", name, component, opts...)
-	if err != nil {
-		return nil, err
 	}
 
 	if err := ctx.RegisterResourceOutputs(component, pulumi.Map{

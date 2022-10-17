@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Pulumi Corp.</Authors>
-    <Company>Pulumi Corp.</Company>
+    <Authors>lbrlabs</Authors>
+    <Company>lbrlabs</Company>
     <Description>A Pulumi package for creating a tailscale bastion in AWS.</Description>
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageProjectUrl></PackageProjectUrl>

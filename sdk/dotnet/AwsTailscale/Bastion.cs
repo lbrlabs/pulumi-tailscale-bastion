@@ -49,13 +49,19 @@ namespace Lbrlabs.PulumiPackage.AwsTailscale
     public sealed class BastionArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// The AWS region you're using
+        /// The EC2 instance type to use for the bastion.
+        /// </summary>
+        [Input("instanceType")]
+        public Input<string>? InstanceType { get; set; }
+
+        /// <summary>
+        /// The AWS region you're using.
         /// </summary>
         [Input("region", required: true)]
         public Input<string> Region { get; set; } = null!;
 
         /// <summary>
-        /// The route you'd like to advertise via tailscale
+        /// The route you'd like to advertise via tailscale.
         /// </summary>
         [Input("route", required: true)]
         public Input<string> Route { get; set; } = null!;
@@ -64,7 +70,7 @@ namespace Lbrlabs.PulumiPackage.AwsTailscale
         private InputList<string>? _subnetIds;
 
         /// <summary>
-        /// The subnet Ids to launch instances in
+        /// The subnet Ids to launch instances in.
         /// </summary>
         public InputList<string> SubnetIds
         {
@@ -73,7 +79,7 @@ namespace Lbrlabs.PulumiPackage.AwsTailscale
         }
 
         /// <summary>
-        /// The VPC the Bastion should be created in
+        /// The VPC the Bastion should be created in.
         /// </summary>
         [Input("vpcId", required: true)]
         public Input<string> VpcId { get; set; } = null!;

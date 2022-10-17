@@ -47,6 +47,7 @@ export class Bastion extends pulumi.ComponentResource {
             if ((!args || args.vpcId === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'vpcId'");
             }
+            resourceInputs["instanceType"] = args ? args.instanceType : undefined;
             resourceInputs["region"] = args ? args.region : undefined;
             resourceInputs["route"] = args ? args.route : undefined;
             resourceInputs["subnetIds"] = args ? args.subnetIds : undefined;
@@ -65,19 +66,23 @@ export class Bastion extends pulumi.ComponentResource {
  */
 export interface BastionArgs {
     /**
-     * The AWS region you're using
+     * The EC2 instance type to use for the bastion.
+     */
+    instanceType?: pulumi.Input<string>;
+    /**
+     * The AWS region you're using.
      */
     region: pulumi.Input<string>;
     /**
-     * The route you'd like to advertise via tailscale
+     * The route you'd like to advertise via tailscale.
      */
     route: pulumi.Input<string>;
     /**
-     * The subnet Ids to launch instances in
+     * The subnet Ids to launch instances in.
      */
     subnetIds: pulumi.Input<pulumi.Input<string>[]>;
     /**
-     * The VPC the Bastion should be created in
+     * The VPC the Bastion should be created in.
      */
     vpcId: pulumi.Input<string>;
 }

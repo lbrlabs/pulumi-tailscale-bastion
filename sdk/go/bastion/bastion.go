@@ -47,25 +47,29 @@ func NewBastion(ctx *pulumi.Context,
 }
 
 type bastionArgs struct {
-	// The AWS region you're using
+	// The EC2 instance type to use for the bastion.
+	InstanceType *string `pulumi:"instanceType"`
+	// The AWS region you're using.
 	Region string `pulumi:"region"`
-	// The route you'd like to advertise via tailscale
+	// The route you'd like to advertise via tailscale.
 	Route string `pulumi:"route"`
-	// The subnet Ids to launch instances in
+	// The subnet Ids to launch instances in.
 	SubnetIds []string `pulumi:"subnetIds"`
-	// The VPC the Bastion should be created in
+	// The VPC the Bastion should be created in.
 	VpcId string `pulumi:"vpcId"`
 }
 
 // The set of arguments for constructing a Bastion resource.
 type BastionArgs struct {
-	// The AWS region you're using
+	// The EC2 instance type to use for the bastion.
+	InstanceType pulumi.StringPtrInput
+	// The AWS region you're using.
 	Region pulumi.StringInput
-	// The route you'd like to advertise via tailscale
+	// The route you'd like to advertise via tailscale.
 	Route pulumi.StringInput
-	// The subnet Ids to launch instances in
+	// The subnet Ids to launch instances in.
 	SubnetIds pulumi.StringArrayInput
-	// The VPC the Bastion should be created in
+	// The VPC the Bastion should be created in.
 	VpcId pulumi.StringInput
 }
 
