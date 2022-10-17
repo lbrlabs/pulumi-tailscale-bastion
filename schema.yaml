@@ -3,7 +3,7 @@
 name: aws-tailscale
 pluginDownloadUrl: "github://api.github.com/lbrlabs"
 description: "A Pulumi package for creating a tailscale bastion in AWS."
-repository: "https://github.com/lbrlabs/pulumi-aws-tailscalebastion"
+repository: "https://github.com/lbrlabs/pulumi-aws-tailscale"
 publisher: "lbrlabs"
 displayname: "aws-tailscale-bastion"
 resources:

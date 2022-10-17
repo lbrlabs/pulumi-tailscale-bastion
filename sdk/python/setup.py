@@ -46,7 +46,7 @@ setup(name='lbrlabs_pulumi_aws_tailscalebastion',
           'install': InstallPluginCommand,
       },
       project_urls={
-          'Repository': 'https://github.com/lbrlabs/pulumi-aws-tailscalebastion'
+          'Repository': 'https://github.com/lbrlabs/pulumi-aws-tailscale'
       },
       packages=find_packages(),
       package_data={
