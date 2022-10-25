@@ -7,8 +7,8 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pulumi/pulumi-aws/sdk/v5 v5.18.0
 	github.com/pulumi/pulumi-tailscale/sdk v0.11.0
-	github.com/pulumi/pulumi/pkg/v3 v3.43.1
-	github.com/pulumi/pulumi/sdk/v3 v3.43.1
+	github.com/pulumi/pulumi/pkg/v3 v3.44.1
+	github.com/pulumi/pulumi/sdk/v3 v3.44.1
 )
 
 require (
