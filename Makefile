@@ -1,4 +1,4 @@
-PACK             := aws-tailscale
+PACK             := tailscale-bastion
 ORG              := lbrlabs
 PROJECT          := github.com/${ORG}/pulumi-${PACK}
 NODE_MODULE_NAME := @lbrlabs/${PACK}

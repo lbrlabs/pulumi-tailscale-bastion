@@ -7,7 +7,7 @@
     <Description>A Pulumi package for creating a tailscale bastion in AWS.</Description>
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageProjectUrl></PackageProjectUrl>
-    <RepositoryUrl>https://github.com/lbrlabs/pulumi-aws-tailscale</RepositoryUrl>
+    <RepositoryUrl>https://github.com/lbrlabs/pulumi-tailscale-bastion</RepositoryUrl>
     <PackageIcon>logo.png</PackageIcon>
 
     <TargetFramework>netcoreapp3.1</TargetFramework>

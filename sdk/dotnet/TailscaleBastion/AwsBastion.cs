@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 using Pulumi.Serialization;
 using Pulumi;
 
-namespace Lbrlabs.PulumiPackage.AwsTailscale
+namespace Lbrlabs.PulumiPackage.TailscaleBastion
 {
-    [AwsTailscaleResourceType("aws-tailscale:index:Bastion")]
-    public partial class Bastion : global::Pulumi.ComponentResource
+    [TailscaleBastionResourceType("tailscale-bastion:index:AwsBastion")]
+    public partial class AwsBastion : global::Pulumi.ComponentResource
     {
         /// <summary>
         /// The name of the ASG that managed the bastion instances
@@ -21,14 +21,14 @@ namespace Lbrlabs.PulumiPackage.AwsTailscale
 
 
         /// <summary>
-        /// Create a Bastion resource with the given unique name, arguments, and options.
+        /// Create a AwsBastion resource with the given unique name, arguments, and options.
         /// </summary>
         ///
         /// <param name="name">The unique name of the resource</param>
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public Bastion(string name, BastionArgs args, ComponentResourceOptions? options = null)
-            : base("aws-tailscale:index:Bastion", name, args ?? new BastionArgs(), MakeResourceOptions(options, ""), remote: true)
+        public AwsBastion(string name, AwsBastionArgs args, ComponentResourceOptions? options = null)
+            : base("tailscale-bastion:index:AwsBastion", name, args ?? new AwsBastionArgs(), MakeResourceOptions(options, ""), remote: true)
         {
         }
 
@@ -46,7 +46,7 @@ namespace Lbrlabs.PulumiPackage.AwsTailscale
         }
     }
 
-    public sealed class BastionArgs : global::Pulumi.ResourceArgs
+    public sealed class AwsBastionArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
         /// The EC2 instance type to use for the bastion.
@@ -84,9 +84,9 @@ namespace Lbrlabs.PulumiPackage.AwsTailscale
         [Input("vpcId", required: true)]
         public Input<string> VpcId { get; set; } = null!;
 
-        public BastionArgs()
+        public AwsBastionArgs()
         {
         }
-        public static new BastionArgs Empty => new BastionArgs();
+        public static new AwsBastionArgs Empty => new AwsBastionArgs();
     }
 }

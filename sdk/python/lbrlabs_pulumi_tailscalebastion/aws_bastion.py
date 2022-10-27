@@ -9,10 +9,10 @@ import pulumi.runtime
 from typing import Any, Mapping, Optional, Sequence, Union, overload
 from . import _utilities
 
-__all__ = ['BastionArgs', 'Bastion']
+__all__ = ['AwsBastionArgs', 'AwsBastion']
 
 @pulumi.input_type
-class BastionArgs:
+class AwsBastionArgs:
     def __init__(__self__, *,
                  region: pulumi.Input[str],
                  route: pulumi.Input[str],
@@ -20,7 +20,7 @@ class BastionArgs:
                  vpc_id: pulumi.Input[str],
                  instance_type: Optional[pulumi.Input[str]] = None):
         """
-        The set of arguments for constructing a Bastion resource.
+        The set of arguments for constructing a AwsBastion resource.
         :param pulumi.Input[str] region: The AWS region you're using.
         :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] subnet_ids: The subnet Ids to launch instances in.
@@ -95,7 +95,7 @@ class BastionArgs:
         pulumi.set(self, "instance_type", value)
 
 
-class Bastion(pulumi.ComponentResource):
+class AwsBastion(pulumi.ComponentResource):
     @overload
     def __init__(__self__,
                  resource_name: str,
@@ -107,7 +107,7 @@ class Bastion(pulumi.ComponentResource):
                  vpc_id: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
-        Create a Bastion resource with the given unique name, props, and options.
+        Create a AwsBastion resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
@@ -120,17 +120,17 @@ class Bastion(pulumi.ComponentResource):
     @overload
     def __init__(__self__,
                  resource_name: str,
-                 args: BastionArgs,
+                 args: AwsBastionArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        Create a Bastion resource with the given unique name, props, and options.
+        Create a AwsBastion resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
-        :param BastionArgs args: The arguments to use to populate this resource's properties.
+        :param AwsBastionArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
         """
         ...
     def __init__(__self__, resource_name: str, *args, **kwargs):
-        resource_args, opts = _utilities.get_resource_args_opts(BastionArgs, pulumi.ResourceOptions, *args, **kwargs)
+        resource_args, opts = _utilities.get_resource_args_opts(AwsBastionArgs, pulumi.ResourceOptions, *args, **kwargs)
         if resource_args is not None:
             __self__._internal_init(resource_name, opts, **resource_args.__dict__)
         else:
@@ -153,7 +153,7 @@ class Bastion(pulumi.ComponentResource):
         else:
             if __props__ is not None:
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
-            __props__ = BastionArgs.__new__(BastionArgs)
+            __props__ = AwsBastionArgs.__new__(AwsBastionArgs)
 
             __props__.__dict__["instance_type"] = instance_type
             if region is None and not opts.urn:
@@ -169,8 +169,8 @@ class Bastion(pulumi.ComponentResource):
                 raise TypeError("Missing required property 'vpc_id'")
             __props__.__dict__["vpc_id"] = vpc_id
             __props__.__dict__["asg_name"] = None
-        super(Bastion, __self__).__init__(
-            'aws-tailscale:index:Bastion',
+        super(AwsBastion, __self__).__init__(
+            'tailscale-bastion:index:AwsBastion',
             resource_name,
             __props__,
             opts,

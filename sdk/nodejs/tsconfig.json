@@ -13,7 +13,8 @@
         "strict": true
     },
     "files": [
-        "bastion.ts",
+        "aws/bastion.ts",
+        "aws/index.ts",
         "index.ts",
         "provider.ts",
         "utilities.ts"
