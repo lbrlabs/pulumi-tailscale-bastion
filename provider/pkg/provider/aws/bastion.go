@@ -52,7 +52,7 @@ func NewBastion(ctx *pulumi.Context,
 
 	component := &Bastion{}
 
-	err := ctx.RegisterComponentResource("aws-tailscale:index:Bastion", name, component, opts...)
+	err := ctx.RegisterComponentResource("tailscale-bastion:aws:Bastion", name, component, opts...)
 	if err != nil {
 		return nil, err
 	}
