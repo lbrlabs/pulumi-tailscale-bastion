@@ -1,5 +1,5 @@
 {
   "resource": true,
-  "name": "aws-tailscale",
+  "name": "tailscale-bastion",
   "server": "github://api.github.com/lbrlabs"
 }

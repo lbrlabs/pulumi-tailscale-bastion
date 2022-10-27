@@ -4,19 +4,19 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
-export class Bastion extends pulumi.ComponentResource {
+export class AwsBastion extends pulumi.ComponentResource {
     /** @internal */
-    public static readonly __pulumiType = 'aws-tailscale:index:Bastion';
+    public static readonly __pulumiType = 'tailscale-bastion:index:AwsBastion';
 
     /**
-     * Returns true if the given object is an instance of Bastion.  This is designed to work even
+     * Returns true if the given object is an instance of AwsBastion.  This is designed to work even
      * when multiple copies of the Pulumi SDK have been loaded into the same process.
      */
-    public static isInstance(obj: any): obj is Bastion {
+    public static isInstance(obj: any): obj is AwsBastion {
         if (obj === undefined || obj === null) {
             return false;
         }
-        return obj['__pulumiType'] === Bastion.__pulumiType;
+        return obj['__pulumiType'] === AwsBastion.__pulumiType;
     }
 
     /**
@@ -25,13 +25,13 @@ export class Bastion extends pulumi.ComponentResource {
     public /*out*/ readonly asgName!: pulumi.Output<string>;
 
     /**
-     * Create a Bastion resource with the given unique name, arguments, and options.
+     * Create a AwsBastion resource with the given unique name, arguments, and options.
      *
      * @param name The _unique_ name of the resource.
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(name: string, args: BastionArgs, opts?: pulumi.ComponentResourceOptions) {
+    constructor(name: string, args: AwsBastionArgs, opts?: pulumi.ComponentResourceOptions) {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
@@ -57,14 +57,14 @@ export class Bastion extends pulumi.ComponentResource {
             resourceInputs["asgName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
-        super(Bastion.__pulumiType, name, resourceInputs, opts, true /*remote*/);
+        super(AwsBastion.__pulumiType, name, resourceInputs, opts, true /*remote*/);
     }
 }
 
 /**
- * The set of arguments for constructing a Bastion resource.
+ * The set of arguments for constructing a AwsBastion resource.
  */
-export interface BastionArgs {
+export interface AwsBastionArgs {
     /**
      * The EC2 instance type to use for the bastion.
      */

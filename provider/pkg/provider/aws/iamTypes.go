@@ -1,4 +1,4 @@
-package provider
+package aws
 
 type AssumeRolePolicy struct {
 	Version   string      `json:"Version"`

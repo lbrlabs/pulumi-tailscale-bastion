@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using Pulumi.Serialization;
 using Pulumi;
 
-namespace Lbrlabs.PulumiPackage.AwsTailscale
+namespace Lbrlabs.PulumiPackage.TailscaleBastion
 {
-    [AwsTailscaleResourceType("pulumi:providers:aws-tailscale")]
+    [TailscaleBastionResourceType("pulumi:providers:tailscale-bastion")]
     public partial class Provider : global::Pulumi.ProviderResource
     {
         /// <summary>
@@ -21,7 +21,7 @@ namespace Lbrlabs.PulumiPackage.AwsTailscale
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
         public Provider(string name, ProviderArgs? args = null, CustomResourceOptions? options = null)
-            : base("aws-tailscale", name, args ?? new ProviderArgs(), MakeResourceOptions(options, ""))
+            : base("tailscale-bastion", name, args ?? new ProviderArgs(), MakeResourceOptions(options, ""))
         {
         }
 

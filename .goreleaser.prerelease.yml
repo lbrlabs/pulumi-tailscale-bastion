@@ -5,7 +5,7 @@ before:
   hooks:
   - make generate_schema
 builds:
-- binary: pulumi-resource-aws-tailscale
+- binary: pulumi-resource-tailscale-bastion
   dir: provider
   env:
   - CGO_ENABLED=0
@@ -20,8 +20,8 @@ builds:
   ldflags:
   - -s
   - -w
-  - -X github.com/lbrlabs/pulumi-aws-tailscale/provider/pkg/version.Version={{.Tag}}
-  main: ./cmd/pulumi-resource-aws-tailscale/
+  - -X github.com/lbrlabs/pulumi-tailscale-bastion/provider/pkg/version.Version={{.Tag}}
+  main: ./cmd/pulumi-resource-tailscale-bastion/
 changelog:
   skip: true
 release:

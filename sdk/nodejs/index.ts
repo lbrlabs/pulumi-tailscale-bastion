@@ -5,33 +5,22 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 // Export members:
-export { BastionArgs } from "./bastion";
-export type Bastion = import("./bastion").Bastion;
-export const Bastion: typeof import("./bastion").Bastion = null as any;
-utilities.lazyLoad(exports, ["Bastion"], () => require("./bastion"));
-
 export { ProviderArgs } from "./provider";
 export type Provider = import("./provider").Provider;
 export const Provider: typeof import("./provider").Provider = null as any;
 utilities.lazyLoad(exports, ["Provider"], () => require("./provider"));
 
 
-const _module = {
-    version: utilities.getVersion(),
-    construct: (name: string, type: string, urn: string): pulumi.Resource => {
-        switch (type) {
-            case "aws-tailscale:index:Bastion":
-                return new Bastion(name, <any>undefined, { urn })
-            default:
-                throw new Error(`unknown resource type ${type}`);
-        }
-    },
+// Export sub-modules:
+import * as aws from "./aws";
+
+export {
+    aws,
 };
-pulumi.runtime.registerResourceModule("aws-tailscale", "index", _module)
-pulumi.runtime.registerResourcePackage("aws-tailscale", {
+pulumi.runtime.registerResourcePackage("tailscale-bastion", {
     version: utilities.getVersion(),
     constructProvider: (name: string, type: string, urn: string): pulumi.ProviderResource => {
-        if (type !== "pulumi:providers:aws-tailscale") {
+        if (type !== "pulumi:providers:tailscale-bastion") {
             throw new Error(`unknown provider type ${type}`);
         }
         return new Provider(name, <any>undefined, { urn });

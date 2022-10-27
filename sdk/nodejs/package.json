@@ -1,10 +1,10 @@
 {
-    "name": "@lbrlabs/pulumi-aws-tailscalebastion",
+    "name": "@lbrlabs/pulumi-tailscalebastion",
     "version": "${VERSION}",
-    "repository": "https://github.com/lbrlabs/pulumi-aws-tailscale",
+    "repository": "https://github.com/lbrlabs/pulumi-tailscale-bastion",
     "scripts": {
         "build": "tsc",
-        "install": "node scripts/install-pulumi-plugin.js resource aws-tailscale ${VERSION}"
+        "install": "node scripts/install-pulumi-plugin.js resource tailscale-bastion ${VERSION}"
     },
     "dependencies": {
         "@pulumi/aws": "^5.0.0",
@@ -18,7 +18,7 @@
     },
     "pulumi": {
         "resource": true,
-        "name": "aws-tailscale",
+        "name": "tailscale-bastion",
         "server": "github://api.github.com/lbrlabs"
     }
 }
