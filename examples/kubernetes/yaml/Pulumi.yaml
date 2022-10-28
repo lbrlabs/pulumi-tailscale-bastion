@@ -1,0 +1,13 @@
+name: yaml_kubernetes_tailscalebastion
+runtime: yaml
+resources:
+  bastion:
+    type: "tailscale-bastion:kubernetes:Bastion"
+    properties:
+      createNamespace: true
+      routes:
+        - 10.100.0.0/16
+        - 172.16.0.0/24
+      
+outputs:
+  name: ${bastion.deploymentName}

@@ -8,22 +8,16 @@ using System.Threading.Tasks;
 using Pulumi.Serialization;
 using Pulumi;
 
-namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
+namespace Lbrlabs.PulumiPackage.TailscaleBastion.Kubernetes
 {
-    [TailscaleBastionResourceType("tailscale-bastion:azure:Bastion")]
+    [TailscaleBastionResourceType("tailscale-bastion:kubernetes:Bastion")]
     public partial class Bastion : global::Pulumi.ComponentResource
     {
         /// <summary>
-        /// The SSH private key to access your bastion
+        /// The name of the kubernetes deployment that contains the tailscale bastion
         /// </summary>
-        [Output("privateKey")]
-        public Output<string> PrivateKey { get; private set; } = null!;
-
-        /// <summary>
-        /// The name of the Scaleset that managed the bastion instances
-        /// </summary>
-        [Output("scaleSetName")]
-        public Output<string> ScaleSetName { get; private set; } = null!;
+        [Output("deploymentName")]
+        public Output<string> DeploymentName { get; private set; } = null!;
 
 
         /// <summary>
@@ -34,7 +28,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
         public Bastion(string name, BastionArgs args, ComponentResourceOptions? options = null)
-            : base("tailscale-bastion:azure:Bastion", name, args ?? new BastionArgs(), MakeResourceOptions(options, ""), remote: true)
+            : base("tailscale-bastion:kubernetes:Bastion", name, args ?? new BastionArgs(), MakeResourceOptions(options, ""), remote: true)
         {
         }
 
@@ -55,34 +49,28 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
     public sealed class BastionArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// The Azure instance SKU to use for the bastion.
+        /// Whether we should create a new namespace.
         /// </summary>
-        [Input("instanceSku")]
-        public Input<string>? InstanceSku { get; set; }
+        [Input("createNamespace", required: true)]
+        public bool CreateNamespace { get; set; }
 
         /// <summary>
-        /// The Azure region you're using.
+        /// The bucket resource.
         /// </summary>
-        [Input("location", required: true)]
-        public Input<string> Location { get; set; } = null!;
+        [Input("namespace")]
+        public Input<Pulumi.Kubernetes.Core.V1.Namespace>? Namespace { get; set; }
+
+        [Input("routes", required: true)]
+        private InputList<string>? _routes;
 
         /// <summary>
-        /// The Azure resource group to create the bastion in.
+        /// The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
         /// </summary>
-        [Input("resourceGroupName", required: true)]
-        public Input<string> ResourceGroupName { get; set; } = null!;
-
-        /// <summary>
-        /// The route you'd like to advertise via tailscale.
-        /// </summary>
-        [Input("route", required: true)]
-        public Input<string> Route { get; set; } = null!;
-
-        /// <summary>
-        /// The subnet Ids to launch instances in.
-        /// </summary>
-        [Input("subnetId", required: true)]
-        public Input<string> SubnetId { get; set; } = null!;
+        public InputList<string> Routes
+        {
+            get => _routes ?? (_routes = new InputList<string>());
+            set => _routes = value;
+        }
 
         public BastionArgs()
         {

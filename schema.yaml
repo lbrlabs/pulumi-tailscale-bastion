@@ -75,12 +75,37 @@ resources:
     required:
       - asgName
       - privateKey
+  tailscale-bastion:kubernetes:Bastion:
+    isComponent: true
+    inputProperties:
+      createNamespace:
+        type: boolean
+        description: "Whether we should create a new namespace."
+        plain: true
+      namespace:
+        "$ref": "/kubernetes/v3.22.1/schema.json#/resources/kubernetes:core%2Fv1:Namespace"
+        description: The bucket resource.
+      routes:
+        type: array
+        items:
+          type: string
+        description: "The routes to advertise to tailscale. This is likely the Pod and Service CIDR."
+    requiredInputs:
+      - createNamespace
+      - routes
+    properties:
+      deploymentName:
+        type: string
+        description: "The name of the kubernetes deployment that contains the tailscale bastion"
+    required:
+      - deploymentName
 language:
   csharp:
     packageReferences:
       Pulumi: 3.*
       Pulumi.Aws: 5.*
       Pulumi.Azure: 5.*
+      Pulumi.Kubernetes: 3.*
       Pulumi.Tls: 4.*
       Pulumi.Tailscale: 0.*
     rootNamespace: "Lbrlabs.PulumiPackage"
@@ -92,6 +117,7 @@ language:
       "@pulumi/aws": "^5.0.0"
       "@pulumi/azure": "^5.0.0"
       "@pulumi/tls": "^4.0.0"
+      "@pulumi/kubernetes": "^3.0.0"
       "@pulumi/tailscale": "^0.11.0"
     devDependencies:
       typescript: "^3.7.0"
@@ -100,6 +126,7 @@ language:
     packageName: "lbrlabs_pulumi_tailscalebastion"
     requires:
       pulumi: ">=3.0.0,<4.0.0"
+      pulumi-kubernetes: ">=3.0.0,<4.0.0"
       pulumi-aws: ">=5.0.0,<6.0.0"
       pulumi-azure: ">=5.0.0,<6.0.0"
       pulumi-tls: ">=4.0.0,<5.0.0"
