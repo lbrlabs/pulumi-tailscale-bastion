@@ -22,7 +22,7 @@ resources:
       location:
         type: string
         description: "The Azure region you're using."
-      instanceSlu:
+      instanceSku:
         type: string
         description: "The Azure instance SKU to use for the bastion."
     requiredInputs:
