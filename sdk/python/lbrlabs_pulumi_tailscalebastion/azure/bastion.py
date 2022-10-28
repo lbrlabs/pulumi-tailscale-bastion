@@ -14,37 +14,49 @@ __all__ = ['BastionArgs', 'Bastion']
 @pulumi.input_type
 class BastionArgs:
     def __init__(__self__, *,
-                 region: pulumi.Input[str],
+                 location: pulumi.Input[str],
+                 resource_group_name: pulumi.Input[str],
                  route: pulumi.Input[str],
-                 subnet_ids: pulumi.Input[Sequence[pulumi.Input[str]]],
-                 vpc_id: pulumi.Input[str],
-                 instance_type: Optional[pulumi.Input[str]] = None):
+                 subnet_id: pulumi.Input[str],
+                 instance_slu: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Bastion resource.
-        :param pulumi.Input[str] region: The AWS region you're using.
+        :param pulumi.Input[str] location: The Azure region you're using.
+        :param pulumi.Input[str] resource_group_name: The Azure resource group to create the bastion in.
         :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
-        :param pulumi.Input[Sequence[pulumi.Input[str]]] subnet_ids: The subnet Ids to launch instances in.
-        :param pulumi.Input[str] vpc_id: The VPC the Bastion should be created in.
-        :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
+        :param pulumi.Input[str] subnet_id: The subnet Ids to launch instances in.
+        :param pulumi.Input[str] instance_slu: The Azure instance SKU to use for the bastion.
         """
-        pulumi.set(__self__, "region", region)
+        pulumi.set(__self__, "location", location)
+        pulumi.set(__self__, "resource_group_name", resource_group_name)
         pulumi.set(__self__, "route", route)
-        pulumi.set(__self__, "subnet_ids", subnet_ids)
-        pulumi.set(__self__, "vpc_id", vpc_id)
-        if instance_type is not None:
-            pulumi.set(__self__, "instance_type", instance_type)
+        pulumi.set(__self__, "subnet_id", subnet_id)
+        if instance_slu is not None:
+            pulumi.set(__self__, "instance_slu", instance_slu)
 
     @property
     @pulumi.getter
-    def region(self) -> pulumi.Input[str]:
+    def location(self) -> pulumi.Input[str]:
         """
-        The AWS region you're using.
+        The Azure region you're using.
         """
-        return pulumi.get(self, "region")
+        return pulumi.get(self, "location")
 
-    @region.setter
-    def region(self, value: pulumi.Input[str]):
-        pulumi.set(self, "region", value)
+    @location.setter
+    def location(self, value: pulumi.Input[str]):
+        pulumi.set(self, "location", value)
+
+    @property
+    @pulumi.getter(name="resourceGroupName")
+    def resource_group_name(self) -> pulumi.Input[str]:
+        """
+        The Azure resource group to create the bastion in.
+        """
+        return pulumi.get(self, "resource_group_name")
+
+    @resource_group_name.setter
+    def resource_group_name(self, value: pulumi.Input[str]):
+        pulumi.set(self, "resource_group_name", value)
 
     @property
     @pulumi.getter
@@ -59,40 +71,28 @@ class BastionArgs:
         pulumi.set(self, "route", value)
 
     @property
-    @pulumi.getter(name="subnetIds")
-    def subnet_ids(self) -> pulumi.Input[Sequence[pulumi.Input[str]]]:
+    @pulumi.getter(name="subnetId")
+    def subnet_id(self) -> pulumi.Input[str]:
         """
         The subnet Ids to launch instances in.
         """
-        return pulumi.get(self, "subnet_ids")
+        return pulumi.get(self, "subnet_id")
 
-    @subnet_ids.setter
-    def subnet_ids(self, value: pulumi.Input[Sequence[pulumi.Input[str]]]):
-        pulumi.set(self, "subnet_ids", value)
-
-    @property
-    @pulumi.getter(name="vpcId")
-    def vpc_id(self) -> pulumi.Input[str]:
-        """
-        The VPC the Bastion should be created in.
-        """
-        return pulumi.get(self, "vpc_id")
-
-    @vpc_id.setter
-    def vpc_id(self, value: pulumi.Input[str]):
-        pulumi.set(self, "vpc_id", value)
+    @subnet_id.setter
+    def subnet_id(self, value: pulumi.Input[str]):
+        pulumi.set(self, "subnet_id", value)
 
     @property
-    @pulumi.getter(name="instanceType")
-    def instance_type(self) -> Optional[pulumi.Input[str]]:
+    @pulumi.getter(name="instanceSlu")
+    def instance_slu(self) -> Optional[pulumi.Input[str]]:
         """
-        The EC2 instance type to use for the bastion.
+        The Azure instance SKU to use for the bastion.
         """
-        return pulumi.get(self, "instance_type")
+        return pulumi.get(self, "instance_slu")
 
-    @instance_type.setter
-    def instance_type(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "instance_type", value)
+    @instance_slu.setter
+    def instance_slu(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "instance_slu", value)
 
 
 class Bastion(pulumi.ComponentResource):
@@ -100,21 +100,21 @@ class Bastion(pulumi.ComponentResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 instance_type: Optional[pulumi.Input[str]] = None,
-                 region: Optional[pulumi.Input[str]] = None,
+                 instance_slu: Optional[pulumi.Input[str]] = None,
+                 location: Optional[pulumi.Input[str]] = None,
+                 resource_group_name: Optional[pulumi.Input[str]] = None,
                  route: Optional[pulumi.Input[str]] = None,
-                 subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
-                 vpc_id: Optional[pulumi.Input[str]] = None,
+                 subnet_id: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         """
         Create a Bastion resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
-        :param pulumi.Input[str] region: The AWS region you're using.
+        :param pulumi.Input[str] instance_slu: The Azure instance SKU to use for the bastion.
+        :param pulumi.Input[str] location: The Azure region you're using.
+        :param pulumi.Input[str] resource_group_name: The Azure resource group to create the bastion in.
         :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
-        :param pulumi.Input[Sequence[pulumi.Input[str]]] subnet_ids: The subnet Ids to launch instances in.
-        :param pulumi.Input[str] vpc_id: The VPC the Bastion should be created in.
+        :param pulumi.Input[str] subnet_id: The subnet Ids to launch instances in.
         """
         ...
     @overload
@@ -139,11 +139,11 @@ class Bastion(pulumi.ComponentResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 instance_type: Optional[pulumi.Input[str]] = None,
-                 region: Optional[pulumi.Input[str]] = None,
+                 instance_slu: Optional[pulumi.Input[str]] = None,
+                 location: Optional[pulumi.Input[str]] = None,
+                 resource_group_name: Optional[pulumi.Input[str]] = None,
                  route: Optional[pulumi.Input[str]] = None,
-                 subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
-                 vpc_id: Optional[pulumi.Input[str]] = None,
+                 subnet_id: Optional[pulumi.Input[str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -155,35 +155,27 @@ class Bastion(pulumi.ComponentResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = BastionArgs.__new__(BastionArgs)
 
-            __props__.__dict__["instance_type"] = instance_type
-            if region is None and not opts.urn:
-                raise TypeError("Missing required property 'region'")
-            __props__.__dict__["region"] = region
+            __props__.__dict__["instance_slu"] = instance_slu
+            if location is None and not opts.urn:
+                raise TypeError("Missing required property 'location'")
+            __props__.__dict__["location"] = location
+            if resource_group_name is None and not opts.urn:
+                raise TypeError("Missing required property 'resource_group_name'")
+            __props__.__dict__["resource_group_name"] = resource_group_name
             if route is None and not opts.urn:
                 raise TypeError("Missing required property 'route'")
             __props__.__dict__["route"] = route
-            if subnet_ids is None and not opts.urn:
-                raise TypeError("Missing required property 'subnet_ids'")
-            __props__.__dict__["subnet_ids"] = subnet_ids
-            if vpc_id is None and not opts.urn:
-                raise TypeError("Missing required property 'vpc_id'")
-            __props__.__dict__["vpc_id"] = vpc_id
-            __props__.__dict__["asg_name"] = None
+            if subnet_id is None and not opts.urn:
+                raise TypeError("Missing required property 'subnet_id'")
+            __props__.__dict__["subnet_id"] = subnet_id
             __props__.__dict__["private_key"] = None
+            __props__.__dict__["scale_set_name"] = None
         super(Bastion, __self__).__init__(
-            'tailscale-bastion:aws:Bastion',
+            'tailscale-bastion:azure:Bastion',
             resource_name,
             __props__,
             opts,
             remote=True)
-
-    @property
-    @pulumi.getter(name="asgName")
-    def asg_name(self) -> pulumi.Output[str]:
-        """
-        The name of the ASG that managed the bastion instances
-        """
-        return pulumi.get(self, "asg_name")
 
     @property
     @pulumi.getter(name="privateKey")
@@ -192,4 +184,12 @@ class Bastion(pulumi.ComponentResource):
         The SSH private key to access your bastion
         """
         return pulumi.get(self, "private_key")
+
+    @property
+    @pulumi.getter(name="scaleSetName")
+    def scale_set_name(self) -> pulumi.Output[str]:
+        """
+        The name of the Scaleset that managed the bastion instances
+        """
+        return pulumi.get(self, "scale_set_name")
 

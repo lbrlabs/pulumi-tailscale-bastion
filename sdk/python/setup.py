@@ -59,7 +59,9 @@ setup(name='lbrlabs_pulumi_tailscalebastion',
           'parver>=0.2.1',
           'pulumi>=3.0.0,<4.0.0',
           'pulumi-aws>=5.0.0,<6.0.0',
+          'pulumi-azure>=5.0.0,<6.0.0',
           'pulumi-tailscale>=0.0.0,<1.0.0',
+          'pulumi-tls>=4.0.0,<5.0.0',
           'semver>=2.8.1'
       ],
       zip_safe=False)

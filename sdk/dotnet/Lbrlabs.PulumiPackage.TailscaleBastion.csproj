@@ -47,7 +47,9 @@
   <ItemGroup>
     <PackageReference Include="Pulumi" Version="3.*" />
     <PackageReference Include="Pulumi.Aws" Version="5.*" ExcludeAssets="contentFiles" />
+    <PackageReference Include="Pulumi.Azure" Version="5.*" ExcludeAssets="contentFiles" />
     <PackageReference Include="Pulumi.Tailscale" Version="0.*" ExcludeAssets="contentFiles" />
+    <PackageReference Include="Pulumi.Tls" Version="4.*" ExcludeAssets="contentFiles" />
   </ItemGroup>
 
   <ItemGroup>

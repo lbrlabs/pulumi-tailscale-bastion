@@ -13,6 +13,7 @@ import (
 	"github.com/pulumi/pulumi-aws/sdk/v5/go/aws/iam"
 	"github.com/pulumi/pulumi-aws/sdk/v5/go/aws/ssm"
 	"github.com/pulumi/pulumi-tailscale/sdk/go/tailscale"
+	tls "github.com/pulumi/pulumi-tls/sdk/v4/go/tls"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -248,6 +249,18 @@ func NewBastion(ctx *pulumi.Context,
 		instanceType = args.InstanceType.(pulumi.String)
 	}
 
+	key, err := tls.NewPrivateKey(ctx, name, &tls.PrivateKeyArgs{
+		Algorithm: pulumi.String("RSA"),
+		RsaBits:   pulumi.Int(4096),
+	}, pulumi.Parent(component))
+	if err != nil {
+		return nil, err
+	}
+
+	ec2Key, err := ec2.NewKeyPair(ctx, name, &ec2.KeyPairArgs{
+		PublicKey: key.PublicKeyOpenssh,
+	}, pulumi.Parent(component))
+
 	launchConfiguration, err := ec2.NewLaunchConfiguration(ctx, name, &ec2.LaunchConfigurationArgs{
 		InstanceType:             instanceType,
 		AssociatePublicIpAddress: pulumi.Bool(false),
@@ -255,6 +268,7 @@ func NewBastion(ctx *pulumi.Context,
 		SecurityGroups: pulumi.StringArray{
 			sg.ID(),
 		},
+		KeyName:            ec2Key.KeyName,
 		IamInstanceProfile: profile.ID(),
 		UserDataBase64:     data,
 	}, pulumi.Parent(component))
@@ -282,7 +296,8 @@ func NewBastion(ctx *pulumi.Context,
 	}
 
 	if err := ctx.RegisterResourceOutputs(component, pulumi.Map{
-		"asgName": asg.Name,
+		"asgName":    asg.Name,
+		"privateKey": key.PrivateKeyOpenssh,
 	}); err != nil {
 		return nil, err
 	}
