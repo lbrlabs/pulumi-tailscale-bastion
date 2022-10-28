@@ -16,13 +16,16 @@ __all__ = ['BastionArgs', 'Bastion']
 class BastionArgs:
     def __init__(__self__, *,
                  create_namespace: bool,
+                 routes: pulumi.Input[Sequence[pulumi.Input[str]]],
                  namespace: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']] = None):
         """
         The set of arguments for constructing a Bastion resource.
         :param bool create_namespace: Whether we should create a new namespace.
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] routes: The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
         :param pulumi.Input['pulumi_kubernetes.core.v1.Namespace'] namespace: The bucket resource.
         """
         pulumi.set(__self__, "create_namespace", create_namespace)
+        pulumi.set(__self__, "routes", routes)
         if namespace is not None:
             pulumi.set(__self__, "namespace", namespace)
 
@@ -37,6 +40,18 @@ class BastionArgs:
     @create_namespace.setter
     def create_namespace(self, value: bool):
         pulumi.set(self, "create_namespace", value)
+
+    @property
+    @pulumi.getter
+    def routes(self) -> pulumi.Input[Sequence[pulumi.Input[str]]]:
+        """
+        The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
+        """
+        return pulumi.get(self, "routes")
+
+    @routes.setter
+    def routes(self, value: pulumi.Input[Sequence[pulumi.Input[str]]]):
+        pulumi.set(self, "routes", value)
 
     @property
     @pulumi.getter
@@ -58,6 +73,7 @@ class Bastion(pulumi.ComponentResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  create_namespace: Optional[bool] = None,
                  namespace: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']] = None,
+                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  __props__=None):
         """
         Create a Bastion resource with the given unique name, props, and options.
@@ -65,6 +81,7 @@ class Bastion(pulumi.ComponentResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param bool create_namespace: Whether we should create a new namespace.
         :param pulumi.Input['pulumi_kubernetes.core.v1.Namespace'] namespace: The bucket resource.
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] routes: The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
         """
         ...
     @overload
@@ -91,6 +108,7 @@ class Bastion(pulumi.ComponentResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  create_namespace: Optional[bool] = None,
                  namespace: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']] = None,
+                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -106,6 +124,9 @@ class Bastion(pulumi.ComponentResource):
                 raise TypeError("Missing required property 'create_namespace'")
             __props__.__dict__["create_namespace"] = create_namespace
             __props__.__dict__["namespace"] = namespace
+            if routes is None and not opts.urn:
+                raise TypeError("Missing required property 'routes'")
+            __props__.__dict__["routes"] = routes
             __props__.__dict__["deployment_name"] = None
         super(Bastion, __self__).__init__(
             'tailscale-bastion:kubernetes:Bastion',

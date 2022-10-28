@@ -26,6 +26,9 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
+	if args.Routes == nil {
+		return nil, errors.New("invalid value for required argument 'Routes'")
+	}
 	opts = pkgResourceDefaultOpts(opts)
 	var resource Bastion
 	err := ctx.RegisterRemoteComponentResource("tailscale-bastion:kubernetes:Bastion", name, args, &resource, opts...)
@@ -40,6 +43,8 @@ type bastionArgs struct {
 	CreateNamespace bool `pulumi:"createNamespace"`
 	// The bucket resource.
 	Namespace *corev1.Namespace `pulumi:"namespace"`
+	// The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
+	Routes []string `pulumi:"routes"`
 }
 
 // The set of arguments for constructing a Bastion resource.
@@ -48,6 +53,8 @@ type BastionArgs struct {
 	CreateNamespace bool
 	// The bucket resource.
 	Namespace corev1.NamespaceInput
+	// The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
+	Routes pulumi.StringArrayInput
 }
 
 func (BastionArgs) ElementType() reflect.Type {

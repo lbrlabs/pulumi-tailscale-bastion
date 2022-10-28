@@ -40,8 +40,12 @@ export class Bastion extends pulumi.ComponentResource {
             if ((!args || args.createNamespace === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'createNamespace'");
             }
+            if ((!args || args.routes === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'routes'");
+            }
             resourceInputs["createNamespace"] = args ? args.createNamespace : undefined;
             resourceInputs["namespace"] = args ? args.namespace : undefined;
+            resourceInputs["routes"] = args ? args.routes : undefined;
             resourceInputs["deploymentName"] = undefined /*out*/;
         } else {
             resourceInputs["deploymentName"] = undefined /*out*/;
@@ -63,4 +67,8 @@ export interface BastionArgs {
      * The bucket resource.
      */
     namespace?: pulumi.Input<pulumiKubernetes.core.v1.Namespace>;
+    /**
+     * The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
+     */
+    routes: pulumi.Input<pulumi.Input<string>[]>;
 }

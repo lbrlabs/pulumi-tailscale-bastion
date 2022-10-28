@@ -60,6 +60,18 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Kubernetes
         [Input("namespace")]
         public Input<Pulumi.Kubernetes.Core.V1.Namespace>? Namespace { get; set; }
 
+        [Input("routes", required: true)]
+        private InputList<string>? _routes;
+
+        /// <summary>
+        /// The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
+        /// </summary>
+        public InputList<string> Routes
+        {
+            get => _routes ?? (_routes = new InputList<string>());
+            set => _routes = value;
+        }
+
         public BastionArgs()
         {
         }

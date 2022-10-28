@@ -85,8 +85,14 @@ resources:
       namespace:
         "$ref": "/kubernetes/v3.22.1/schema.json#/resources/kubernetes:core%2Fv1:Namespace"
         description: The bucket resource.
+      routes:
+        type: array
+        items:
+          type: string
+        description: "The routes to advertise to tailscale. This is likely the Pod and Service CIDR."
     requiredInputs:
       - createNamespace
+      - routes
     properties:
       deploymentName:
         type: string
@@ -111,7 +117,7 @@ language:
       "@pulumi/aws": "^5.0.0"
       "@pulumi/azure": "^5.0.0"
       "@pulumi/tls": "^4.0.0"
-      "@pulumi/kubernetes": "^4.0.0"
+      "@pulumi/kubernetes": "^3.0.0"
       "@pulumi/tailscale": "^0.11.0"
     devDependencies:
       typescript: "^3.7.0"
