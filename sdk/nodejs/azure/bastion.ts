@@ -51,7 +51,7 @@ export class Bastion extends pulumi.ComponentResource {
             if ((!args || args.subnetId === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'subnetId'");
             }
-            resourceInputs["instanceSlu"] = args ? args.instanceSlu : undefined;
+            resourceInputs["instanceSku"] = args ? args.instanceSku : undefined;
             resourceInputs["location"] = args ? args.location : undefined;
             resourceInputs["resourceGroupName"] = args ? args.resourceGroupName : undefined;
             resourceInputs["route"] = args ? args.route : undefined;
@@ -74,7 +74,7 @@ export interface BastionArgs {
     /**
      * The Azure instance SKU to use for the bastion.
      */
-    instanceSlu?: pulumi.Input<string>;
+    instanceSku?: pulumi.Input<string>;
     /**
      * The Azure region you're using.
      */

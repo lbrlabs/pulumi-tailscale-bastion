@@ -18,21 +18,21 @@ class BastionArgs:
                  resource_group_name: pulumi.Input[str],
                  route: pulumi.Input[str],
                  subnet_id: pulumi.Input[str],
-                 instance_slu: Optional[pulumi.Input[str]] = None):
+                 instance_sku: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Bastion resource.
         :param pulumi.Input[str] location: The Azure region you're using.
         :param pulumi.Input[str] resource_group_name: The Azure resource group to create the bastion in.
         :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
         :param pulumi.Input[str] subnet_id: The subnet Ids to launch instances in.
-        :param pulumi.Input[str] instance_slu: The Azure instance SKU to use for the bastion.
+        :param pulumi.Input[str] instance_sku: The Azure instance SKU to use for the bastion.
         """
         pulumi.set(__self__, "location", location)
         pulumi.set(__self__, "resource_group_name", resource_group_name)
         pulumi.set(__self__, "route", route)
         pulumi.set(__self__, "subnet_id", subnet_id)
-        if instance_slu is not None:
-            pulumi.set(__self__, "instance_slu", instance_slu)
+        if instance_sku is not None:
+            pulumi.set(__self__, "instance_sku", instance_sku)
 
     @property
     @pulumi.getter
@@ -83,16 +83,16 @@ class BastionArgs:
         pulumi.set(self, "subnet_id", value)
 
     @property
-    @pulumi.getter(name="instanceSlu")
-    def instance_slu(self) -> Optional[pulumi.Input[str]]:
+    @pulumi.getter(name="instanceSku")
+    def instance_sku(self) -> Optional[pulumi.Input[str]]:
         """
         The Azure instance SKU to use for the bastion.
         """
-        return pulumi.get(self, "instance_slu")
+        return pulumi.get(self, "instance_sku")
 
-    @instance_slu.setter
-    def instance_slu(self, value: Optional[pulumi.Input[str]]):
-        pulumi.set(self, "instance_slu", value)
+    @instance_sku.setter
+    def instance_sku(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "instance_sku", value)
 
 
 class Bastion(pulumi.ComponentResource):
@@ -100,7 +100,7 @@ class Bastion(pulumi.ComponentResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 instance_slu: Optional[pulumi.Input[str]] = None,
+                 instance_sku: Optional[pulumi.Input[str]] = None,
                  location: Optional[pulumi.Input[str]] = None,
                  resource_group_name: Optional[pulumi.Input[str]] = None,
                  route: Optional[pulumi.Input[str]] = None,
@@ -110,7 +110,7 @@ class Bastion(pulumi.ComponentResource):
         Create a Bastion resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[str] instance_slu: The Azure instance SKU to use for the bastion.
+        :param pulumi.Input[str] instance_sku: The Azure instance SKU to use for the bastion.
         :param pulumi.Input[str] location: The Azure region you're using.
         :param pulumi.Input[str] resource_group_name: The Azure resource group to create the bastion in.
         :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
@@ -139,7 +139,7 @@ class Bastion(pulumi.ComponentResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 instance_slu: Optional[pulumi.Input[str]] = None,
+                 instance_sku: Optional[pulumi.Input[str]] = None,
                  location: Optional[pulumi.Input[str]] = None,
                  resource_group_name: Optional[pulumi.Input[str]] = None,
                  route: Optional[pulumi.Input[str]] = None,
@@ -155,7 +155,7 @@ class Bastion(pulumi.ComponentResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = BastionArgs.__new__(BastionArgs)
 
-            __props__.__dict__["instance_slu"] = instance_slu
+            __props__.__dict__["instance_sku"] = instance_sku
             if location is None and not opts.urn:
                 raise TypeError("Missing required property 'location'")
             __props__.__dict__["location"] = location

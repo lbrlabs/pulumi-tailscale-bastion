@@ -41,7 +41,8 @@ type UserDataArgs struct {
 type Bastion struct {
 	pulumi.ResourceState
 
-	AsgName pulumi.StringOutput `pulumi:"asgName"`
+	AsgName    pulumi.StringOutput `pulumi:"asgName"`
+	PrivateKey pulumi.StringOutput `pulumi:"privateKey"`
 }
 
 // NewBastion creates a new Bastion component resource.
@@ -294,6 +295,9 @@ func NewBastion(ctx *pulumi.Context,
 	if err != nil {
 		return nil, fmt.Errorf("error creating asg: %v", err)
 	}
+
+	component.AsgName = asg.Name
+	component.PrivateKey = key.PrivateKeyOpenssh
 
 	if err := ctx.RegisterResourceOutputs(component, pulumi.Map{
 		"asgName":    asg.Name,

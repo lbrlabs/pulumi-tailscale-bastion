@@ -18,6 +18,8 @@
         "azure/bastion.ts",
         "azure/index.ts",
         "index.ts",
+        "kubernetes/bastion.ts",
+        "kubernetes/index.ts",
         "provider.ts",
         "utilities.ts"
     ]
