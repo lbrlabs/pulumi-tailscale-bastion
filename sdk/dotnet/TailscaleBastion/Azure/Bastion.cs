@@ -8,22 +8,22 @@ using System.Threading.Tasks;
 using Pulumi.Serialization;
 using Pulumi;
 
-namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
+namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
 {
-    [TailscaleBastionResourceType("tailscale-bastion:aws:Bastion")]
+    [TailscaleBastionResourceType("tailscale-bastion:azure:Bastion")]
     public partial class Bastion : global::Pulumi.ComponentResource
     {
-        /// <summary>
-        /// The name of the ASG that managed the bastion instances
-        /// </summary>
-        [Output("asgName")]
-        public Output<string> AsgName { get; private set; } = null!;
-
         /// <summary>
         /// The SSH private key to access your bastion
         /// </summary>
         [Output("privateKey")]
         public Output<string> PrivateKey { get; private set; } = null!;
+
+        /// <summary>
+        /// The name of the Scaleset that managed the bastion instances
+        /// </summary>
+        [Output("scaleSetName")]
+        public Output<string> ScaleSetName { get; private set; } = null!;
 
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
         public Bastion(string name, BastionArgs args, ComponentResourceOptions? options = null)
-            : base("tailscale-bastion:aws:Bastion", name, args ?? new BastionArgs(), MakeResourceOptions(options, ""), remote: true)
+            : base("tailscale-bastion:azure:Bastion", name, args ?? new BastionArgs(), MakeResourceOptions(options, ""), remote: true)
         {
         }
 
@@ -55,16 +55,22 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
     public sealed class BastionArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// The EC2 instance type to use for the bastion.
+        /// The Azure instance SKU to use for the bastion.
         /// </summary>
-        [Input("instanceType")]
-        public Input<string>? InstanceType { get; set; }
+        [Input("instanceSlu")]
+        public Input<string>? InstanceSlu { get; set; }
 
         /// <summary>
-        /// The AWS region you're using.
+        /// The Azure region you're using.
         /// </summary>
-        [Input("region", required: true)]
-        public Input<string> Region { get; set; } = null!;
+        [Input("location", required: true)]
+        public Input<string> Location { get; set; } = null!;
+
+        /// <summary>
+        /// The Azure resource group to create the bastion in.
+        /// </summary>
+        [Input("resourceGroupName", required: true)]
+        public Input<string> ResourceGroupName { get; set; } = null!;
 
         /// <summary>
         /// The route you'd like to advertise via tailscale.
@@ -72,23 +78,11 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         [Input("route", required: true)]
         public Input<string> Route { get; set; } = null!;
 
-        [Input("subnetIds", required: true)]
-        private InputList<string>? _subnetIds;
-
         /// <summary>
         /// The subnet Ids to launch instances in.
         /// </summary>
-        public InputList<string> SubnetIds
-        {
-            get => _subnetIds ?? (_subnetIds = new InputList<string>());
-            set => _subnetIds = value;
-        }
-
-        /// <summary>
-        /// The VPC the Bastion should be created in.
-        /// </summary>
-        [Input("vpcId", required: true)]
-        public Input<string> VpcId { get; set; } = null!;
+        [Input("subnetId", required: true)]
+        public Input<string> SubnetId { get; set; } = null!;
 
         public BastionArgs()
         {

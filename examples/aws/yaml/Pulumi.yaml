@@ -6,7 +6,7 @@ resources:
     properties:
       cidrBlock: "172.20.0.0/22"
   bastion:
-    type: "aws-tailscale:index:Bastion"
+    type: "tailscale-bastion:aws:Bastion"
     properties:
       vpcId: ${vpc.vpcId}
       subnetIds: ${vpc.privateSubnetIds}

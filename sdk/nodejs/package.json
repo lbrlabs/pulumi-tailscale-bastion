@@ -8,7 +8,9 @@
     },
     "dependencies": {
         "@pulumi/aws": "^5.0.0",
-        "@pulumi/tailscale": "^0.11.0"
+        "@pulumi/azure": "^5.0.0",
+        "@pulumi/tailscale": "^0.11.0",
+        "@pulumi/tls": "^4.0.0"
     },
     "devDependencies": {
         "typescript": "^3.7.0"

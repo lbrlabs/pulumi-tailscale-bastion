@@ -7,6 +7,39 @@ repository: "https://github.com/lbrlabs/pulumi-tailscale-bastion"
 publisher: "lbrlabs"
 displayname: "tailscale-bastion"
 resources:
+  tailscale-bastion:azure:Bastion:
+    isComponent: true
+    inputProperties:
+      resourceGroupName:
+        type: string
+        description: "The Azure resource group to create the bastion in."
+      subnetId:
+        type: string
+        description: "The subnet Ids to launch instances in."
+      route:
+        type: string
+        description: "The route you'd like to advertise via tailscale."
+      location:
+        type: string
+        description: "The Azure region you're using."
+      instanceSlu:
+        type: string
+        description: "The Azure instance SKU to use for the bastion."
+    requiredInputs:
+      - resourceGroupName
+      - subnetId
+      - route
+      - location
+    properties:
+      scaleSetName:
+        type: string
+        description: "The name of the Scaleset that managed the bastion instances"
+      privateKey:
+        type: string
+        description: "The SSH private key to access your bastion"
+    required:
+      - scaleSetName
+      - privateKey
   tailscale-bastion:aws:Bastion:
     isComponent: true
     inputProperties:
@@ -36,13 +69,19 @@ resources:
       asgName:
         type: string
         description: "The name of the ASG that managed the bastion instances"
+      privateKey:
+        type: string
+        description: "The SSH private key to access your bastion"
     required:
       - asgName
+      - privateKey
 language:
   csharp:
     packageReferences:
       Pulumi: 3.*
       Pulumi.Aws: 5.*
+      Pulumi.Azure: 5.*
+      Pulumi.Tls: 4.*
       Pulumi.Tailscale: 0.*
     rootNamespace: "Lbrlabs.PulumiPackage"
   go:
@@ -51,6 +90,8 @@ language:
   nodejs:
     dependencies:
       "@pulumi/aws": "^5.0.0"
+      "@pulumi/azure": "^5.0.0"
+      "@pulumi/tls": "^4.0.0"
       "@pulumi/tailscale": "^0.11.0"
     devDependencies:
       typescript: "^3.7.0"
@@ -60,4 +101,6 @@ language:
     requires:
       pulumi: ">=3.0.0,<4.0.0"
       pulumi-aws: ">=5.0.0,<6.0.0"
+      pulumi-azure: ">=5.0.0,<6.0.0"
+      pulumi-tls: ">=4.0.0,<5.0.0"
       pulumi-tailscale: ">=0.0.0,<1.0.0"

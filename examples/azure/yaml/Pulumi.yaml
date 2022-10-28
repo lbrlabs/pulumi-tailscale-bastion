@@ -1,0 +1,28 @@
+name: yaml_azure_tailscalebastion
+runtime: yaml
+resources:
+  resourceGroup:
+    type: azure-native:resources:ResourceGroup
+  virtualNetwork:
+    type: azure-native:network:VirtualNetwork
+    properties:
+      resourceGroupName: ${resourceGroup.name}
+      addressSpace:
+        addressPrefixes: [ "172.16.0.0/22" ]
+  subnet:
+    type: azure-native:network:Subnet
+    properties:
+      resourceGroupName: ${resourceGroup.name}
+      virtualNetworkName: ${virtualNetwork.name}
+      addressPrefix: "172.16.0.0/24"
+  bastion:
+    type: "tailscale-bastion:azure:Bastion"
+    properties:
+      resourceGroupName: ${resourceGroup.name}
+      subnetId: ${subnet.id}
+      route: "172.20.0.0/22"
+      location: "WestUs"
+      
+outputs:
+  url: ${virtualNetwork.name}
+  key: ${bastion.privateKey}
