@@ -11,7 +11,7 @@ require (
 	github.com/pulumi/pulumi-tailscale/sdk v0.11.0
 	github.com/pulumi/pulumi-tls/sdk/v4 v4.6.1
 	github.com/pulumi/pulumi/pkg/v3 v3.44.3
-	github.com/pulumi/pulumi/sdk/v3 v3.44.3
+	github.com/pulumi/pulumi/sdk/v3 v3.47.1
 )
 
 require (
