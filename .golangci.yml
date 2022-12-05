@@ -3,7 +3,7 @@ linters:
     - deadcode
     - errcheck
     - goconst
-    - gofmt
+      #- gofmt
     - golint
     - gosec
     - govet
@@ -19,5 +19,6 @@ linters:
 run:
   skip-files:
     - schema.go
+    - generate.go
     - pulumiManifest.go
   timeout: 20m

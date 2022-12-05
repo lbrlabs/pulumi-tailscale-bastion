@@ -195,6 +195,9 @@ func NewBastion(ctx *pulumi.Context,
 	}
 
 	ami := ec2.LookupAmiOutput(ctx, ec2.LookupAmiOutputArgs{
+		Owners: pulumi.StringArray{
+			pulumi.String("amazon"),
+		},
 		Filters: ec2.GetAmiFilterArray{
 			ec2.GetAmiFilterArgs{
 				Name: pulumi.String("owner-alias"),
@@ -202,6 +205,7 @@ func NewBastion(ctx *pulumi.Context,
 					pulumi.String("amazon"),
 				},
 			},
+
 			ec2.GetAmiFilterArgs{
 				Name: pulumi.String("virtualization-type"),
 				Values: pulumi.StringArray{
