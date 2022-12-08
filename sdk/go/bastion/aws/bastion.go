@@ -14,9 +14,9 @@ import (
 type Bastion struct {
 	pulumi.ResourceState
 
-	// The name of the ASG that managed the bastion instances
+	// The name of the ASG that managed the bastion instances.
 	AsgName pulumi.StringOutput `pulumi:"asgName"`
-	// The SSH private key to access your bastion
+	// The SSH private key to access your bastion.
 	PrivateKey pulumi.StringOutput `pulumi:"privateKey"`
 }
 
@@ -162,12 +162,12 @@ func (o BastionOutput) ToBastionOutputWithContext(ctx context.Context) BastionOu
 	return o
 }
 
-// The name of the ASG that managed the bastion instances
+// The name of the ASG that managed the bastion instances.
 func (o BastionOutput) AsgName() pulumi.StringOutput {
 	return o.ApplyT(func(v *Bastion) pulumi.StringOutput { return v.AsgName }).(pulumi.StringOutput)
 }
 
-// The SSH private key to access your bastion
+// The SSH private key to access your bastion.
 func (o BastionOutput) PrivateKey() pulumi.StringOutput {
 	return o.ApplyT(func(v *Bastion) pulumi.StringOutput { return v.PrivateKey }).(pulumi.StringOutput)
 }

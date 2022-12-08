@@ -149,6 +149,9 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating scale set: %v", err)
 	}
 
+	component.ScaleSetName = scaleset.Name
+	component.PrivateKey = key.PublicKeyOpenssh
+
 	if err := ctx.RegisterResourceOutputs(component, pulumi.Map{
 		"scaleSetName": scaleset.Name,
 		"privateKey":   key.PrivateKeyOpenssh,

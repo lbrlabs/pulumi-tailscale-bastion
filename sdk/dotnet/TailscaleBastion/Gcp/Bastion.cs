@@ -8,11 +8,23 @@ using System.Threading.Tasks;
 using Pulumi.Serialization;
 using Pulumi;
 
-namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
+namespace Lbrlabs.PulumiPackage.TailscaleBastion.Gcp
 {
-    [TailscaleBastionResourceType("tailscale-bastion:azure:Bastion")]
+    [TailscaleBastionResourceType("tailscale-bastion:gcp:Bastion")]
     public partial class Bastion : global::Pulumi.ComponentResource
     {
+        /// <summary>
+        /// The name of the autoscaler that manages the instances.
+        /// </summary>
+        [Output("autoscalerName")]
+        public Output<string> AutoscalerName { get; private set; } = null!;
+
+        /// <summary>
+        /// The name of the group manager that manages the instances.
+        /// </summary>
+        [Output("groupManagerName")]
+        public Output<string> GroupManagerName { get; private set; } = null!;
+
         /// <summary>
         /// The SSH private key to access your bastion.
         /// </summary>
@@ -20,10 +32,10 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
         public Output<string> PrivateKey { get; private set; } = null!;
 
         /// <summary>
-        /// The name of the Scaleset that managed the bastion instances.
+        /// The name of the target that manages the instances.
         /// </summary>
-        [Output("scaleSetName")]
-        public Output<string> ScaleSetName { get; private set; } = null!;
+        [Output("targetPoolName")]
+        public Output<string> TargetPoolName { get; private set; } = null!;
 
 
         /// <summary>
@@ -34,7 +46,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
         public Bastion(string name, BastionArgs args, ComponentResourceOptions? options = null)
-            : base("tailscale-bastion:azure:Bastion", name, args ?? new BastionArgs(), MakeResourceOptions(options, ""), remote: true)
+            : base("tailscale-bastion:gcp:Bastion", name, args ?? new BastionArgs(), MakeResourceOptions(options, ""), remote: true)
         {
         }
 
@@ -55,22 +67,10 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
     public sealed class BastionArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// The Azure instance SKU to use for the bastion.
+        /// The GCP machine type to launch. Defaults to f1-micro.
         /// </summary>
-        [Input("instanceSku")]
-        public Input<string>? InstanceSku { get; set; }
-
-        /// <summary>
-        /// The Azure region you're using.
-        /// </summary>
-        [Input("location", required: true)]
-        public Input<string> Location { get; set; } = null!;
-
-        /// <summary>
-        /// The Azure resource group to create the bastion in.
-        /// </summary>
-        [Input("resourceGroupName", required: true)]
-        public Input<string> ResourceGroupName { get; set; } = null!;
+        [Input("machineType")]
+        public Input<string>? MachineType { get; set; }
 
         /// <summary>
         /// The route you'd like to advertise via tailscale.
@@ -79,10 +79,10 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
         public Input<string> Route { get; set; } = null!;
 
         /// <summary>
-        /// The subnet Ids to launch instances in.
+        /// The subnetwork to create the bastion in.
         /// </summary>
-        [Input("subnetId", required: true)]
-        public Input<string> SubnetId { get; set; } = null!;
+        [Input("subnetNetworkId", required: true)]
+        public Input<string> SubnetNetworkId { get; set; } = null!;
 
         public BastionArgs()
         {

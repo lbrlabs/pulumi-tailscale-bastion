@@ -181,7 +181,7 @@ class Bastion(pulumi.ComponentResource):
     @pulumi.getter(name="privateKey")
     def private_key(self) -> pulumi.Output[str]:
         """
-        The SSH private key to access your bastion
+        The SSH private key to access your bastion.
         """
         return pulumi.get(self, "private_key")
 
@@ -189,7 +189,7 @@ class Bastion(pulumi.ComponentResource):
     @pulumi.getter(name="scaleSetName")
     def scale_set_name(self) -> pulumi.Output[str]:
         """
-        The name of the Scaleset that managed the bastion instances
+        The name of the Scaleset that managed the bastion instances.
         """
         return pulumi.get(self, "scale_set_name")
 

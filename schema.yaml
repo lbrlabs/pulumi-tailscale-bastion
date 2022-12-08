@@ -7,6 +7,39 @@ repository: "https://github.com/lbrlabs/pulumi-tailscale-bastion"
 publisher: "lbrlabs"
 displayname: "tailscale-bastion"
 resources:
+  tailscale-bastion:gcp:Bastion:
+    isComponent: true
+    inputProperties:
+      subnetNetworkId:
+        type: string
+        description: "The subnetwork to create the bastion in."
+      route:
+        type: string
+        description: "The route you'd like to advertise via tailscale."
+      machineType:
+        type: string
+        description: "The GCP machine type to launch. Defaults to f1-micro."
+    requiredInputs:
+      - subnetNetworkId
+      - route
+    properties:
+      autoscalerName:
+        type: string
+        description: "The name of the autoscaler that manages the instances."
+      groupManagerName:
+        type: string
+        description: "The name of the group manager that manages the instances."
+      targetPoolName:
+        type: string
+        description: "The name of the target that manages the instances."
+      privateKey:
+        type: string
+        description: "The SSH private key to access your bastion."
+    required:
+      - autoscalerName
+      - groupManagerName
+      - targetPoolName
+      - privateKey
   tailscale-bastion:azure:Bastion:
     isComponent: true
     inputProperties:
@@ -33,10 +66,10 @@ resources:
     properties:
       scaleSetName:
         type: string
-        description: "The name of the Scaleset that managed the bastion instances"
+        description: "The name of the Scaleset that managed the bastion instances."
       privateKey:
         type: string
-        description: "The SSH private key to access your bastion"
+        description: "The SSH private key to access your bastion."
     required:
       - scaleSetName
       - privateKey
@@ -68,10 +101,10 @@ resources:
     properties:
       asgName:
         type: string
-        description: "The name of the ASG that managed the bastion instances"
+        description: "The name of the ASG that managed the bastion instances."
       privateKey:
         type: string
-        description: "The SSH private key to access your bastion"
+        description: "The SSH private key to access your bastion."
     required:
       - asgName
       - privateKey

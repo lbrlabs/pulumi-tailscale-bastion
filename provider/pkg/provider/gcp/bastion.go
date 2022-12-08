@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/pulumi/pulumi-gcp/sdk/v6/go/gcp/compute"
 	"github.com/pulumi/pulumi-tailscale/sdk/go/tailscale"
+	tls "github.com/pulumi/pulumi-tls/sdk/v4/go/tls"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"text/template"
 )
@@ -31,6 +32,11 @@ type UserDataArgs struct {
 // The Bastion component resource.
 type Bastion struct {
 	pulumi.ResourceState
+
+	AutoscalerName   pulumi.StringOutput `pulumi:"autoscalerName"`
+	GroupManagerName pulumi.StringOutput `pulumi:"groupManagerName"`
+	TargetPoolName   pulumi.StringOutput `pulumi:"targetPoolName"`
+	PrivateKey       pulumi.StringOutput `pulumi:"privateKey"`
 }
 
 // NewBastion creates a new Bastion component resource.
@@ -89,13 +95,13 @@ func NewBastion(ctx *pulumi.Context,
 		},
 	).(pulumi.StringOutput)
 
-	// key, err := tls.NewPrivateKey(ctx, name, &tls.PrivateKeyArgs{
-	// 	Algorithm: pulumi.String("RSA"),
-	// 	RsaBits:   pulumi.Int(4096),
-	// }, pulumi.Parent(component))
-	// if err != nil {
-	// 	return nil, err
-	// }
+	key, err := tls.NewPrivateKey(ctx, name, &tls.PrivateKeyArgs{
+		Algorithm: pulumi.String("RSA"),
+		RsaBits:   pulumi.Int(4096),
+	}, pulumi.Parent(component))
+	if err != nil {
+		return nil, err
+	}
 
 	var machineType pulumi.String
 	if args.MachineType == nil {
@@ -121,7 +127,7 @@ func NewBastion(ctx *pulumi.Context,
 		},
 		Metadata: pulumi.Map{
 			"user-data": data,
-			// "ssh-keys": 
+			"ssh-keys":  pulumi.Sprintf("bastion:%s", key.PublicKeyOpenssh),
 		},
 	}, pulumi.Parent(component))
 
@@ -137,7 +143,7 @@ func NewBastion(ctx *pulumi.Context,
 			targetPool.SelfLink,
 		},
 		BaseInstanceName: pulumi.String(fmt.Sprintf("%s-%s", name, "bastion")),
-	}, pulumi.Parent(component))
+	}, pulumi.Parent(template))
 
 	autoscaler, err := compute.NewAutoscalar(ctx, name, &compute.AutoscalarArgs{
 		Target: groupManager.ID(),
@@ -145,12 +151,18 @@ func NewBastion(ctx *pulumi.Context,
 			MaxReplicas: pulumi.Int(1),
 			MinReplicas: pulumi.Int(1),
 		},
-	}, pulumi.Parent(component))
+	}, pulumi.Parent(groupManager))
+
+	component.AutoscalerName = autoscaler.Name
+	component.GroupManagerName = groupManager.Name
+	component.TargetPoolName = targetPool.Name
+	component.PrivateKey = key.PrivateKeyOpenssh
 
 	if err := ctx.RegisterResourceOutputs(component, pulumi.Map{
 		"autoscalerName":   autoscaler.Name,
 		"groupManagerName": groupManager.Name,
 		"targetPoolName":   targetPool.Name,
+		"privateKey":       key.PrivateKeyOpenssh,
 	}); err != nil {
 		return nil, err
 	}

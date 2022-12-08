@@ -6,7 +6,7 @@ import * as utilities from "../utilities";
 
 export class Bastion extends pulumi.ComponentResource {
     /** @internal */
-    public static readonly __pulumiType = 'tailscale-bastion:aws:Bastion';
+    public static readonly __pulumiType = 'tailscale-bastion:gcp:Bastion';
 
     /**
      * Returns true if the given object is an instance of Bastion.  This is designed to work even
@@ -20,13 +20,21 @@ export class Bastion extends pulumi.ComponentResource {
     }
 
     /**
-     * The name of the ASG that managed the bastion instances.
+     * The name of the autoscaler that manages the instances.
      */
-    public /*out*/ readonly asgName!: pulumi.Output<string>;
+    public /*out*/ readonly autoscalerName!: pulumi.Output<string>;
+    /**
+     * The name of the group manager that manages the instances.
+     */
+    public /*out*/ readonly groupManagerName!: pulumi.Output<string>;
     /**
      * The SSH private key to access your bastion.
      */
     public /*out*/ readonly privateKey!: pulumi.Output<string>;
+    /**
+     * The name of the target that manages the instances.
+     */
+    public /*out*/ readonly targetPoolName!: pulumi.Output<string>;
 
     /**
      * Create a Bastion resource with the given unique name, arguments, and options.
@@ -39,28 +47,24 @@ export class Bastion extends pulumi.ComponentResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.region === undefined) && !opts.urn) {
-                throw new Error("Missing required property 'region'");
-            }
             if ((!args || args.route === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'route'");
             }
-            if ((!args || args.subnetIds === undefined) && !opts.urn) {
-                throw new Error("Missing required property 'subnetIds'");
+            if ((!args || args.subnetNetworkId === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'subnetNetworkId'");
             }
-            if ((!args || args.vpcId === undefined) && !opts.urn) {
-                throw new Error("Missing required property 'vpcId'");
-            }
-            resourceInputs["instanceType"] = args ? args.instanceType : undefined;
-            resourceInputs["region"] = args ? args.region : undefined;
+            resourceInputs["machineType"] = args ? args.machineType : undefined;
             resourceInputs["route"] = args ? args.route : undefined;
-            resourceInputs["subnetIds"] = args ? args.subnetIds : undefined;
-            resourceInputs["vpcId"] = args ? args.vpcId : undefined;
-            resourceInputs["asgName"] = undefined /*out*/;
+            resourceInputs["subnetNetworkId"] = args ? args.subnetNetworkId : undefined;
+            resourceInputs["autoscalerName"] = undefined /*out*/;
+            resourceInputs["groupManagerName"] = undefined /*out*/;
             resourceInputs["privateKey"] = undefined /*out*/;
+            resourceInputs["targetPoolName"] = undefined /*out*/;
         } else {
-            resourceInputs["asgName"] = undefined /*out*/;
+            resourceInputs["autoscalerName"] = undefined /*out*/;
+            resourceInputs["groupManagerName"] = undefined /*out*/;
             resourceInputs["privateKey"] = undefined /*out*/;
+            resourceInputs["targetPoolName"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Bastion.__pulumiType, name, resourceInputs, opts, true /*remote*/);
@@ -72,23 +76,15 @@ export class Bastion extends pulumi.ComponentResource {
  */
 export interface BastionArgs {
     /**
-     * The EC2 instance type to use for the bastion.
+     * The GCP machine type to launch. Defaults to f1-micro.
      */
-    instanceType?: pulumi.Input<string>;
-    /**
-     * The AWS region you're using.
-     */
-    region: pulumi.Input<string>;
+    machineType?: pulumi.Input<string>;
     /**
      * The route you'd like to advertise via tailscale.
      */
     route: pulumi.Input<string>;
     /**
-     * The subnet Ids to launch instances in.
+     * The subnetwork to create the bastion in.
      */
-    subnetIds: pulumi.Input<pulumi.Input<string>[]>;
-    /**
-     * The VPC the Bastion should be created in.
-     */
-    vpcId: pulumi.Input<string>;
+    subnetNetworkId: pulumi.Input<string>;
 }

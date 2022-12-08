@@ -20,11 +20,11 @@ export class Bastion extends pulumi.ComponentResource {
     }
 
     /**
-     * The SSH private key to access your bastion
+     * The SSH private key to access your bastion.
      */
     public /*out*/ readonly privateKey!: pulumi.Output<string>;
     /**
-     * The name of the Scaleset that managed the bastion instances
+     * The name of the Scaleset that managed the bastion instances.
      */
     public /*out*/ readonly scaleSetName!: pulumi.Output<string>;
 

@@ -17,6 +17,8 @@
         "aws/index.ts",
         "azure/bastion.ts",
         "azure/index.ts",
+        "gcp/bastion.ts",
+        "gcp/index.ts",
         "index.ts",
         "kubernetes/bastion.ts",
         "kubernetes/index.ts",

@@ -1,0 +1,44 @@
+name: yaml_gcp_tailscalebastion
+runtime: yaml
+resources:
+  network:
+    type: gcp:compute:Network
+    properties:
+      autoCreateSubnetworks: false
+      routingMode: "REGIONAL"
+  router:
+    type: gcp:compute:Router
+    properties:
+      network: ${network.id} 
+  public:
+    type: gcp:compute:Subnetwork
+    properties:
+      ipCidrRange: "172.16.0.0/24"
+      network: ${network.id}
+      privateIpGoogleAccess: true
+  private:
+    type: gcp:compute:Subnetwork
+    properties:
+      ipCidrRange: "172.16.1.0/24"
+      network: ${network.id}
+      privateIpGoogleAccess: true
+  routernat:
+    type: gcp:compute:RouterNat
+    properties:
+      router: ${router.name}
+      natIpAllocateOption: "AUTO_ONLY"
+      sourceSubnetworkIpRangesToNat: "LIST_OF_SUBNETWORKS"
+      subnetworks:
+      - name: ${public.selfLink}
+        sourceIpRangesToNats: [ "ALL_IP_RANGES" ]
+      - name: ${private.selfLink}
+        sourceIpRangesToNats: [ "ALL_IP_RANGES" ]
+  bastion:
+    type: "tailscale-bastion:gcp:Bastion"
+    properties:
+      subnetNetworkId: ${private.id}
+      route: "172.16.1.0/24"
+       
+outputs:
+  
+  key: ${bastion.privateKey}

@@ -14,13 +14,13 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
     public partial class Bastion : global::Pulumi.ComponentResource
     {
         /// <summary>
-        /// The name of the ASG that managed the bastion instances
+        /// The name of the ASG that managed the bastion instances.
         /// </summary>
         [Output("asgName")]
         public Output<string> AsgName { get; private set; } = null!;
 
         /// <summary>
-        /// The SSH private key to access your bastion
+        /// The SSH private key to access your bastion.
         /// </summary>
         [Output("privateKey")]
         public Output<string> PrivateKey { get; private set; } = null!;

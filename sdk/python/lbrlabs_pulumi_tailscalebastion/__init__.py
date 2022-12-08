@@ -13,11 +13,14 @@ if typing.TYPE_CHECKING:
     aws = __aws
     import lbrlabs_pulumi_tailscalebastion.azure as __azure
     azure = __azure
+    import lbrlabs_pulumi_tailscalebastion.gcp as __gcp
+    gcp = __gcp
     import lbrlabs_pulumi_tailscalebastion.kubernetes as __kubernetes
     kubernetes = __kubernetes
 else:
     aws = _utilities.lazy_import('lbrlabs_pulumi_tailscalebastion.aws')
     azure = _utilities.lazy_import('lbrlabs_pulumi_tailscalebastion.azure')
+    gcp = _utilities.lazy_import('lbrlabs_pulumi_tailscalebastion.gcp')
     kubernetes = _utilities.lazy_import('lbrlabs_pulumi_tailscalebastion.kubernetes')
 
 _utilities.register(
@@ -37,6 +40,14 @@ _utilities.register(
   "fqn": "lbrlabs_pulumi_tailscalebastion.azure",
   "classes": {
    "tailscale-bastion:azure:Bastion": "Bastion"
+  }
+ },
+ {
+  "pkg": "tailscale-bastion",
+  "mod": "gcp",
+  "fqn": "lbrlabs_pulumi_tailscalebastion.gcp",
+  "classes": {
+   "tailscale-bastion:gcp:Bastion": "Bastion"
   }
  },
  {
