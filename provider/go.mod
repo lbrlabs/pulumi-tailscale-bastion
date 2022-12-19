@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/pkg/errors v0.9.1
-	github.com/pulumi/pulumi-aws/sdk/v5 v5.19.0
+	github.com/pulumi/pulumi-aws/sdk/v5 v5.24.0
 	github.com/pulumi/pulumi-azure/sdk/v5 v5.23.0
 	github.com/pulumi/pulumi-kubernetes/sdk/v3 v3.22.1
 	github.com/pulumi/pulumi-tailscale/sdk v0.11.0
