@@ -5,13 +5,13 @@ go 1.19
 require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/pkg/errors v0.9.1
-	github.com/pulumi/pulumi-aws/sdk/v5 v5.19.0
+	github.com/pulumi/pulumi-aws/sdk/v5 v5.28.0
 	github.com/pulumi/pulumi-azure/sdk/v5 v5.23.0
 	github.com/pulumi/pulumi-kubernetes/sdk/v3 v3.22.1
 	github.com/pulumi/pulumi-tailscale/sdk v0.11.0
 	github.com/pulumi/pulumi-tls/sdk/v4 v4.6.1
 	github.com/pulumi/pulumi/pkg/v3 v3.44.3
-	github.com/pulumi/pulumi/sdk/v3 v3.44.3
+	github.com/pulumi/pulumi/sdk/v3 v3.50.1
 )
 
 require (
