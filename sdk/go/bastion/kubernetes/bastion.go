@@ -7,9 +7,11 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/pkg/errors"
+	"errors"
+	"github.com/lbrlabs/pulumi-tailscale-bastion/sdk/go/bastion/internal"
 	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v3/go/kubernetes/core/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumix"
 )
 
 type Bastion struct {
@@ -29,7 +31,7 @@ func NewBastion(ctx *pulumi.Context,
 	if args.Routes == nil {
 		return nil, errors.New("invalid value for required argument 'Routes'")
 	}
-	opts = pkgResourceDefaultOpts(opts)
+	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Bastion
 	err := ctx.RegisterRemoteComponentResource("tailscale-bastion:kubernetes:Bastion", name, args, &resource, opts...)
 	if err != nil {
@@ -80,6 +82,12 @@ func (i *Bastion) ToBastionOutputWithContext(ctx context.Context) BastionOutput 
 	return pulumi.ToOutputWithContext(ctx, i).(BastionOutput)
 }
 
+func (i *Bastion) ToOutput(ctx context.Context) pulumix.Output[*Bastion] {
+	return pulumix.Output[*Bastion]{
+		OutputState: i.ToBastionOutputWithContext(ctx).OutputState,
+	}
+}
+
 // BastionArrayInput is an input type that accepts BastionArray and BastionArrayOutput values.
 // You can construct a concrete instance of `BastionArrayInput` via:
 //
@@ -103,6 +111,12 @@ func (i BastionArray) ToBastionArrayOutput() BastionArrayOutput {
 
 func (i BastionArray) ToBastionArrayOutputWithContext(ctx context.Context) BastionArrayOutput {
 	return pulumi.ToOutputWithContext(ctx, i).(BastionArrayOutput)
+}
+
+func (i BastionArray) ToOutput(ctx context.Context) pulumix.Output[[]*Bastion] {
+	return pulumix.Output[[]*Bastion]{
+		OutputState: i.ToBastionArrayOutputWithContext(ctx).OutputState,
+	}
 }
 
 // BastionMapInput is an input type that accepts BastionMap and BastionMapOutput values.
@@ -130,6 +144,12 @@ func (i BastionMap) ToBastionMapOutputWithContext(ctx context.Context) BastionMa
 	return pulumi.ToOutputWithContext(ctx, i).(BastionMapOutput)
 }
 
+func (i BastionMap) ToOutput(ctx context.Context) pulumix.Output[map[string]*Bastion] {
+	return pulumix.Output[map[string]*Bastion]{
+		OutputState: i.ToBastionMapOutputWithContext(ctx).OutputState,
+	}
+}
+
 type BastionOutput struct{ *pulumi.OutputState }
 
 func (BastionOutput) ElementType() reflect.Type {
@@ -142,6 +162,12 @@ func (o BastionOutput) ToBastionOutput() BastionOutput {
 
 func (o BastionOutput) ToBastionOutputWithContext(ctx context.Context) BastionOutput {
 	return o
+}
+
+func (o BastionOutput) ToOutput(ctx context.Context) pulumix.Output[*Bastion] {
+	return pulumix.Output[*Bastion]{
+		OutputState: o.OutputState,
+	}
 }
 
 // The name of the kubernetes deployment that contains the tailscale bastion
@@ -163,6 +189,12 @@ func (o BastionArrayOutput) ToBastionArrayOutputWithContext(ctx context.Context)
 	return o
 }
 
+func (o BastionArrayOutput) ToOutput(ctx context.Context) pulumix.Output[[]*Bastion] {
+	return pulumix.Output[[]*Bastion]{
+		OutputState: o.OutputState,
+	}
+}
+
 func (o BastionArrayOutput) Index(i pulumi.IntInput) BastionOutput {
 	return pulumi.All(o, i).ApplyT(func(vs []interface{}) *Bastion {
 		return vs[0].([]*Bastion)[vs[1].(int)]
@@ -181,6 +213,12 @@ func (o BastionMapOutput) ToBastionMapOutput() BastionMapOutput {
 
 func (o BastionMapOutput) ToBastionMapOutputWithContext(ctx context.Context) BastionMapOutput {
 	return o
+}
+
+func (o BastionMapOutput) ToOutput(ctx context.Context) pulumix.Output[map[string]*Bastion] {
+	return pulumix.Output[map[string]*Bastion]{
+		OutputState: o.OutputState,
+	}
 }
 
 func (o BastionMapOutput) MapIndex(k pulumi.StringInput) BastionOutput {

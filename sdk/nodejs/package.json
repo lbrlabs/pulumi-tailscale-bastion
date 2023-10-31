@@ -3,21 +3,19 @@
     "version": "${VERSION}",
     "repository": "https://github.com/lbrlabs/pulumi-tailscale-bastion",
     "scripts": {
-        "build": "tsc",
-        "install": "node scripts/install-pulumi-plugin.js resource tailscale-bastion ${VERSION}"
+        "build": "tsc"
     },
     "dependencies": {
-        "@pulumi/aws": "^5.0.0",
+        "@pulumi/aws": "^6.0.0",
         "@pulumi/azure": "^5.0.0",
         "@pulumi/kubernetes": "^3.0.0",
+        "@pulumi/pulumi": "^3.42.0",
         "@pulumi/tailscale": "^0.11.0",
         "@pulumi/tls": "^4.0.0"
     },
     "devDependencies": {
+        "@types/node": "^14",
         "typescript": "^3.7.0"
-    },
-    "peerDependencies": {
-        "@pulumi/pulumi": "latest"
     },
     "pulumi": {
         "resource": true,

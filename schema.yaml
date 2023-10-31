@@ -103,7 +103,7 @@ language:
   csharp:
     packageReferences:
       Pulumi: 3.*
-      Pulumi.Aws: 5.*
+      Pulumi.Aws: 6.*
       Pulumi.Azure: 5.*
       Pulumi.Kubernetes: 3.*
       Pulumi.Tls: 4.*
@@ -114,7 +114,7 @@ language:
     importBasePath: github.com/lbrlabs/pulumi-tailscale-bastion/sdk/go/bastion
   nodejs:
     dependencies:
-      "@pulumi/aws": "^5.0.0"
+      "@pulumi/aws": "^6.0.0"
       "@pulumi/azure": "^5.0.0"
       "@pulumi/tls": "^4.0.0"
       "@pulumi/kubernetes": "^3.0.0"
@@ -127,7 +127,7 @@ language:
     requires:
       pulumi: ">=3.0.0,<4.0.0"
       pulumi-kubernetes: ">=3.0.0,<4.0.0"
-      pulumi-aws: ">=5.0.0,<6.0.0"
+      pulumi-aws: ">=6.0.0,<7.0.0"
       pulumi-azure: ">=5.0.0,<6.0.0"
       pulumi-tls: ">=4.0.0,<5.0.0"
       pulumi-tailscale: ">=0.0.0,<1.0.0"
