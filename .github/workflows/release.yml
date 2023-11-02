@@ -182,7 +182,7 @@ jobs:
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v3
       with:
-        args: release --rm-dist --skip-validate --timeout 150m0s
+        args: release -p 2 --rm-dist --skip-validate --timeout 150m0s
         version: latest
     strategy:
       fail-fast: true
