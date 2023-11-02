@@ -65,4 +65,4 @@ $ dotnet add package Lbrlabs.PulumiPackage.TailscaleBastion
 
 See the Pulumi registry for API docs:
 
-https://www.pulumi.com/registry/packages/lbrlabs-tailscale-bastion{/api-docs/
+https://www.pulumi.com/registry/packages/lbrlabs-tailscale-bastion/api-docs/
