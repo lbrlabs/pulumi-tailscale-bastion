@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"text/template"
 
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/autoscaling"
@@ -24,17 +25,28 @@ var (
 
 // The set of arguments for creating a Bastion component resource.
 type BastionArgs struct {
-	VpcID        pulumi.StringInput      `pulumi:"vpcId"`
-	SubnetIds    pulumi.StringArrayInput `pulumi:"subnetIds"`
-	Route        pulumi.StringInput      `pulumi:"route"`
-	Region       pulumi.StringInput      `pulumi:"region"`
-	InstanceType pulumi.StringInput      `pulumi:"instanceType"`
+	VpcID         pulumi.StringInput      `pulumi:"vpcId"`
+	SubnetIds     pulumi.StringArrayInput `pulumi:"subnetIds"`
+	TailscaleTags pulumi.StringArrayInput `pulumi:"tailscaleTags"`
+	Route         pulumi.StringInput      `pulumi:"route"`
+	Region        pulumi.StringInput      `pulumi:"region"`
+	InstanceType  pulumi.StringInput      `pulumi:"instanceType"`
 }
 
 type UserDataArgs struct {
 	ParameterName string
 	Route         string
 	Region        string
+	TailscaleTags []string
+}
+
+// Join the tags into a CSV
+func (uda *UserDataArgs) JoinedTags() string {
+	prefixedTags := make([]string, len(uda.TailscaleTags))
+	for i, tag := range uda.TailscaleTags {
+		prefixedTags[i] = "tag:" + tag
+	}
+	return strings.Join(prefixedTags, ",")
 }
 
 // The Bastion component resource.
@@ -64,6 +76,7 @@ func NewBastion(ctx *pulumi.Context,
 		Ephemeral:     pulumi.Bool(true),
 		Preauthorized: pulumi.Bool(true),
 		Reusable:      pulumi.Bool(true),
+		Tags:          args.TailscaleTags,
 	}, pulumi.Parent(component))
 	if err != nil {
 		return nil, fmt.Errorf("error creating tailnet key: %v", err)
@@ -222,12 +235,13 @@ func NewBastion(ctx *pulumi.Context,
 		MostRecent: pulumi.BoolPtr(true),
 	}, pulumi.Parent(component))
 
-	data := pulumi.All(tailnetKeySsmParameter.Name, args.Route, args.Region).ApplyT(
+	data := pulumi.All(tailnetKeySsmParameter.Name, args.Route, args.Region, args.TailscaleTags).ApplyT(
 		func(args []interface{}) (string, error) {
 			d := UserDataArgs{
 				ParameterName: args[0].(string),
 				Route:         args[1].(string),
 				Region:        args[2].(string),
+				TailscaleTags: args[3].([]string),
 			}
 
 			var userDataBytes bytes.Buffer

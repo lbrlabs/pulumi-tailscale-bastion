@@ -72,6 +72,18 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Kubernetes
             set => _routes = value;
         }
 
+        [Input("tailscaleTags")]
+        private InputList<string>? _tailscaleTags;
+
+        /// <summary>
+        /// The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
+        /// </summary>
+        public InputList<string> TailscaleTags
+        {
+            get => _tailscaleTags ?? (_tailscaleTags = new InputList<string>());
+            set => _tailscaleTags = value;
+        }
+
         public BastionArgs()
         {
         }

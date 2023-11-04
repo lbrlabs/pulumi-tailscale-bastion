@@ -59,6 +59,8 @@ type bastionArgs struct {
 	Route string `pulumi:"route"`
 	// The subnet Ids to launch instances in.
 	SubnetIds []string `pulumi:"subnetIds"`
+	// The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
+	TailscaleTags []string `pulumi:"tailscaleTags"`
 	// The VPC the Bastion should be created in.
 	VpcId string `pulumi:"vpcId"`
 }
@@ -73,6 +75,8 @@ type BastionArgs struct {
 	Route pulumi.StringInput
 	// The subnet Ids to launch instances in.
 	SubnetIds pulumi.StringArrayInput
+	// The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
+	TailscaleTags pulumi.StringArrayInput
 	// The VPC the Bastion should be created in.
 	VpcId pulumi.StringInput
 }

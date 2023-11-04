@@ -47,6 +47,8 @@ type bastionArgs struct {
 	Namespace *corev1.Namespace `pulumi:"namespace"`
 	// The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
 	Routes []string `pulumi:"routes"`
+	// The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
+	TailscaleTags []string `pulumi:"tailscaleTags"`
 }
 
 // The set of arguments for constructing a Bastion resource.
@@ -57,6 +59,8 @@ type BastionArgs struct {
 	Namespace corev1.NamespaceInput
 	// The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
 	Routes pulumi.StringArrayInput
+	// The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
+	TailscaleTags pulumi.StringArrayInput
 }
 
 func (BastionArgs) ElementType() reflect.Type {

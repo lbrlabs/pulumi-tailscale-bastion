@@ -46,6 +46,7 @@ export class Bastion extends pulumi.ComponentResource {
             resourceInputs["createNamespace"] = args ? args.createNamespace : undefined;
             resourceInputs["namespace"] = args ? args.namespace : undefined;
             resourceInputs["routes"] = args ? args.routes : undefined;
+            resourceInputs["tailscaleTags"] = args ? args.tailscaleTags : undefined;
             resourceInputs["deploymentName"] = undefined /*out*/;
         } else {
             resourceInputs["deploymentName"] = undefined /*out*/;
@@ -71,4 +72,8 @@ export interface BastionArgs {
      * The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
      */
     routes: pulumi.Input<pulumi.Input<string>[]>;
+    /**
+     * The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
+     */
+    tailscaleTags?: pulumi.Input<pulumi.Input<string>[]>;
 }

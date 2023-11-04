@@ -5,6 +5,7 @@ import (
 	_ "embed" // embed needs to be a blank import
 	"encoding/base64"
 	"fmt"
+	"strings"
 	"text/template"
 
 	"github.com/pulumi/pulumi-azure/sdk/v5/go/azure/compute"
@@ -20,16 +21,27 @@ var (
 
 // The set of arguments for creating a Bastion component resource.
 type BastionArgs struct {
-	ResourceGroupName pulumi.StringInput `pulumi:"resourceGroupName"`
-	SubnetID          pulumi.StringInput `pulumi:"subnetId"`
-	Location          pulumi.StringInput `pulumi:"location"`
-	Route             pulumi.StringInput `pulumi:"route"`
-	InstanceSku       pulumi.StringInput `pulumi:"instanceSku"`
+	ResourceGroupName pulumi.StringInput      `pulumi:"resourceGroupName"`
+	SubnetID          pulumi.StringInput      `pulumi:"subnetId"`
+	Location          pulumi.StringInput      `pulumi:"location"`
+	Route             pulumi.StringInput      `pulumi:"route"`
+	InstanceSku       pulumi.StringInput      `pulumi:"instanceSku"`
+	TailscaleTags     pulumi.StringArrayInput `pulumi:"tailscaleTags"`
 }
 
 type UserDataArgs struct {
-	AuthKey string
-	Route   string
+	AuthKey       string
+	Route         string
+	TailscaleTags []string
+}
+
+// Join the tags into a CSV
+func (uda *UserDataArgs) JoinedTags() string {
+	prefixedTags := make([]string, len(uda.TailscaleTags))
+	for i, tag := range uda.TailscaleTags {
+		prefixedTags[i] = "tag:" + tag
+	}
+	return strings.Join(prefixedTags, ",")
 }
 
 // The Bastion component resource.
@@ -59,16 +71,18 @@ func NewBastion(ctx *pulumi.Context,
 		Ephemeral:     pulumi.Bool(true),
 		Preauthorized: pulumi.Bool(true),
 		Reusable:      pulumi.Bool(true),
+		Tags:          args.TailscaleTags,
 	}, pulumi.Parent(component))
 	if err != nil {
 		return nil, fmt.Errorf("error creating tailnet key: %v", err)
 	}
 
-	data := pulumi.All(tailnetKey.Key, args.Route).ApplyT(
+	data := pulumi.All(tailnetKey.Key, args.Route, args.TailscaleTags).ApplyT(
 		func(args []interface{}) (string, error) {
 			d := UserDataArgs{
-				AuthKey: args[0].(string),
-				Route:   args[1].(string),
+				AuthKey:       args[0].(string),
+				Route:         args[1].(string),
+				TailscaleTags: args[2].([]string),
 			}
 
 			var userDataBytes bytes.Buffer

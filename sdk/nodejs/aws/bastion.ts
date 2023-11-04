@@ -55,6 +55,7 @@ export class Bastion extends pulumi.ComponentResource {
             resourceInputs["region"] = args ? args.region : undefined;
             resourceInputs["route"] = args ? args.route : undefined;
             resourceInputs["subnetIds"] = args ? args.subnetIds : undefined;
+            resourceInputs["tailscaleTags"] = args ? args.tailscaleTags : undefined;
             resourceInputs["vpcId"] = args ? args.vpcId : undefined;
             resourceInputs["asgName"] = undefined /*out*/;
             resourceInputs["privateKey"] = undefined /*out*/;
@@ -87,6 +88,10 @@ export interface BastionArgs {
      * The subnet Ids to launch instances in.
      */
     subnetIds: pulumi.Input<pulumi.Input<string>[]>;
+    /**
+     * The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
+     */
+    tailscaleTags?: pulumi.Input<pulumi.Input<string>[]>;
     /**
      * The VPC the Bastion should be created in.
      */

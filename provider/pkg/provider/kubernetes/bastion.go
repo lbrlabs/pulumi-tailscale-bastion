@@ -17,6 +17,7 @@ type BastionArgs struct {
 	CreateNamespace bool                    `pulumi:"createNamespace"`
 	Namespace       *corev1.Namespace       `pulumi:"namespace"`
 	Routes          pulumi.StringArrayInput `pulumi:"routes"`
+	TailscaleTags   pulumi.StringArrayInput `pulumi:"tailscaleTags"`
 }
 
 // The Bastion component resource.
@@ -45,6 +46,7 @@ func NewBastion(ctx *pulumi.Context,
 		Ephemeral:     pulumi.Bool(true),
 		Preauthorized: pulumi.Bool(true),
 		Reusable:      pulumi.Bool(true),
+		Tags:          args.TailscaleTags,
 	}, pulumi.Parent(component))
 	if err != nil {
 		return nil, fmt.Errorf("error creating tailnet key: %v", err)
