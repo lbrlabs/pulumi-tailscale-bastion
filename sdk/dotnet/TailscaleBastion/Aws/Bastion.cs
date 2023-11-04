@@ -84,7 +84,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
             set => _subnetIds = value;
         }
 
-        [Input("tailscaleTags")]
+        [Input("tailscaleTags", required: true)]
         private InputList<string>? _tailscaleTags;
 
         /// <summary>

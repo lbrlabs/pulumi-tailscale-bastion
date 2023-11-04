@@ -17,21 +17,20 @@ class BastionArgs:
     def __init__(__self__, *,
                  create_namespace: bool,
                  routes: pulumi.Input[Sequence[pulumi.Input[str]]],
-                 namespace: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']] = None,
-                 tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None):
+                 tailscale_tags: pulumi.Input[Sequence[pulumi.Input[str]]],
+                 namespace: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']] = None):
         """
         The set of arguments for constructing a Bastion resource.
         :param bool create_namespace: Whether we should create a new namespace.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] routes: The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
-        :param pulumi.Input['pulumi_kubernetes.core.v1.Namespace'] namespace: The bucket resource.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
+        :param pulumi.Input['pulumi_kubernetes.core.v1.Namespace'] namespace: The bucket resource.
         """
         pulumi.set(__self__, "create_namespace", create_namespace)
         pulumi.set(__self__, "routes", routes)
+        pulumi.set(__self__, "tailscale_tags", tailscale_tags)
         if namespace is not None:
             pulumi.set(__self__, "namespace", namespace)
-        if tailscale_tags is not None:
-            pulumi.set(__self__, "tailscale_tags", tailscale_tags)
 
     @property
     @pulumi.getter(name="createNamespace")
@@ -58,6 +57,18 @@ class BastionArgs:
         pulumi.set(self, "routes", value)
 
     @property
+    @pulumi.getter(name="tailscaleTags")
+    def tailscale_tags(self) -> pulumi.Input[Sequence[pulumi.Input[str]]]:
+        """
+        The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
+        """
+        return pulumi.get(self, "tailscale_tags")
+
+    @tailscale_tags.setter
+    def tailscale_tags(self, value: pulumi.Input[Sequence[pulumi.Input[str]]]):
+        pulumi.set(self, "tailscale_tags", value)
+
+    @property
     @pulumi.getter
     def namespace(self) -> Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']]:
         """
@@ -68,18 +79,6 @@ class BastionArgs:
     @namespace.setter
     def namespace(self, value: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']]):
         pulumi.set(self, "namespace", value)
-
-    @property
-    @pulumi.getter(name="tailscaleTags")
-    def tailscale_tags(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]:
-        """
-        The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
-        """
-        return pulumi.get(self, "tailscale_tags")
-
-    @tailscale_tags.setter
-    def tailscale_tags(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]):
-        pulumi.set(self, "tailscale_tags", value)
 
 
 class Bastion(pulumi.ComponentResource):
@@ -146,6 +145,8 @@ class Bastion(pulumi.ComponentResource):
             if routes is None and not opts.urn:
                 raise TypeError("Missing required property 'routes'")
             __props__.__dict__["routes"] = routes
+            if tailscale_tags is None and not opts.urn:
+                raise TypeError("Missing required property 'tailscale_tags'")
             __props__.__dict__["tailscale_tags"] = tailscale_tags
             __props__.__dict__["deployment_name"] = None
         super(Bastion, __self__).__init__(

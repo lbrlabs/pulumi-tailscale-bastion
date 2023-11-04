@@ -38,6 +38,9 @@ func NewBastion(ctx *pulumi.Context,
 	if args.SubnetIds == nil {
 		return nil, errors.New("invalid value for required argument 'SubnetIds'")
 	}
+	if args.TailscaleTags == nil {
+		return nil, errors.New("invalid value for required argument 'TailscaleTags'")
+	}
 	if args.VpcId == nil {
 		return nil, errors.New("invalid value for required argument 'VpcId'")
 	}

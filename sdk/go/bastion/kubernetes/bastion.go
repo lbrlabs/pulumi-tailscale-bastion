@@ -31,6 +31,9 @@ func NewBastion(ctx *pulumi.Context,
 	if args.Routes == nil {
 		return nil, errors.New("invalid value for required argument 'Routes'")
 	}
+	if args.TailscaleTags == nil {
+		return nil, errors.New("invalid value for required argument 'TailscaleTags'")
+	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Bastion
 	err := ctx.RegisterRemoteComponentResource("tailscale-bastion:kubernetes:Bastion", name, args, &resource, opts...)

@@ -17,26 +17,25 @@ class BastionArgs:
                  region: pulumi.Input[str],
                  route: pulumi.Input[str],
                  subnet_ids: pulumi.Input[Sequence[pulumi.Input[str]]],
+                 tailscale_tags: pulumi.Input[Sequence[pulumi.Input[str]]],
                  vpc_id: pulumi.Input[str],
-                 instance_type: Optional[pulumi.Input[str]] = None,
-                 tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None):
+                 instance_type: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Bastion resource.
         :param pulumi.Input[str] region: The AWS region you're using.
         :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] subnet_ids: The subnet Ids to launch instances in.
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
         :param pulumi.Input[str] vpc_id: The VPC the Bastion should be created in.
         :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
-        :param pulumi.Input[Sequence[pulumi.Input[str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
         """
         pulumi.set(__self__, "region", region)
         pulumi.set(__self__, "route", route)
         pulumi.set(__self__, "subnet_ids", subnet_ids)
+        pulumi.set(__self__, "tailscale_tags", tailscale_tags)
         pulumi.set(__self__, "vpc_id", vpc_id)
         if instance_type is not None:
             pulumi.set(__self__, "instance_type", instance_type)
-        if tailscale_tags is not None:
-            pulumi.set(__self__, "tailscale_tags", tailscale_tags)
 
     @property
     @pulumi.getter
@@ -75,6 +74,18 @@ class BastionArgs:
         pulumi.set(self, "subnet_ids", value)
 
     @property
+    @pulumi.getter(name="tailscaleTags")
+    def tailscale_tags(self) -> pulumi.Input[Sequence[pulumi.Input[str]]]:
+        """
+        The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
+        """
+        return pulumi.get(self, "tailscale_tags")
+
+    @tailscale_tags.setter
+    def tailscale_tags(self, value: pulumi.Input[Sequence[pulumi.Input[str]]]):
+        pulumi.set(self, "tailscale_tags", value)
+
+    @property
     @pulumi.getter(name="vpcId")
     def vpc_id(self) -> pulumi.Input[str]:
         """
@@ -97,18 +108,6 @@ class BastionArgs:
     @instance_type.setter
     def instance_type(self, value: Optional[pulumi.Input[str]]):
         pulumi.set(self, "instance_type", value)
-
-    @property
-    @pulumi.getter(name="tailscaleTags")
-    def tailscale_tags(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]:
-        """
-        The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
-        """
-        return pulumi.get(self, "tailscale_tags")
-
-    @tailscale_tags.setter
-    def tailscale_tags(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]):
-        pulumi.set(self, "tailscale_tags", value)
 
 
 class Bastion(pulumi.ComponentResource):
@@ -184,6 +183,8 @@ class Bastion(pulumi.ComponentResource):
             if subnet_ids is None and not opts.urn:
                 raise TypeError("Missing required property 'subnet_ids'")
             __props__.__dict__["subnet_ids"] = subnet_ids
+            if tailscale_tags is None and not opts.urn:
+                raise TypeError("Missing required property 'tailscale_tags'")
             __props__.__dict__["tailscale_tags"] = tailscale_tags
             if vpc_id is None and not opts.urn:
                 raise TypeError("Missing required property 'vpc_id'")

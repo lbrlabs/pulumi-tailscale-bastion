@@ -72,7 +72,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Kubernetes
             set => _routes = value;
         }
 
-        [Input("tailscaleTags")]
+        [Input("tailscaleTags", required: true)]
         private InputList<string>? _tailscaleTags;
 
         /// <summary>

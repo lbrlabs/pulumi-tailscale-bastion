@@ -41,6 +41,9 @@ func NewBastion(ctx *pulumi.Context,
 	if args.SubnetId == nil {
 		return nil, errors.New("invalid value for required argument 'SubnetId'")
 	}
+	if args.TailscaleTags == nil {
+		return nil, errors.New("invalid value for required argument 'TailscaleTags'")
+	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Bastion
 	err := ctx.RegisterRemoteComponentResource("tailscale-bastion:azure:Bastion", name, args, &resource, opts...)

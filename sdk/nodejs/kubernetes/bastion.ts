@@ -43,6 +43,9 @@ export class Bastion extends pulumi.ComponentResource {
             if ((!args || args.routes === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'routes'");
             }
+            if ((!args || args.tailscaleTags === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'tailscaleTags'");
+            }
             resourceInputs["createNamespace"] = args ? args.createNamespace : undefined;
             resourceInputs["namespace"] = args ? args.namespace : undefined;
             resourceInputs["routes"] = args ? args.routes : undefined;
@@ -75,5 +78,5 @@ export interface BastionArgs {
     /**
      * The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
      */
-    tailscaleTags?: pulumi.Input<pulumi.Input<string>[]>;
+    tailscaleTags: pulumi.Input<pulumi.Input<string>[]>;
 }

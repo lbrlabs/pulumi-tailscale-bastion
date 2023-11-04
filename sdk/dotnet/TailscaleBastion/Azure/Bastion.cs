@@ -84,7 +84,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
         [Input("subnetId", required: true)]
         public Input<string> SubnetId { get; set; } = null!;
 
-        [Input("tailscaleTags")]
+        [Input("tailscaleTags", required: true)]
         private InputList<string>? _tailscaleTags;
 
         /// <summary>

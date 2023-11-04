@@ -48,6 +48,9 @@ export class Bastion extends pulumi.ComponentResource {
             if ((!args || args.subnetIds === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'subnetIds'");
             }
+            if ((!args || args.tailscaleTags === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'tailscaleTags'");
+            }
             if ((!args || args.vpcId === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'vpcId'");
             }
@@ -91,7 +94,7 @@ export interface BastionArgs {
     /**
      * The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
      */
-    tailscaleTags?: pulumi.Input<pulumi.Input<string>[]>;
+    tailscaleTags: pulumi.Input<pulumi.Input<string>[]>;
     /**
      * The VPC the Bastion should be created in.
      */
