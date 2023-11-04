@@ -37,11 +37,7 @@ type UserDataArgs struct {
 
 // Join the tags into a CSV
 func (uda *UserDataArgs) JoinedTags() string {
-	prefixedTags := make([]string, len(uda.TailscaleTags))
-	for i, tag := range uda.TailscaleTags {
-		prefixedTags[i] = "tag:" + tag
-	}
-	return strings.Join(prefixedTags, ",")
+	return strings.Join(uda.TailscaleTags, ",")
 }
 
 // The Bastion component resource.
