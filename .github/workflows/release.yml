@@ -96,7 +96,7 @@ jobs:
         - "3.7"
   prerequisites:
     name: prerequisites
-    runs-on: ubuntu-latestt
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
@@ -161,7 +161,7 @@ jobs:
   publish:
     name: publish
     needs: test
-    runs-on: ubuntu-latestt
+    runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
     - name: Checkout Repo
