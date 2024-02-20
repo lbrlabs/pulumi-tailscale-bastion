@@ -34,6 +34,9 @@ func NewBastion(ctx *pulumi.Context,
 	if args.TailscaleTags == nil {
 		return nil, errors.New("invalid value for required argument 'TailscaleTags'")
 	}
+	if args.HighAvailability == nil {
+		args.HighAvailability = pulumi.Bool(false)
+	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Bastion
 	err := ctx.RegisterRemoteComponentResource("tailscale-bastion:kubernetes:Bastion", name, args, &resource, opts...)
@@ -46,6 +49,8 @@ func NewBastion(ctx *pulumi.Context,
 type bastionArgs struct {
 	// Whether we should create a new namespace.
 	CreateNamespace bool `pulumi:"createNamespace"`
+	// Whether the bastion should be highly available.
+	HighAvailability bool `pulumi:"highAvailability"`
 	// The bucket resource.
 	Namespace *corev1.Namespace `pulumi:"namespace"`
 	// The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
@@ -58,6 +63,8 @@ type bastionArgs struct {
 type BastionArgs struct {
 	// Whether we should create a new namespace.
 	CreateNamespace bool
+	// Whether the bastion should be highly available.
+	HighAvailability pulumi.BoolInput
 	// The bucket resource.
 	Namespace corev1.NamespaceInput
 	// The routes to advertise to tailscale. This is likely the Pod and Service CIDR.

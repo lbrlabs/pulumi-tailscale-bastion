@@ -25,12 +25,13 @@ var (
 
 // The set of arguments for creating a Bastion component resource.
 type BastionArgs struct {
-	VpcID         pulumi.StringInput      `pulumi:"vpcId"`
-	SubnetIds     pulumi.StringArrayInput `pulumi:"subnetIds"`
-	TailscaleTags pulumi.StringArrayInput `pulumi:"tailscaleTags"`
-	Route         pulumi.StringInput      `pulumi:"route"`
-	Region        pulumi.StringInput      `pulumi:"region"`
-	InstanceType  pulumi.StringInput      `pulumi:"instanceType"`
+	VpcID            pulumi.StringInput      `pulumi:"vpcId"`
+	SubnetIds        pulumi.StringArrayInput `pulumi:"subnetIds"`
+	TailscaleTags    pulumi.StringArrayInput `pulumi:"tailscaleTags"`
+	Route            pulumi.StringInput      `pulumi:"route"`
+	Region           pulumi.StringInput      `pulumi:"region"`
+	InstanceType     pulumi.StringInput      `pulumi:"instanceType"`
+	HighAvailability bool                    `pulumi:"highAvailability"`
 }
 
 type UserDataArgs struct {
@@ -291,10 +292,18 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating launch configuration: %v", err)
 	}
 
+	var size int
+
+	if args.HighAvailability {
+		size = 2
+	} else {
+		size = 1
+	}
+
 	asg, err := autoscaling.NewGroup(ctx, name, &autoscaling.GroupArgs{
 		LaunchConfiguration:    launchConfiguration.ID(),
-		MaxSize:                pulumi.Int(1),
-		MinSize:                pulumi.Int(1),
+		MaxSize:                pulumi.Int(size),
+		MinSize:                pulumi.Int(size),
 		HealthCheckType:        pulumi.String("EC2"),
 		HealthCheckGracePeriod: pulumi.Int(30),
 		VpcZoneIdentifiers:     args.SubnetIds,

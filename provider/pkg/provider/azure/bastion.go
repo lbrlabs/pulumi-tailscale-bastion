@@ -27,6 +27,7 @@ type BastionArgs struct {
 	Route             pulumi.StringInput      `pulumi:"route"`
 	InstanceSku       pulumi.StringInput      `pulumi:"instanceSku"`
 	TailscaleTags     pulumi.StringArrayInput `pulumi:"tailscaleTags"`
+	HighAvailability  bool                    `pulumi:"highAvailability"`
 }
 
 type UserDataArgs struct {
@@ -113,12 +114,20 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, err
 	}
 
+	var size int
+
+	if args.HighAvailability {
+		size = 2
+	} else {
+		size = 1
+	}
+
 	scaleset, err := compute.NewLinuxVirtualMachineScaleSet(ctx, name, &compute.LinuxVirtualMachineScaleSetArgs{
 		ResourceGroupName: args.ResourceGroupName,
 		Location:          args.Location,
 		UpgradeMode:       pulumi.String("Manual"),
 		Sku:               sku,
-		Instances:         pulumi.Int(1),
+		Instances:         pulumi.Int(size),
 		SourceImageReference: &compute.LinuxVirtualMachineScaleSetSourceImageReferenceArgs{
 			Publisher: pulumi.String("Canonical"),
 			Offer:     pulumi.String("0001-com-ubuntu-server-focal"),

@@ -44,6 +44,9 @@ func NewBastion(ctx *pulumi.Context,
 	if args.VpcId == nil {
 		return nil, errors.New("invalid value for required argument 'VpcId'")
 	}
+	if args.HighAvailability == nil {
+		args.HighAvailability = pulumi.Bool(false)
+	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Bastion
 	err := ctx.RegisterRemoteComponentResource("tailscale-bastion:aws:Bastion", name, args, &resource, opts...)
@@ -54,6 +57,8 @@ func NewBastion(ctx *pulumi.Context,
 }
 
 type bastionArgs struct {
+	// Whether the bastion should be highly available.
+	HighAvailability bool `pulumi:"highAvailability"`
 	// The EC2 instance type to use for the bastion.
 	InstanceType *string `pulumi:"instanceType"`
 	// The AWS region you're using.
@@ -70,6 +75,8 @@ type bastionArgs struct {
 
 // The set of arguments for constructing a Bastion resource.
 type BastionArgs struct {
+	// Whether the bastion should be highly available.
+	HighAvailability pulumi.BoolInput
 	// The EC2 instance type to use for the bastion.
 	InstanceType pulumi.StringPtrInput
 	// The AWS region you're using.

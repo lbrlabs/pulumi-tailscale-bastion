@@ -44,6 +44,9 @@ func NewBastion(ctx *pulumi.Context,
 	if args.TailscaleTags == nil {
 		return nil, errors.New("invalid value for required argument 'TailscaleTags'")
 	}
+	if args.HighAvailability == nil {
+		args.HighAvailability = pulumi.Bool(false)
+	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Bastion
 	err := ctx.RegisterRemoteComponentResource("tailscale-bastion:azure:Bastion", name, args, &resource, opts...)
@@ -54,6 +57,8 @@ func NewBastion(ctx *pulumi.Context,
 }
 
 type bastionArgs struct {
+	// Whether the bastion should be highly available.
+	HighAvailability bool `pulumi:"highAvailability"`
 	// The Azure instance SKU to use for the bastion.
 	InstanceSku *string `pulumi:"instanceSku"`
 	// The Azure region you're using.
@@ -70,6 +75,8 @@ type bastionArgs struct {
 
 // The set of arguments for constructing a Bastion resource.
 type BastionArgs struct {
+	// Whether the bastion should be highly available.
+	HighAvailability pulumi.BoolInput
 	// The Azure instance SKU to use for the bastion.
 	InstanceSku pulumi.StringPtrInput
 	// The Azure region you're using.

@@ -25,12 +25,17 @@ resources:
       instanceSku:
         type: string
         description: "The Azure instance SKU to use for the bastion."
+      highAvailability:
+        type: boolean
+        description: "Whether the bastion should be highly available."
+        default: false
       tailscaleTags:
         type: array
         items:
           type: string
         description: "The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL."
     requiredInputs:
+      - highAvailability
       - resourceGroupName
       - subnetId
       - route
@@ -49,6 +54,10 @@ resources:
   tailscale-bastion:aws:Bastion:
     isComponent: true
     inputProperties:
+      highAvailability:
+        type: boolean
+        description: "Whether the bastion should be highly available."
+        default: false
       vpcId:
         type: string
         description: "The VPC the Bastion should be created in."
@@ -72,6 +81,7 @@ resources:
         type: string
         description: "The EC2 instance type to use for the bastion."
     requiredInputs:
+      - highAvailability
       - vpcId
       - subnetIds
       - route
@@ -90,6 +100,10 @@ resources:
   tailscale-bastion:kubernetes:Bastion:
     isComponent: true
     inputProperties:
+      highAvailability:
+        type: boolean
+        description: "Whether the bastion should be highly available."
+        default: false
       tailscaleTags:
         type: array
         items:
@@ -108,6 +122,7 @@ resources:
           type: string
         description: "The routes to advertise to tailscale. This is likely the Pod and Service CIDR."
     requiredInputs:
+      - highAvailability
       - createNamespace
       - routes
       - tailscaleTags
