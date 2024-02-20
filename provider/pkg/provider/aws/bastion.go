@@ -32,6 +32,7 @@ type BastionArgs struct {
 	Region           pulumi.StringInput      `pulumi:"region"`
 	InstanceType     pulumi.StringInput      `pulumi:"instanceType"`
 	HighAvailability bool                    `pulumi:"highAvailability"`
+	EnableSSH        bool                    `pulumi:"enableSSH"`
 }
 
 type UserDataArgs struct {
@@ -39,6 +40,7 @@ type UserDataArgs struct {
 	Route         string
 	Region        string
 	TailscaleTags []string
+	EnableSSH     bool
 }
 
 // Join the tags into a CSV
@@ -232,13 +234,14 @@ func NewBastion(ctx *pulumi.Context,
 		MostRecent: pulumi.BoolPtr(true),
 	}, pulumi.Parent(component))
 
-	data := pulumi.All(tailnetKeySsmParameter.Name, args.Route, args.Region, args.TailscaleTags).ApplyT(
+	data := pulumi.All(tailnetKeySsmParameter.Name, args.Route, args.Region, args.TailscaleTags, args.EnableSSH).ApplyT(
 		func(args []interface{}) (string, error) {
 			d := UserDataArgs{
 				ParameterName: args[0].(string),
 				Route:         args[1].(string),
 				Region:        args[2].(string),
 				TailscaleTags: args[3].([]string),
+				EnableSSH:     args[4].(bool),
 			}
 
 			var userDataBytes bytes.Buffer

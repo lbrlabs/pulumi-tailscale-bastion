@@ -28,12 +28,14 @@ type BastionArgs struct {
 	InstanceSku       pulumi.StringInput      `pulumi:"instanceSku"`
 	TailscaleTags     pulumi.StringArrayInput `pulumi:"tailscaleTags"`
 	HighAvailability  bool                    `pulumi:"highAvailability"`
+	EnableSSH         bool                    `pulumi:"enableSSH"`
 }
 
 type UserDataArgs struct {
 	AuthKey       string
 	Route         string
 	TailscaleTags []string
+	EnableSSH     bool
 }
 
 // Join the tags into a CSV
@@ -74,12 +76,13 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating tailnet key: %v", err)
 	}
 
-	data := pulumi.All(tailnetKey.Key, args.Route, args.TailscaleTags).ApplyT(
+	data := pulumi.All(tailnetKey.Key, args.Route, args.TailscaleTags, args.EnableSSH).ApplyT(
 		func(args []interface{}) (string, error) {
 			d := UserDataArgs{
 				AuthKey:       args[0].(string),
 				Route:         args[1].(string),
 				TailscaleTags: args[2].([]string),
+				EnableSSH:     args[3].(bool),
 			}
 
 			var userDataBytes bytes.Buffer
