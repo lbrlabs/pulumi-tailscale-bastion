@@ -55,6 +55,12 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
     public sealed class BastionArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// Whether to enable SSH access to the bastion.
+        /// </summary>
+        [Input("enableSSH")]
+        public Input<bool>? EnableSSH { get; set; }
+
+        /// <summary>
         /// Whether the bastion should be highly available.
         /// </summary>
         [Input("highAvailability", required: true)]
@@ -110,6 +116,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
 
         public BastionArgs()
         {
+            EnableSSH = true;
             HighAvailability = false;
         }
         public static new BastionArgs Empty => new BastionArgs();

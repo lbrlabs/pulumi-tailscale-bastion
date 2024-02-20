@@ -2,20 +2,26 @@
 
 import pulumi
 import pulumi_awsx as awsx
-import lbrlabs_pulumi_aws_tailscalebastion as lbrlabs
+import lbrlabs_pulumi_tailscalebastion as tailscale
 
 vpc = awsx.ec2.Vpc(
     "example",
     cidr_block="172.20.0.0/22",
+#     nat_gateways=awsx.ec2.NatGatewayConfigurationArgs(
+#         strategy=awsx.ec2.NatGatewayStrategy.NONE
+#     ),
 )
 
-bastion = lbrlabs.Bastion(
+bastion = tailscale.aws.Bastion(
     "example",
     vpc_id=vpc.vpc_id,
     subnet_ids=vpc.private_subnet_ids,
     route="172.20.0.0/22",
+    tailscale_tags=["tag:bastion"],
     region="us-west-2",
+    high_availability=True,
+    enable_ssh=True,
 )
 
 
-pulumi.export("vpcId", vpc.id)
+pulumi.export("vpcId", vpc.vpc_id)

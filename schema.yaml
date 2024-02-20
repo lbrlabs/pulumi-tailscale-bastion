@@ -10,6 +10,10 @@ resources:
   tailscale-bastion:azure:Bastion:
     isComponent: true
     inputProperties:
+      enableSSH:
+        type: boolean
+        description: "Whether to enable SSH access to the bastion."
+        default: true
       resourceGroupName:
         type: string
         description: "The Azure resource group to create the bastion in."
@@ -54,6 +58,10 @@ resources:
   tailscale-bastion:aws:Bastion:
     isComponent: true
     inputProperties:
+      enableSSH:
+        type: boolean
+        description: "Whether to enable SSH access to the bastion."
+        default: true
       highAvailability:
         type: boolean
         description: "Whether the bastion should be highly available."

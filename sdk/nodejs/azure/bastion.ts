@@ -57,6 +57,7 @@ export class Bastion extends pulumi.ComponentResource {
             if ((!args || args.tailscaleTags === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'tailscaleTags'");
             }
+            resourceInputs["enableSSH"] = (args ? args.enableSSH : undefined) ?? true;
             resourceInputs["highAvailability"] = (args ? args.highAvailability : undefined) ?? false;
             resourceInputs["instanceSku"] = args ? args.instanceSku : undefined;
             resourceInputs["location"] = args ? args.location : undefined;
@@ -79,6 +80,10 @@ export class Bastion extends pulumi.ComponentResource {
  * The set of arguments for constructing a Bastion resource.
  */
 export interface BastionArgs {
+    /**
+     * Whether to enable SSH access to the bastion.
+     */
+    enableSSH?: pulumi.Input<boolean>;
     /**
      * Whether the bastion should be highly available.
      */

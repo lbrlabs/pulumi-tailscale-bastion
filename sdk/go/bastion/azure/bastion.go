@@ -44,6 +44,9 @@ func NewBastion(ctx *pulumi.Context,
 	if args.TailscaleTags == nil {
 		return nil, errors.New("invalid value for required argument 'TailscaleTags'")
 	}
+	if args.EnableSSH == nil {
+		args.EnableSSH = pulumi.BoolPtr(true)
+	}
 	if args.HighAvailability == nil {
 		args.HighAvailability = pulumi.Bool(false)
 	}
@@ -57,6 +60,8 @@ func NewBastion(ctx *pulumi.Context,
 }
 
 type bastionArgs struct {
+	// Whether to enable SSH access to the bastion.
+	EnableSSH *bool `pulumi:"enableSSH"`
 	// Whether the bastion should be highly available.
 	HighAvailability bool `pulumi:"highAvailability"`
 	// The Azure instance SKU to use for the bastion.
@@ -75,6 +80,8 @@ type bastionArgs struct {
 
 // The set of arguments for constructing a Bastion resource.
 type BastionArgs struct {
+	// Whether to enable SSH access to the bastion.
+	EnableSSH pulumi.BoolPtrInput
 	// Whether the bastion should be highly available.
 	HighAvailability pulumi.BoolInput
 	// The Azure instance SKU to use for the bastion.
