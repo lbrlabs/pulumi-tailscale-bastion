@@ -55,6 +55,12 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Kubernetes
         public bool CreateNamespace { get; set; }
 
         /// <summary>
+        /// Whether the bastion should be highly available.
+        /// </summary>
+        [Input("highAvailability", required: true)]
+        public Input<bool> HighAvailability { get; set; } = null!;
+
+        /// <summary>
         /// The bucket resource.
         /// </summary>
         [Input("namespace")]
@@ -86,6 +92,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Kubernetes
 
         public BastionArgs()
         {
+            HighAvailability = false;
         }
         public static new BastionArgs Empty => new BastionArgs();
     }

@@ -40,6 +40,9 @@ export class Bastion extends pulumi.ComponentResource {
             if ((!args || args.createNamespace === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'createNamespace'");
             }
+            if ((!args || args.highAvailability === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'highAvailability'");
+            }
             if ((!args || args.routes === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'routes'");
             }
@@ -47,6 +50,7 @@ export class Bastion extends pulumi.ComponentResource {
                 throw new Error("Missing required property 'tailscaleTags'");
             }
             resourceInputs["createNamespace"] = args ? args.createNamespace : undefined;
+            resourceInputs["highAvailability"] = (args ? args.highAvailability : undefined) ?? false;
             resourceInputs["namespace"] = args ? args.namespace : undefined;
             resourceInputs["routes"] = args ? args.routes : undefined;
             resourceInputs["tailscaleTags"] = args ? args.tailscaleTags : undefined;
@@ -67,6 +71,10 @@ export interface BastionArgs {
      * Whether we should create a new namespace.
      */
     createNamespace: boolean;
+    /**
+     * Whether the bastion should be highly available.
+     */
+    highAvailability: pulumi.Input<boolean>;
     /**
      * The bucket resource.
      */

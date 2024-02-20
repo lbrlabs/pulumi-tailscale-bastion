@@ -14,6 +14,7 @@ __all__ = ['BastionArgs', 'Bastion']
 @pulumi.input_type
 class BastionArgs:
     def __init__(__self__, *,
+                 high_availability: Optional[pulumi.Input[bool]] = None,
                  region: pulumi.Input[str],
                  route: pulumi.Input[str],
                  subnet_ids: pulumi.Input[Sequence[pulumi.Input[str]]],
@@ -22,6 +23,7 @@ class BastionArgs:
                  instance_type: Optional[pulumi.Input[str]] = None):
         """
         The set of arguments for constructing a Bastion resource.
+        :param pulumi.Input[bool] high_availability: Whether the bastion should be highly available.
         :param pulumi.Input[str] region: The AWS region you're using.
         :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] subnet_ids: The subnet Ids to launch instances in.
@@ -29,6 +31,9 @@ class BastionArgs:
         :param pulumi.Input[str] vpc_id: The VPC the Bastion should be created in.
         :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
         """
+        if high_availability is None:
+            high_availability = False
+        pulumi.set(__self__, "high_availability", high_availability)
         pulumi.set(__self__, "region", region)
         pulumi.set(__self__, "route", route)
         pulumi.set(__self__, "subnet_ids", subnet_ids)
@@ -36,6 +41,18 @@ class BastionArgs:
         pulumi.set(__self__, "vpc_id", vpc_id)
         if instance_type is not None:
             pulumi.set(__self__, "instance_type", instance_type)
+
+    @property
+    @pulumi.getter(name="highAvailability")
+    def high_availability(self) -> pulumi.Input[bool]:
+        """
+        Whether the bastion should be highly available.
+        """
+        return pulumi.get(self, "high_availability")
+
+    @high_availability.setter
+    def high_availability(self, value: pulumi.Input[bool]):
+        pulumi.set(self, "high_availability", value)
 
     @property
     @pulumi.getter
@@ -115,6 +132,7 @@ class Bastion(pulumi.ComponentResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 high_availability: Optional[pulumi.Input[bool]] = None,
                  instance_type: Optional[pulumi.Input[str]] = None,
                  region: Optional[pulumi.Input[str]] = None,
                  route: Optional[pulumi.Input[str]] = None,
@@ -126,6 +144,7 @@ class Bastion(pulumi.ComponentResource):
         Create a Bastion resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[bool] high_availability: Whether the bastion should be highly available.
         :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
         :param pulumi.Input[str] region: The AWS region you're using.
         :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
@@ -156,6 +175,7 @@ class Bastion(pulumi.ComponentResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 high_availability: Optional[pulumi.Input[bool]] = None,
                  instance_type: Optional[pulumi.Input[str]] = None,
                  region: Optional[pulumi.Input[str]] = None,
                  route: Optional[pulumi.Input[str]] = None,
@@ -173,6 +193,11 @@ class Bastion(pulumi.ComponentResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = BastionArgs.__new__(BastionArgs)
 
+            if high_availability is None:
+                high_availability = False
+            if high_availability is None and not opts.urn:
+                raise TypeError("Missing required property 'high_availability'")
+            __props__.__dict__["high_availability"] = high_availability
             __props__.__dict__["instance_type"] = instance_type
             if region is None and not opts.urn:
                 raise TypeError("Missing required property 'region'")

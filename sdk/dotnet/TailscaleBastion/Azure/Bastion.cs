@@ -55,6 +55,12 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
     public sealed class BastionArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// Whether the bastion should be highly available.
+        /// </summary>
+        [Input("highAvailability", required: true)]
+        public Input<bool> HighAvailability { get; set; } = null!;
+
+        /// <summary>
         /// The Azure instance SKU to use for the bastion.
         /// </summary>
         [Input("instanceSku")]
@@ -98,6 +104,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
 
         public BastionArgs()
         {
+            HighAvailability = false;
         }
         public static new BastionArgs Empty => new BastionArgs();
     }

@@ -14,10 +14,11 @@ import (
 
 // The set of arguments for creating a Bastion component resource.
 type BastionArgs struct {
-	CreateNamespace bool                    `pulumi:"createNamespace"`
-	Namespace       *corev1.Namespace       `pulumi:"namespace"`
-	Routes          pulumi.StringArrayInput `pulumi:"routes"`
-	TailscaleTags   pulumi.StringArrayInput `pulumi:"tailscaleTags"`
+	CreateNamespace  bool                    `pulumi:"createNamespace"`
+	Namespace        *corev1.Namespace       `pulumi:"namespace"`
+	Routes           pulumi.StringArrayInput `pulumi:"routes"`
+	TailscaleTags    pulumi.StringArrayInput `pulumi:"tailscaleTags"`
+	HighAvailability bool                    `pulumi:"highAvailability"`
 }
 
 // The Bastion component resource.
@@ -149,12 +150,20 @@ func NewBastion(ctx *pulumi.Context,
 		},
 	).(pulumi.StringOutput)
 
+	var size int
+
+	if args.HighAvailability {
+		size = 2
+	} else {
+		size = 1
+	}
+
 	deployment, err := appsv1.NewDeployment(ctx, name, &appsv1.DeploymentArgs{
 		Metadata: &metav1.ObjectMetaArgs{
 			Namespace: namespace.Metadata.Name(),
 		},
 		Spec: &appsv1.DeploymentSpecArgs{
-			Replicas: pulumi.Int(1),
+			Replicas: pulumi.Int(size),
 			Selector: &metav1.LabelSelectorArgs{
 				MatchLabels: pulumi.StringMap{
 					"name":        pulumi.String(name),

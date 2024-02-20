@@ -39,6 +39,9 @@ export class Bastion extends pulumi.ComponentResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
+            if ((!args || args.highAvailability === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'highAvailability'");
+            }
             if ((!args || args.region === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'region'");
             }
@@ -54,6 +57,7 @@ export class Bastion extends pulumi.ComponentResource {
             if ((!args || args.vpcId === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'vpcId'");
             }
+            resourceInputs["highAvailability"] = (args ? args.highAvailability : undefined) ?? false;
             resourceInputs["instanceType"] = args ? args.instanceType : undefined;
             resourceInputs["region"] = args ? args.region : undefined;
             resourceInputs["route"] = args ? args.route : undefined;
@@ -75,6 +79,10 @@ export class Bastion extends pulumi.ComponentResource {
  * The set of arguments for constructing a Bastion resource.
  */
 export interface BastionArgs {
+    /**
+     * Whether the bastion should be highly available.
+     */
+    highAvailability: pulumi.Input<boolean>;
     /**
      * The EC2 instance type to use for the bastion.
      */

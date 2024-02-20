@@ -16,17 +16,22 @@ __all__ = ['BastionArgs', 'Bastion']
 class BastionArgs:
     def __init__(__self__, *,
                  create_namespace: bool,
+                 high_availability: Optional[pulumi.Input[bool]] = None,
                  routes: pulumi.Input[Sequence[pulumi.Input[str]]],
                  tailscale_tags: pulumi.Input[Sequence[pulumi.Input[str]]],
                  namespace: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']] = None):
         """
         The set of arguments for constructing a Bastion resource.
         :param bool create_namespace: Whether we should create a new namespace.
+        :param pulumi.Input[bool] high_availability: Whether the bastion should be highly available.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] routes: The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
         :param pulumi.Input['pulumi_kubernetes.core.v1.Namespace'] namespace: The bucket resource.
         """
         pulumi.set(__self__, "create_namespace", create_namespace)
+        if high_availability is None:
+            high_availability = False
+        pulumi.set(__self__, "high_availability", high_availability)
         pulumi.set(__self__, "routes", routes)
         pulumi.set(__self__, "tailscale_tags", tailscale_tags)
         if namespace is not None:
@@ -43,6 +48,18 @@ class BastionArgs:
     @create_namespace.setter
     def create_namespace(self, value: bool):
         pulumi.set(self, "create_namespace", value)
+
+    @property
+    @pulumi.getter(name="highAvailability")
+    def high_availability(self) -> pulumi.Input[bool]:
+        """
+        Whether the bastion should be highly available.
+        """
+        return pulumi.get(self, "high_availability")
+
+    @high_availability.setter
+    def high_availability(self, value: pulumi.Input[bool]):
+        pulumi.set(self, "high_availability", value)
 
     @property
     @pulumi.getter
@@ -87,6 +104,7 @@ class Bastion(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  create_namespace: Optional[bool] = None,
+                 high_availability: Optional[pulumi.Input[bool]] = None,
                  namespace: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
@@ -96,6 +114,7 @@ class Bastion(pulumi.ComponentResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param bool create_namespace: Whether we should create a new namespace.
+        :param pulumi.Input[bool] high_availability: Whether the bastion should be highly available.
         :param pulumi.Input['pulumi_kubernetes.core.v1.Namespace'] namespace: The bucket resource.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] routes: The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
@@ -124,6 +143,7 @@ class Bastion(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  create_namespace: Optional[bool] = None,
+                 high_availability: Optional[pulumi.Input[bool]] = None,
                  namespace: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
@@ -141,6 +161,11 @@ class Bastion(pulumi.ComponentResource):
             if create_namespace is None and not opts.urn:
                 raise TypeError("Missing required property 'create_namespace'")
             __props__.__dict__["create_namespace"] = create_namespace
+            if high_availability is None:
+                high_availability = False
+            if high_availability is None and not opts.urn:
+                raise TypeError("Missing required property 'high_availability'")
+            __props__.__dict__["high_availability"] = high_availability
             __props__.__dict__["namespace"] = namespace
             if routes is None and not opts.urn:
                 raise TypeError("Missing required property 'routes'")

@@ -55,6 +55,12 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
     public sealed class BastionArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// Whether the bastion should be highly available.
+        /// </summary>
+        [Input("highAvailability", required: true)]
+        public Input<bool> HighAvailability { get; set; } = null!;
+
+        /// <summary>
         /// The EC2 instance type to use for the bastion.
         /// </summary>
         [Input("instanceType")]
@@ -104,6 +110,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
 
         public BastionArgs()
         {
+            HighAvailability = false;
         }
         public static new BastionArgs Empty => new BastionArgs();
     }
