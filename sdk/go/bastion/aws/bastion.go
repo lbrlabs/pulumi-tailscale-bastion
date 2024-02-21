@@ -50,6 +50,9 @@ func NewBastion(ctx *pulumi.Context,
 	if args.HighAvailability == nil {
 		args.HighAvailability = pulumi.Bool(false)
 	}
+	if args.Public == nil {
+		args.Public = pulumi.BoolPtr(false)
+	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Bastion
 	err := ctx.RegisterRemoteComponentResource("tailscale-bastion:aws:Bastion", name, args, &resource, opts...)
@@ -66,6 +69,8 @@ type bastionArgs struct {
 	HighAvailability bool `pulumi:"highAvailability"`
 	// The EC2 instance type to use for the bastion.
 	InstanceType *string `pulumi:"instanceType"`
+	// Whether the bastion is going in public subnets.
+	Public *bool `pulumi:"public"`
 	// The AWS region you're using.
 	Region string `pulumi:"region"`
 	// The route you'd like to advertise via tailscale.
@@ -86,6 +91,8 @@ type BastionArgs struct {
 	HighAvailability pulumi.BoolInput
 	// The EC2 instance type to use for the bastion.
 	InstanceType pulumi.StringPtrInput
+	// Whether the bastion is going in public subnets.
+	Public pulumi.BoolPtrInput
 	// The AWS region you're using.
 	Region pulumi.StringInput
 	// The route you'd like to advertise via tailscale.

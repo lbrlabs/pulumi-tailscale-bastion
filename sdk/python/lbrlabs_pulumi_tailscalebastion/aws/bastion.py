@@ -21,7 +21,8 @@ class BastionArgs:
                  tailscale_tags: pulumi.Input[Sequence[pulumi.Input[str]]],
                  vpc_id: pulumi.Input[str],
                  enable_ssh: Optional[pulumi.Input[bool]] = None,
-                 instance_type: Optional[pulumi.Input[str]] = None):
+                 instance_type: Optional[pulumi.Input[str]] = None,
+                 public: Optional[pulumi.Input[bool]] = None):
         """
         The set of arguments for constructing a Bastion resource.
         :param pulumi.Input[bool] high_availability: Whether the bastion should be highly available.
@@ -32,6 +33,7 @@ class BastionArgs:
         :param pulumi.Input[str] vpc_id: The VPC the Bastion should be created in.
         :param pulumi.Input[bool] enable_ssh: Whether to enable SSH access to the bastion.
         :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
+        :param pulumi.Input[bool] public: Whether the bastion is going in public subnets.
         """
         if high_availability is None:
             high_availability = False
@@ -47,6 +49,10 @@ class BastionArgs:
             pulumi.set(__self__, "enable_ssh", enable_ssh)
         if instance_type is not None:
             pulumi.set(__self__, "instance_type", instance_type)
+        if public is None:
+            public = False
+        if public is not None:
+            pulumi.set(__self__, "public", public)
 
     @property
     @pulumi.getter(name="highAvailability")
@@ -144,6 +150,18 @@ class BastionArgs:
     def instance_type(self, value: Optional[pulumi.Input[str]]):
         pulumi.set(self, "instance_type", value)
 
+    @property
+    @pulumi.getter
+    def public(self) -> Optional[pulumi.Input[bool]]:
+        """
+        Whether the bastion is going in public subnets.
+        """
+        return pulumi.get(self, "public")
+
+    @public.setter
+    def public(self, value: Optional[pulumi.Input[bool]]):
+        pulumi.set(self, "public", value)
+
 
 class Bastion(pulumi.ComponentResource):
     @overload
@@ -153,6 +171,7 @@ class Bastion(pulumi.ComponentResource):
                  enable_ssh: Optional[pulumi.Input[bool]] = None,
                  high_availability: Optional[pulumi.Input[bool]] = None,
                  instance_type: Optional[pulumi.Input[str]] = None,
+                 public: Optional[pulumi.Input[bool]] = None,
                  region: Optional[pulumi.Input[str]] = None,
                  route: Optional[pulumi.Input[str]] = None,
                  subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
@@ -166,6 +185,7 @@ class Bastion(pulumi.ComponentResource):
         :param pulumi.Input[bool] enable_ssh: Whether to enable SSH access to the bastion.
         :param pulumi.Input[bool] high_availability: Whether the bastion should be highly available.
         :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
+        :param pulumi.Input[bool] public: Whether the bastion is going in public subnets.
         :param pulumi.Input[str] region: The AWS region you're using.
         :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] subnet_ids: The subnet Ids to launch instances in.
@@ -198,6 +218,7 @@ class Bastion(pulumi.ComponentResource):
                  enable_ssh: Optional[pulumi.Input[bool]] = None,
                  high_availability: Optional[pulumi.Input[bool]] = None,
                  instance_type: Optional[pulumi.Input[str]] = None,
+                 public: Optional[pulumi.Input[bool]] = None,
                  region: Optional[pulumi.Input[str]] = None,
                  route: Optional[pulumi.Input[str]] = None,
                  subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
@@ -223,6 +244,9 @@ class Bastion(pulumi.ComponentResource):
                 raise TypeError("Missing required property 'high_availability'")
             __props__.__dict__["high_availability"] = high_availability
             __props__.__dict__["instance_type"] = instance_type
+            if public is None:
+                public = False
+            __props__.__dict__["public"] = public
             if region is None and not opts.urn:
                 raise TypeError("Missing required property 'region'")
             __props__.__dict__["region"] = region

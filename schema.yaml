@@ -58,6 +58,10 @@ resources:
   tailscale-bastion:aws:Bastion:
     isComponent: true
     inputProperties:
+      public:
+        type: boolean
+        description: "Whether the bastion is going in public subnets."
+        default: false
       enableSSH:
         type: boolean
         description: "Whether to enable SSH access to the bastion."
