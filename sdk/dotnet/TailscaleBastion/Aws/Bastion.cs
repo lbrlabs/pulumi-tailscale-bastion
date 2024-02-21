@@ -73,6 +73,12 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         public Input<string>? InstanceType { get; set; }
 
         /// <summary>
+        /// Whether the bastion is going in public subnets.
+        /// </summary>
+        [Input("public")]
+        public Input<bool>? Public { get; set; }
+
+        /// <summary>
         /// The AWS region you're using.
         /// </summary>
         [Input("region", required: true)]
@@ -118,6 +124,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         {
             EnableSSH = true;
             HighAvailability = false;
+            Public = false;
         }
         public static new BastionArgs Empty => new BastionArgs();
     }

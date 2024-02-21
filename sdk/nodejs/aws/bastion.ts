@@ -60,6 +60,7 @@ export class Bastion extends pulumi.ComponentResource {
             resourceInputs["enableSSH"] = (args ? args.enableSSH : undefined) ?? true;
             resourceInputs["highAvailability"] = (args ? args.highAvailability : undefined) ?? false;
             resourceInputs["instanceType"] = args ? args.instanceType : undefined;
+            resourceInputs["public"] = (args ? args.public : undefined) ?? false;
             resourceInputs["region"] = args ? args.region : undefined;
             resourceInputs["route"] = args ? args.route : undefined;
             resourceInputs["subnetIds"] = args ? args.subnetIds : undefined;
@@ -92,6 +93,10 @@ export interface BastionArgs {
      * The EC2 instance type to use for the bastion.
      */
     instanceType?: pulumi.Input<string>;
+    /**
+     * Whether the bastion is going in public subnets.
+     */
+    public?: pulumi.Input<boolean>;
     /**
      * The AWS region you're using.
      */

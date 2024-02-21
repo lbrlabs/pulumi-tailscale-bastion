@@ -33,6 +33,7 @@ type BastionArgs struct {
 	InstanceType     pulumi.StringInput      `pulumi:"instanceType"`
 	HighAvailability bool                    `pulumi:"highAvailability"`
 	EnableSSH        bool                    `pulumi:"enableSSH"`
+	Public           bool                    `pulumi:"public"`
 }
 
 type UserDataArgs struct {
@@ -179,9 +180,12 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating IAM instance profile: %v", err)
 	}
 
-	sg, err := ec2.NewSecurityGroup(ctx, name, &ec2.SecurityGroupArgs{
-		VpcId: args.VpcID,
-		Ingress: ec2.SecurityGroupIngressArray{
+	var ingress ec2.SecurityGroupIngressArray
+
+	// if we're using public subnets, we open the UDP port
+	// this ensure we don't use DERP relays
+	if args.Public {
+		ingress = ec2.SecurityGroupIngressArray{
 			ec2.SecurityGroupIngressArgs{
 				Protocol: pulumi.String("icmp"),
 				FromPort: pulumi.Int(0),
@@ -190,7 +194,32 @@ func NewBastion(ctx *pulumi.Context,
 					pulumi.String("0.0.0.0/0"),
 				},
 			},
-		},
+			// allow access to udp port 41641
+			ec2.SecurityGroupIngressArgs{
+				Protocol: pulumi.String("udp"),
+				FromPort: pulumi.Int(41641),
+				ToPort:   pulumi.Int(41641),
+				CidrBlocks: pulumi.StringArray{
+					pulumi.String("0.0.0.0/0"),
+				},
+			},
+		}
+	} else {
+		ingress = ec2.SecurityGroupIngressArray{
+			ec2.SecurityGroupIngressArgs{
+				Protocol: pulumi.String("icmp"),
+				FromPort: pulumi.Int(0),
+				ToPort:   pulumi.Int(0),
+				CidrBlocks: pulumi.StringArray{
+					pulumi.String("0.0.0.0/0"),
+				},
+			},
+		}
+	}
+
+	sg, err := ec2.NewSecurityGroup(ctx, name, &ec2.SecurityGroupArgs{
+		VpcId:   args.VpcID,
+		Ingress: ingress,
 		Egress: ec2.SecurityGroupEgressArray{
 			ec2.SecurityGroupEgressArgs{
 				Protocol: pulumi.String("-1"),
@@ -280,9 +309,11 @@ func NewBastion(ctx *pulumi.Context,
 		PublicKey: key.PublicKeyOpenssh,
 	}, pulumi.Parent(component))
 
+
+
 	launchConfiguration, err := ec2.NewLaunchConfiguration(ctx, name, &ec2.LaunchConfigurationArgs{
 		InstanceType:             instanceType,
-		AssociatePublicIpAddress: pulumi.Bool(false),
+		AssociatePublicIpAddress: pulumi.Bool(args.Public),
 		ImageId:                  ami.Id(),
 		SecurityGroups: pulumi.StringArray{
 			sg.ID(),
