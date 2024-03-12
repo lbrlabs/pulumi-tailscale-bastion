@@ -57,8 +57,11 @@ export class Bastion extends pulumi.ComponentResource {
             if ((!args || args.vpcId === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'vpcId'");
             }
+            resourceInputs["enableAppConnector"] = (args ? args.enableAppConnector : undefined) ?? false;
+            resourceInputs["enableExitNode"] = (args ? args.enableExitNode : undefined) ?? false;
             resourceInputs["enableSSH"] = (args ? args.enableSSH : undefined) ?? true;
             resourceInputs["highAvailability"] = (args ? args.highAvailability : undefined) ?? false;
+            resourceInputs["hostname"] = args ? args.hostname : undefined;
             resourceInputs["instanceType"] = args ? args.instanceType : undefined;
             resourceInputs["public"] = (args ? args.public : undefined) ?? false;
             resourceInputs["region"] = args ? args.region : undefined;
@@ -82,6 +85,14 @@ export class Bastion extends pulumi.ComponentResource {
  */
 export interface BastionArgs {
     /**
+     * Whether the bastion advertises itself as an app connector.
+     */
+    enableAppConnector?: pulumi.Input<boolean>;
+    /**
+     * Whether the subnet router can advertise itself as an exit node.
+     */
+    enableExitNode?: pulumi.Input<boolean>;
+    /**
      * Whether to enable SSH access to the bastion.
      */
     enableSSH?: pulumi.Input<boolean>;
@@ -89,6 +100,10 @@ export interface BastionArgs {
      * Whether the bastion should be highly available.
      */
     highAvailability: pulumi.Input<boolean>;
+    /**
+     * The hostname of the bastion.
+     */
+    hostname?: pulumi.Input<string>;
     /**
      * The EC2 instance type to use for the bastion.
      */

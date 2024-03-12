@@ -44,6 +44,12 @@ func NewBastion(ctx *pulumi.Context,
 	if args.VpcId == nil {
 		return nil, errors.New("invalid value for required argument 'VpcId'")
 	}
+	if args.EnableAppConnector == nil {
+		args.EnableAppConnector = pulumi.BoolPtr(false)
+	}
+	if args.EnableExitNode == nil {
+		args.EnableExitNode = pulumi.BoolPtr(false)
+	}
 	if args.EnableSSH == nil {
 		args.EnableSSH = pulumi.BoolPtr(true)
 	}
@@ -63,10 +69,16 @@ func NewBastion(ctx *pulumi.Context,
 }
 
 type bastionArgs struct {
+	// Whether the bastion advertises itself as an app connector.
+	EnableAppConnector *bool `pulumi:"enableAppConnector"`
+	// Whether the subnet router can advertise itself as an exit node.
+	EnableExitNode *bool `pulumi:"enableExitNode"`
 	// Whether to enable SSH access to the bastion.
 	EnableSSH *bool `pulumi:"enableSSH"`
 	// Whether the bastion should be highly available.
 	HighAvailability bool `pulumi:"highAvailability"`
+	// The hostname of the bastion.
+	Hostname *string `pulumi:"hostname"`
 	// The EC2 instance type to use for the bastion.
 	InstanceType *string `pulumi:"instanceType"`
 	// Whether the bastion is going in public subnets.
@@ -85,10 +97,16 @@ type bastionArgs struct {
 
 // The set of arguments for constructing a Bastion resource.
 type BastionArgs struct {
+	// Whether the bastion advertises itself as an app connector.
+	EnableAppConnector pulumi.BoolPtrInput
+	// Whether the subnet router can advertise itself as an exit node.
+	EnableExitNode pulumi.BoolPtrInput
 	// Whether to enable SSH access to the bastion.
 	EnableSSH pulumi.BoolPtrInput
 	// Whether the bastion should be highly available.
 	HighAvailability pulumi.BoolInput
+	// The hostname of the bastion.
+	Hostname pulumi.StringPtrInput
 	// The EC2 instance type to use for the bastion.
 	InstanceType pulumi.StringPtrInput
 	// Whether the bastion is going in public subnets.

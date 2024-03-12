@@ -20,7 +20,10 @@ class BastionArgs:
                  subnet_ids: pulumi.Input[Sequence[pulumi.Input[str]]],
                  tailscale_tags: pulumi.Input[Sequence[pulumi.Input[str]]],
                  vpc_id: pulumi.Input[str],
+                 enable_app_connector: Optional[pulumi.Input[bool]] = None,
+                 enable_exit_node: Optional[pulumi.Input[bool]] = None,
                  enable_ssh: Optional[pulumi.Input[bool]] = None,
+                 hostname: Optional[pulumi.Input[str]] = None,
                  instance_type: Optional[pulumi.Input[str]] = None,
                  public: Optional[pulumi.Input[bool]] = None):
         """
@@ -31,7 +34,10 @@ class BastionArgs:
         :param pulumi.Input[Sequence[pulumi.Input[str]]] subnet_ids: The subnet Ids to launch instances in.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
         :param pulumi.Input[str] vpc_id: The VPC the Bastion should be created in.
+        :param pulumi.Input[bool] enable_app_connector: Whether the bastion advertises itself as an app connector.
+        :param pulumi.Input[bool] enable_exit_node: Whether the subnet router can advertise itself as an exit node.
         :param pulumi.Input[bool] enable_ssh: Whether to enable SSH access to the bastion.
+        :param pulumi.Input[str] hostname: The hostname of the bastion.
         :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
         :param pulumi.Input[bool] public: Whether the bastion is going in public subnets.
         """
@@ -43,10 +49,20 @@ class BastionArgs:
         pulumi.set(__self__, "subnet_ids", subnet_ids)
         pulumi.set(__self__, "tailscale_tags", tailscale_tags)
         pulumi.set(__self__, "vpc_id", vpc_id)
+        if enable_app_connector is None:
+            enable_app_connector = False
+        if enable_app_connector is not None:
+            pulumi.set(__self__, "enable_app_connector", enable_app_connector)
+        if enable_exit_node is None:
+            enable_exit_node = False
+        if enable_exit_node is not None:
+            pulumi.set(__self__, "enable_exit_node", enable_exit_node)
         if enable_ssh is None:
             enable_ssh = True
         if enable_ssh is not None:
             pulumi.set(__self__, "enable_ssh", enable_ssh)
+        if hostname is not None:
+            pulumi.set(__self__, "hostname", hostname)
         if instance_type is not None:
             pulumi.set(__self__, "instance_type", instance_type)
         if public is None:
@@ -127,6 +143,30 @@ class BastionArgs:
         pulumi.set(self, "vpc_id", value)
 
     @property
+    @pulumi.getter(name="enableAppConnector")
+    def enable_app_connector(self) -> Optional[pulumi.Input[bool]]:
+        """
+        Whether the bastion advertises itself as an app connector.
+        """
+        return pulumi.get(self, "enable_app_connector")
+
+    @enable_app_connector.setter
+    def enable_app_connector(self, value: Optional[pulumi.Input[bool]]):
+        pulumi.set(self, "enable_app_connector", value)
+
+    @property
+    @pulumi.getter(name="enableExitNode")
+    def enable_exit_node(self) -> Optional[pulumi.Input[bool]]:
+        """
+        Whether the subnet router can advertise itself as an exit node.
+        """
+        return pulumi.get(self, "enable_exit_node")
+
+    @enable_exit_node.setter
+    def enable_exit_node(self, value: Optional[pulumi.Input[bool]]):
+        pulumi.set(self, "enable_exit_node", value)
+
+    @property
     @pulumi.getter(name="enableSSH")
     def enable_ssh(self) -> Optional[pulumi.Input[bool]]:
         """
@@ -137,6 +177,18 @@ class BastionArgs:
     @enable_ssh.setter
     def enable_ssh(self, value: Optional[pulumi.Input[bool]]):
         pulumi.set(self, "enable_ssh", value)
+
+    @property
+    @pulumi.getter
+    def hostname(self) -> Optional[pulumi.Input[str]]:
+        """
+        The hostname of the bastion.
+        """
+        return pulumi.get(self, "hostname")
+
+    @hostname.setter
+    def hostname(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "hostname", value)
 
     @property
     @pulumi.getter(name="instanceType")
@@ -168,8 +220,11 @@ class Bastion(pulumi.ComponentResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 enable_app_connector: Optional[pulumi.Input[bool]] = None,
+                 enable_exit_node: Optional[pulumi.Input[bool]] = None,
                  enable_ssh: Optional[pulumi.Input[bool]] = None,
                  high_availability: Optional[pulumi.Input[bool]] = None,
+                 hostname: Optional[pulumi.Input[str]] = None,
                  instance_type: Optional[pulumi.Input[str]] = None,
                  public: Optional[pulumi.Input[bool]] = None,
                  region: Optional[pulumi.Input[str]] = None,
@@ -182,8 +237,11 @@ class Bastion(pulumi.ComponentResource):
         Create a Bastion resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[bool] enable_app_connector: Whether the bastion advertises itself as an app connector.
+        :param pulumi.Input[bool] enable_exit_node: Whether the subnet router can advertise itself as an exit node.
         :param pulumi.Input[bool] enable_ssh: Whether to enable SSH access to the bastion.
         :param pulumi.Input[bool] high_availability: Whether the bastion should be highly available.
+        :param pulumi.Input[str] hostname: The hostname of the bastion.
         :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
         :param pulumi.Input[bool] public: Whether the bastion is going in public subnets.
         :param pulumi.Input[str] region: The AWS region you're using.
@@ -215,8 +273,11 @@ class Bastion(pulumi.ComponentResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 enable_app_connector: Optional[pulumi.Input[bool]] = None,
+                 enable_exit_node: Optional[pulumi.Input[bool]] = None,
                  enable_ssh: Optional[pulumi.Input[bool]] = None,
                  high_availability: Optional[pulumi.Input[bool]] = None,
+                 hostname: Optional[pulumi.Input[str]] = None,
                  instance_type: Optional[pulumi.Input[str]] = None,
                  public: Optional[pulumi.Input[bool]] = None,
                  region: Optional[pulumi.Input[str]] = None,
@@ -235,6 +296,12 @@ class Bastion(pulumi.ComponentResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = BastionArgs.__new__(BastionArgs)
 
+            if enable_app_connector is None:
+                enable_app_connector = False
+            __props__.__dict__["enable_app_connector"] = enable_app_connector
+            if enable_exit_node is None:
+                enable_exit_node = False
+            __props__.__dict__["enable_exit_node"] = enable_exit_node
             if enable_ssh is None:
                 enable_ssh = True
             __props__.__dict__["enable_ssh"] = enable_ssh
@@ -243,6 +310,7 @@ class Bastion(pulumi.ComponentResource):
             if high_availability is None and not opts.urn:
                 raise TypeError("Missing required property 'high_availability'")
             __props__.__dict__["high_availability"] = high_availability
+            __props__.__dict__["hostname"] = hostname
             __props__.__dict__["instance_type"] = instance_type
             if public is None:
                 public = False

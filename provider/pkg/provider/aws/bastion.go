@@ -25,23 +25,29 @@ var (
 
 // The set of arguments for creating a Bastion component resource.
 type BastionArgs struct {
-	VpcID            pulumi.StringInput      `pulumi:"vpcId"`
-	SubnetIds        pulumi.StringArrayInput `pulumi:"subnetIds"`
-	TailscaleTags    pulumi.StringArrayInput `pulumi:"tailscaleTags"`
-	Route            pulumi.StringInput      `pulumi:"route"`
-	Region           pulumi.StringInput      `pulumi:"region"`
-	InstanceType     pulumi.StringInput      `pulumi:"instanceType"`
-	HighAvailability bool                    `pulumi:"highAvailability"`
-	EnableSSH        bool                    `pulumi:"enableSSH"`
-	Public           bool                    `pulumi:"public"`
+	VpcID              pulumi.StringInput      `pulumi:"vpcId"`
+	SubnetIds          pulumi.StringArrayInput `pulumi:"subnetIds"`
+	TailscaleTags      pulumi.StringArrayInput `pulumi:"tailscaleTags"`
+	Route              pulumi.StringInput      `pulumi:"route"`
+	Region             pulumi.StringInput      `pulumi:"region"`
+	InstanceType       pulumi.StringInput      `pulumi:"instanceType"`
+	Hostname           pulumi.StringInput      `pulumi:"hostname"`
+	HighAvailability   bool                    `pulumi:"highAvailability"`
+	EnableSSH          bool                    `pulumi:"enableSSH"`
+	Public             bool                    `pulumi:"public"`
+	EnableExitNode     bool                    `pulumi:"enableExitNode"`
+	EnableAppConnector bool                    `pulumi:"enableAppConnector"`
 }
 
 type UserDataArgs struct {
-	ParameterName string
-	Route         string
-	Region        string
-	TailscaleTags []string
-	EnableSSH     bool
+	ParameterName      string
+	Route              string
+	Region             string
+	TailscaleTags      []string
+	EnableSSH          bool
+	EnableExitNode     bool
+	EnableAppConnector bool
+	Hostname           string
 }
 
 // Join the tags into a CSV
@@ -71,12 +77,21 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, err
 	}
 
+	var hostname pulumi.StringInput
+
+	if args.Hostname == nil {
+		hostname = pulumi.String(name)
+	} else {
+		hostname = args.Hostname
+	}
+
 	// create a tailnet key to auth devices
 	tailnetKey, err := tailscale.NewTailnetKey(ctx, name, &tailscale.TailnetKeyArgs{
 		Ephemeral:     pulumi.Bool(true),
 		Preauthorized: pulumi.Bool(true),
 		Reusable:      pulumi.Bool(true),
 		Tags:          args.TailscaleTags,
+		Description:   pulumi.Sprintf("Auth key for %s", hostname),
 	}, pulumi.Parent(component))
 	if err != nil {
 		return nil, fmt.Errorf("error creating tailnet key: %v", err)
@@ -84,8 +99,9 @@ func NewBastion(ctx *pulumi.Context,
 
 	// store the key in an AWS SSM parameter
 	tailnetKeySsmParameter, err := ssm.NewParameter(ctx, name, &ssm.ParameterArgs{
-		Type:  ssm.ParameterTypeSecureString,
-		Value: tailnetKey.Key,
+		Type:        ssm.ParameterTypeSecureString,
+		Value:       tailnetKey.Key,
+		Description: pulumi.Sprintf("Tailscale auth key for %s", hostname),
 	}, pulumi.Parent(component))
 	if err != nil {
 		return nil, fmt.Errorf("error creating SSM parameter: %v", err)
@@ -263,14 +279,17 @@ func NewBastion(ctx *pulumi.Context,
 		MostRecent: pulumi.BoolPtr(true),
 	}, pulumi.Parent(component))
 
-	data := pulumi.All(tailnetKeySsmParameter.Name, args.Route, args.Region, args.TailscaleTags, args.EnableSSH).ApplyT(
+	data := pulumi.All(tailnetKeySsmParameter.Name, args.Route, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector).ApplyT(
 		func(args []interface{}) (string, error) {
 			d := UserDataArgs{
-				ParameterName: args[0].(string),
-				Route:         args[1].(string),
-				Region:        args[2].(string),
-				TailscaleTags: args[3].([]string),
-				EnableSSH:     args[4].(bool),
+				ParameterName:      args[0].(string),
+				Route:              args[1].(string),
+				Region:             args[2].(string),
+				TailscaleTags:      args[3].([]string),
+				EnableSSH:          args[4].(bool),
+				Hostname:           args[5].(string),
+				EnableExitNode:     args[6].(bool),
+				EnableAppConnector: args[7].(bool),
 			}
 
 			var userDataBytes bytes.Buffer
@@ -309,8 +328,6 @@ func NewBastion(ctx *pulumi.Context,
 		PublicKey: key.PublicKeyOpenssh,
 	}, pulumi.Parent(component))
 
-
-
 	launchConfiguration, err := ec2.NewLaunchConfiguration(ctx, name, &ec2.LaunchConfigurationArgs{
 		InstanceType:             instanceType,
 		AssociatePublicIpAddress: pulumi.Bool(args.Public),
@@ -334,6 +351,19 @@ func NewBastion(ctx *pulumi.Context,
 		size = 1
 	}
 
+	var instanceRefresh autoscaling.GroupInstanceRefreshPtrInput
+	if args.HighAvailability {
+		instanceRefresh = autoscaling.GroupInstanceRefreshArgs{
+			Strategy: pulumi.String("Rolling"),
+			Preferences: autoscaling.GroupInstanceRefreshPreferencesArgs{
+				MinHealthyPercentage: pulumi.Int(50),
+			},
+		}
+
+	} else {
+		instanceRefresh = nil
+	}
+
 	asg, err := autoscaling.NewGroup(ctx, name, &autoscaling.GroupArgs{
 		LaunchConfiguration:    launchConfiguration.ID(),
 		MaxSize:                pulumi.Int(size),
@@ -341,6 +371,7 @@ func NewBastion(ctx *pulumi.Context,
 		HealthCheckType:        pulumi.String("EC2"),
 		HealthCheckGracePeriod: pulumi.Int(30),
 		VpcZoneIdentifiers:     args.SubnetIds,
+		InstanceRefresh:        instanceRefresh,
 		Tags: autoscaling.GroupTagArray{
 			autoscaling.GroupTagArgs{
 				Key:               pulumi.String("Name"),

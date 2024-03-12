@@ -58,6 +58,9 @@ resources:
   tailscale-bastion:aws:Bastion:
     isComponent: true
     inputProperties:
+      hostname:
+        type: string
+        description: "The hostname of the bastion."
       public:
         type: boolean
         description: "Whether the bastion is going in public subnets."
@@ -66,6 +69,14 @@ resources:
         type: boolean
         description: "Whether to enable SSH access to the bastion."
         default: true
+      enableAppConnector:
+        type: boolean
+        description: "Whether the bastion advertises itself as an app connector."
+        default: false
+      enableExitNode:
+        type: boolean
+        description: "Whether the subnet router can advertise itself as an exit node."
+        default: false
       highAvailability:
         type: boolean
         description: "Whether the bastion should be highly available."
