@@ -98,7 +98,7 @@ jobs:
         - dotnet
         - go
         nodeversion:
-        - 18.x
+        - 21.x
         pythonversion:
         - "3.7"
   comment-notification:
@@ -187,7 +187,7 @@ jobs:
         goversion:
         - 1.21.x
         nodeversion:
-        - 18.x
+        - 21.x
         pythonversion:
         - "3.7"
   test:
@@ -276,7 +276,7 @@ jobs:
         - dotnet
         - go
         nodeversion:
-        - 18.x
+        - 21.x
         pythonversion:
         - "3.7"
 name: run-acceptance-tests
