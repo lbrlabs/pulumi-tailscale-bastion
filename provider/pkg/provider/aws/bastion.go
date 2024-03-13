@@ -43,17 +43,13 @@ type UserDataArgs struct {
 	ParameterName      string
 	Route              string
 	Region             string
-	TailscaleTags      []string
+	TailscaleTags      string
 	EnableSSH          bool
 	EnableExitNode     bool
 	EnableAppConnector bool
 	Hostname           string
 }
 
-// Join the tags into a CSV
-func (uda *UserDataArgs) JoinedTags() string {
-	return strings.Join(uda.TailscaleTags, ",")
-}
 
 // The Bastion component resource.
 type Bastion struct {
@@ -281,11 +277,14 @@ func NewBastion(ctx *pulumi.Context,
 
 	data := pulumi.All(tailnetKeySsmParameter.Name, args.Route, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector).ApplyT(
 		func(args []interface{}) (string, error) {
+
+        	tagCSV := strings.Join(args[3].([]string), ",")
+
 			d := UserDataArgs{
 				ParameterName:      args[0].(string),
 				Route:              args[1].(string),
 				Region:             args[2].(string),
-				TailscaleTags:      args[3].([]string),
+				TailscaleTags:      tagCSV,
 				EnableSSH:          args[4].(bool),
 				Hostname:           args[5].(string),
 				EnableExitNode:     args[6].(bool),
