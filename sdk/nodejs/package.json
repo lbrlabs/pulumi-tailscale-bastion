@@ -1,6 +1,13 @@
 {
     "name": "@lbrlabs/pulumi-tailscalebastion",
     "version": "${VERSION}",
+    "keywords": [
+        "aws",
+        "tailscale",
+        "lbrlabs",
+        "kind/component",
+        "category/network"
+    ],
     "repository": "https://github.com/lbrlabs/pulumi-tailscale-bastion",
     "scripts": {
         "build": "tsc"
