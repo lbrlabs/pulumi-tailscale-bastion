@@ -6,6 +6,12 @@ description: "A Pulumi package for creating a tailscale bastion in AWS."
 repository: "https://github.com/lbrlabs/pulumi-tailscale-bastion"
 publisher: "lbrlabs"
 displayname: "tailscale-bastion"
+keywords:
+  - aws
+  - tailscale
+  - lbrlabs
+  - kind/component
+  - category/network
 resources:
   tailscale-bastion:azure:Bastion:
     isComponent: true
