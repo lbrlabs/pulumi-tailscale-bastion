@@ -32,9 +32,6 @@ func NewBastion(ctx *pulumi.Context,
 	if args.Region == nil {
 		return nil, errors.New("invalid value for required argument 'Region'")
 	}
-	if args.Route == nil {
-		return nil, errors.New("invalid value for required argument 'Route'")
-	}
 	if args.SubnetIds == nil {
 		return nil, errors.New("invalid value for required argument 'SubnetIds'")
 	}
@@ -85,8 +82,8 @@ type bastionArgs struct {
 	Public *bool `pulumi:"public"`
 	// The AWS region you're using.
 	Region string `pulumi:"region"`
-	// The route you'd like to advertise via tailscale.
-	Route string `pulumi:"route"`
+	// The routes you'd like to advertise via tailscale.
+	Routes []string `pulumi:"routes"`
 	// The subnet Ids to launch instances in.
 	SubnetIds []string `pulumi:"subnetIds"`
 	// The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
@@ -113,8 +110,8 @@ type BastionArgs struct {
 	Public pulumi.BoolPtrInput
 	// The AWS region you're using.
 	Region pulumi.StringInput
-	// The route you'd like to advertise via tailscale.
-	Route pulumi.StringInput
+	// The routes you'd like to advertise via tailscale.
+	Routes pulumi.StringArrayInput
 	// The subnet Ids to launch instances in.
 	SubnetIds pulumi.StringArrayInput
 	// The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.

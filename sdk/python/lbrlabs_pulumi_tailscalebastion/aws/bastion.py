@@ -16,7 +16,6 @@ class BastionArgs:
     def __init__(__self__, *,
                  high_availability: Optional[pulumi.Input[bool]] = None,
                  region: pulumi.Input[str],
-                 route: pulumi.Input[str],
                  subnet_ids: pulumi.Input[Sequence[pulumi.Input[str]]],
                  tailscale_tags: pulumi.Input[Sequence[pulumi.Input[str]]],
                  vpc_id: pulumi.Input[str],
@@ -25,12 +24,12 @@ class BastionArgs:
                  enable_ssh: Optional[pulumi.Input[bool]] = None,
                  hostname: Optional[pulumi.Input[str]] = None,
                  instance_type: Optional[pulumi.Input[str]] = None,
-                 public: Optional[pulumi.Input[bool]] = None):
+                 public: Optional[pulumi.Input[bool]] = None,
+                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None):
         """
         The set of arguments for constructing a Bastion resource.
         :param pulumi.Input[bool] high_availability: Whether the bastion should be highly available.
         :param pulumi.Input[str] region: The AWS region you're using.
-        :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] subnet_ids: The subnet Ids to launch instances in.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
         :param pulumi.Input[str] vpc_id: The VPC the Bastion should be created in.
@@ -40,12 +39,12 @@ class BastionArgs:
         :param pulumi.Input[str] hostname: The hostname of the bastion.
         :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
         :param pulumi.Input[bool] public: Whether the bastion is going in public subnets.
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] routes: The routes you'd like to advertise via tailscale.
         """
         if high_availability is None:
             high_availability = False
         pulumi.set(__self__, "high_availability", high_availability)
         pulumi.set(__self__, "region", region)
-        pulumi.set(__self__, "route", route)
         pulumi.set(__self__, "subnet_ids", subnet_ids)
         pulumi.set(__self__, "tailscale_tags", tailscale_tags)
         pulumi.set(__self__, "vpc_id", vpc_id)
@@ -69,6 +68,8 @@ class BastionArgs:
             public = False
         if public is not None:
             pulumi.set(__self__, "public", public)
+        if routes is not None:
+            pulumi.set(__self__, "routes", routes)
 
     @property
     @pulumi.getter(name="highAvailability")
@@ -93,18 +94,6 @@ class BastionArgs:
     @region.setter
     def region(self, value: pulumi.Input[str]):
         pulumi.set(self, "region", value)
-
-    @property
-    @pulumi.getter
-    def route(self) -> pulumi.Input[str]:
-        """
-        The route you'd like to advertise via tailscale.
-        """
-        return pulumi.get(self, "route")
-
-    @route.setter
-    def route(self, value: pulumi.Input[str]):
-        pulumi.set(self, "route", value)
 
     @property
     @pulumi.getter(name="subnetIds")
@@ -214,6 +203,18 @@ class BastionArgs:
     def public(self, value: Optional[pulumi.Input[bool]]):
         pulumi.set(self, "public", value)
 
+    @property
+    @pulumi.getter
+    def routes(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]:
+        """
+        The routes you'd like to advertise via tailscale.
+        """
+        return pulumi.get(self, "routes")
+
+    @routes.setter
+    def routes(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]]):
+        pulumi.set(self, "routes", value)
+
 
 class Bastion(pulumi.ComponentResource):
     @overload
@@ -228,7 +229,7 @@ class Bastion(pulumi.ComponentResource):
                  instance_type: Optional[pulumi.Input[str]] = None,
                  public: Optional[pulumi.Input[bool]] = None,
                  region: Optional[pulumi.Input[str]] = None,
-                 route: Optional[pulumi.Input[str]] = None,
+                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  vpc_id: Optional[pulumi.Input[str]] = None,
@@ -245,7 +246,7 @@ class Bastion(pulumi.ComponentResource):
         :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
         :param pulumi.Input[bool] public: Whether the bastion is going in public subnets.
         :param pulumi.Input[str] region: The AWS region you're using.
-        :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] routes: The routes you'd like to advertise via tailscale.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] subnet_ids: The subnet Ids to launch instances in.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
         :param pulumi.Input[str] vpc_id: The VPC the Bastion should be created in.
@@ -281,7 +282,7 @@ class Bastion(pulumi.ComponentResource):
                  instance_type: Optional[pulumi.Input[str]] = None,
                  public: Optional[pulumi.Input[bool]] = None,
                  region: Optional[pulumi.Input[str]] = None,
-                 route: Optional[pulumi.Input[str]] = None,
+                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  vpc_id: Optional[pulumi.Input[str]] = None,
@@ -318,9 +319,7 @@ class Bastion(pulumi.ComponentResource):
             if region is None and not opts.urn:
                 raise TypeError("Missing required property 'region'")
             __props__.__dict__["region"] = region
-            if route is None and not opts.urn:
-                raise TypeError("Missing required property 'route'")
-            __props__.__dict__["route"] = route
+            __props__.__dict__["routes"] = routes
             if subnet_ids is None and not opts.urn:
                 raise TypeError("Missing required property 'subnet_ids'")
             __props__.__dict__["subnet_ids"] = subnet_ids

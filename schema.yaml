@@ -100,9 +100,11 @@ resources:
         items:
           type: string
         description: "The subnet Ids to launch instances in."
-      route:
-        type: string
-        description: "The route you'd like to advertise via tailscale."
+      routes:
+        type: array
+        items:
+          type: string
+        description: "The routes you'd like to advertise via tailscale."
       region:
         type: string
         description: "The AWS region you're using."
@@ -113,7 +115,6 @@ resources:
       - highAvailability
       - vpcId
       - subnetIds
-      - route
       - region
       - tailscaleTags
     properties:
