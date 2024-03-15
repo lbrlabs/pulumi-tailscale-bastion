@@ -21,26 +21,27 @@ var (
 
 // The set of arguments for creating a Bastion component resource.
 type BastionArgs struct {
-	ResourceGroupName pulumi.StringInput      `pulumi:"resourceGroupName"`
-	SubnetID          pulumi.StringInput      `pulumi:"subnetId"`
-	Location          pulumi.StringInput      `pulumi:"location"`
-	Route             pulumi.StringInput      `pulumi:"route"`
-	InstanceSku       pulumi.StringInput      `pulumi:"instanceSku"`
-	TailscaleTags     pulumi.StringArrayInput `pulumi:"tailscaleTags"`
-	HighAvailability  bool                    `pulumi:"highAvailability"`
-	EnableSSH         bool                    `pulumi:"enableSSH"`
+	ResourceGroupName  pulumi.StringInput      `pulumi:"resourceGroupName"`
+	SubnetID           pulumi.StringInput      `pulumi:"subnetId"`
+	Location           pulumi.StringInput      `pulumi:"location"`
+	Routes             pulumi.StringArrayInput `pulumi:"routes"`
+	InstanceSku        pulumi.StringInput      `pulumi:"instanceSku"`
+	TailscaleTags      pulumi.StringArrayInput `pulumi:"tailscaleTags"`
+	Hostname           pulumi.StringInput      `pulumi:"hostname"`
+	HighAvailability   bool                    `pulumi:"highAvailability"`
+	EnableSSH          bool                    `pulumi:"enableSSH"`
+	EnableExitNode     bool                    `pulumi:"enableExitNode"`
+	EnableAppConnector bool                    `pulumi:"enableAppConnector"`
 }
 
 type UserDataArgs struct {
-	AuthKey       string
-	Route         string
-	TailscaleTags []string
-	EnableSSH     bool
-}
-
-// Join the tags into a CSV
-func (uda *UserDataArgs) JoinedTags() string {
-	return strings.Join(uda.TailscaleTags, ",")
+	AuthKey            string
+	Routes             string
+	TailscaleTags      string
+	EnableSSH          bool
+	EnableExitNode     bool
+	EnableAppConnector bool
+	Hostname           string
 }
 
 // The Bastion component resource.
@@ -65,6 +66,14 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, err
 	}
 
+	var hostname pulumi.StringInput
+
+	if args.Hostname == nil {
+		hostname = pulumi.String(name)
+	} else {
+		hostname = args.Hostname
+	}
+
 	// create a tailnet key to auth devices
 	tailnetKey, err := tailscale.NewTailnetKey(ctx, name, &tailscale.TailnetKeyArgs{
 		Ephemeral:     pulumi.Bool(true),
@@ -76,13 +85,28 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating tailnet key: %v", err)
 	}
 
-	data := pulumi.All(tailnetKey.Key, args.Route, args.TailscaleTags, args.EnableSSH).ApplyT(
+	data := pulumi.All(tailnetKey.Key, args.Routes, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector).ApplyT(
 		func(args []interface{}) (string, error) {
+
+			tagCSV := strings.Join(args[3].([]string), ",")
+
+			var routesCsv string
+
+			if args[1] != nil {
+				routes := args[1].([]string)
+				routesCsv = strings.Join(routes, ",")
+			} else {
+				routesCsv = ""
+			}
+
 			d := UserDataArgs{
-				AuthKey:       args[0].(string),
-				Route:         args[1].(string),
-				TailscaleTags: args[2].([]string),
-				EnableSSH:     args[3].(bool),
+				AuthKey:            args[0].(string),
+				Routes:             routesCsv,
+				TailscaleTags:      tagCSV,
+				EnableSSH:          args[3].(bool),
+				Hostname:           args[4].(string),
+				EnableExitNode:     args[5].(bool),
+				EnableAppConnector: args[6].(bool),
 			}
 
 			var userDataBytes bytes.Buffer

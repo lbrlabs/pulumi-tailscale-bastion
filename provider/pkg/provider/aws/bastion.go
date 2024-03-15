@@ -279,8 +279,10 @@ func NewBastion(ctx *pulumi.Context,
 			tagCSV := strings.Join(args[3].([]string), ",")
 
 			var routesCsv string
-			if len(args[1].([]string)) != 0 {
-				routesCsv = strings.Join(args[1].([]string), ",")
+
+			if args[1] != nil {
+				routes := args[1].([]string)
+				routesCsv = strings.Join(routes, ",")
 			} else {
 				routesCsv = ""
 			}
