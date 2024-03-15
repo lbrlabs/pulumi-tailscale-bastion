@@ -55,6 +55,18 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
     public sealed class BastionArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// Whether the bastion advertises itself as an app connector.
+        /// </summary>
+        [Input("enableAppConnector")]
+        public Input<bool>? EnableAppConnector { get; set; }
+
+        /// <summary>
+        /// Whether the subnet router can advertise itself as an exit node.
+        /// </summary>
+        [Input("enableExitNode")]
+        public Input<bool>? EnableExitNode { get; set; }
+
+        /// <summary>
         /// Whether to enable SSH access to the bastion.
         /// </summary>
         [Input("enableSSH")]
@@ -65,6 +77,12 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         /// </summary>
         [Input("highAvailability", required: true)]
         public Input<bool> HighAvailability { get; set; } = null!;
+
+        /// <summary>
+        /// The hostname of the bastion.
+        /// </summary>
+        [Input("hostname")]
+        public Input<string>? Hostname { get; set; }
 
         /// <summary>
         /// The EC2 instance type to use for the bastion.
@@ -122,6 +140,8 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
 
         public BastionArgs()
         {
+            EnableAppConnector = false;
+            EnableExitNode = false;
             EnableSSH = true;
             HighAvailability = false;
             Public = false;

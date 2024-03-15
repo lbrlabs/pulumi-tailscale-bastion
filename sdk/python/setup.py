@@ -23,6 +23,7 @@ setup(name='lbrlabs_pulumi_tailscalebastion',
       description="A Pulumi package for creating a tailscale bastion in AWS.",
       long_description=readme(),
       long_description_content_type='text/markdown',
+      keywords='aws tailscale lbrlabs kind/component category/network',
       project_urls={
           'Repository': 'https://github.com/lbrlabs/pulumi-tailscale-bastion'
       },

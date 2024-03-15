@@ -6,6 +6,12 @@ description: "A Pulumi package for creating a tailscale bastion in AWS."
 repository: "https://github.com/lbrlabs/pulumi-tailscale-bastion"
 publisher: "lbrlabs"
 displayname: "tailscale-bastion"
+keywords:
+  - aws
+  - tailscale
+  - lbrlabs
+  - kind/component
+  - category/network
 resources:
   tailscale-bastion:azure:Bastion:
     isComponent: true
@@ -58,6 +64,9 @@ resources:
   tailscale-bastion:aws:Bastion:
     isComponent: true
     inputProperties:
+      hostname:
+        type: string
+        description: "The hostname of the bastion."
       public:
         type: boolean
         description: "Whether the bastion is going in public subnets."
@@ -66,6 +75,14 @@ resources:
         type: boolean
         description: "Whether to enable SSH access to the bastion."
         default: true
+      enableAppConnector:
+        type: boolean
+        description: "Whether the bastion advertises itself as an app connector."
+        default: false
+      enableExitNode:
+        type: boolean
+        description: "Whether the subnet router can advertise itself as an exit node."
+        default: false
       highAvailability:
         type: boolean
         description: "Whether the bastion should be highly available."
@@ -166,6 +183,8 @@ language:
       "@pulumi/tailscale": "^0.11.0"
     devDependencies:
       typescript: "^3.7.0"
+      glob: "^9.0.0"
+      minimatch: "^5.0.0"
     packageName: "@lbrlabs/pulumi-tailscalebastion"
   python:
     packageName: "lbrlabs_pulumi_tailscalebastion"
