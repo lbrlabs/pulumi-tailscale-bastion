@@ -102,11 +102,17 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         [Input("region", required: true)]
         public Input<string> Region { get; set; } = null!;
 
+        [Input("routes")]
+        private InputList<string>? _routes;
+
         /// <summary>
-        /// The route you'd like to advertise via tailscale.
+        /// The routes you'd like to advertise via tailscale.
         /// </summary>
-        [Input("route", required: true)]
-        public Input<string> Route { get; set; } = null!;
+        public InputList<string> Routes
+        {
+            get => _routes ?? (_routes = new InputList<string>());
+            set => _routes = value;
+        }
 
         [Input("subnetIds", required: true)]
         private InputList<string>? _subnetIds;

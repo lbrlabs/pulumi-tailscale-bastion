@@ -6,9 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"strings"
-	"text/template"
-
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/autoscaling"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/ec2"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/iam"
@@ -16,6 +13,8 @@ import (
 	"github.com/pulumi/pulumi-tailscale/sdk/go/tailscale"
 	tls "github.com/pulumi/pulumi-tls/sdk/v4/go/tls"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+	"strings"
+	"text/template"
 )
 
 var (
@@ -28,7 +27,7 @@ type BastionArgs struct {
 	VpcID              pulumi.StringInput      `pulumi:"vpcId"`
 	SubnetIds          pulumi.StringArrayInput `pulumi:"subnetIds"`
 	TailscaleTags      pulumi.StringArrayInput `pulumi:"tailscaleTags"`
-	Route              pulumi.StringInput      `pulumi:"route"`
+	Routes             pulumi.StringArrayInput `pulumi:"routes"`
 	Region             pulumi.StringInput      `pulumi:"region"`
 	InstanceType       pulumi.StringInput      `pulumi:"instanceType"`
 	Hostname           pulumi.StringInput      `pulumi:"hostname"`
@@ -41,7 +40,7 @@ type BastionArgs struct {
 
 type UserDataArgs struct {
 	ParameterName      string
-	Route              string
+	Routes             string
 	Region             string
 	TailscaleTags      string
 	EnableSSH          bool
@@ -49,7 +48,6 @@ type UserDataArgs struct {
 	EnableAppConnector bool
 	Hostname           string
 }
-
 
 // The Bastion component resource.
 type Bastion struct {
@@ -275,14 +273,23 @@ func NewBastion(ctx *pulumi.Context,
 		MostRecent: pulumi.BoolPtr(true),
 	}, pulumi.Parent(component))
 
-	data := pulumi.All(tailnetKeySsmParameter.Name, args.Route, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector).ApplyT(
+	data := pulumi.All(tailnetKeySsmParameter.Name, args.Routes, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector).ApplyT(
 		func(args []interface{}) (string, error) {
 
-        	tagCSV := strings.Join(args[3].([]string), ",")
+			tagCSV := strings.Join(args[3].([]string), ",")
+
+			var routesCsv string
+
+			if args[1] != nil {
+				routes := args[1].([]string)
+				routesCsv = strings.Join(routes, ",")
+			} else {
+				routesCsv = ""
+			}
 
 			d := UserDataArgs{
 				ParameterName:      args[0].(string),
-				Route:              args[1].(string),
+				Routes:             routesCsv,
 				Region:             args[2].(string),
 				TailscaleTags:      tagCSV,
 				EnableSSH:          args[4].(bool),
