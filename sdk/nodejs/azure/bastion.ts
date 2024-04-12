@@ -48,8 +48,8 @@ export class Bastion extends pulumi.ComponentResource {
             if ((!args || args.resourceGroupName === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'resourceGroupName'");
             }
-            if ((!args || args.route === undefined) && !opts.urn) {
-                throw new Error("Missing required property 'route'");
+            if ((!args || args.routes === undefined) && !opts.urn) {
+                throw new Error("Missing required property 'routes'");
             }
             if ((!args || args.subnetId === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'subnetId'");
@@ -63,7 +63,7 @@ export class Bastion extends pulumi.ComponentResource {
             resourceInputs["location"] = args ? args.location : undefined;
             resourceInputs["public"] = (args ? args.public : undefined) ?? false;
             resourceInputs["resourceGroupName"] = args ? args.resourceGroupName : undefined;
-            resourceInputs["route"] = args ? args.route : undefined;
+            resourceInputs["routes"] = args ? args.routes : undefined;
             resourceInputs["subnetId"] = args ? args.subnetId : undefined;
             resourceInputs["tailscaleTags"] = args ? args.tailscaleTags : undefined;
             resourceInputs["privateKey"] = undefined /*out*/;
@@ -106,9 +106,9 @@ export interface BastionArgs {
      */
     resourceGroupName: pulumi.Input<string>;
     /**
-     * The route you'd like to advertise via tailscale.
+     * The routes you'd like to advertise via tailscale.
      */
-    route: pulumi.Input<string>;
+    routes: pulumi.Input<pulumi.Input<string>[]>;
     /**
      * The subnet Ids to launch instances in.
      */

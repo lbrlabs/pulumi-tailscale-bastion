@@ -26,9 +26,11 @@ resources:
       subnetId:
         type: string
         description: "The subnet Ids to launch instances in."
-      route:
-        type: string
-        description: "The route you'd like to advertise via tailscale."
+      routes:
+        type: array
+        items:
+          type: string
+        description: "The routes you'd like to advertise via tailscale."
       location:
         type: string
         description: "The Azure region you're using."
@@ -52,7 +54,7 @@ resources:
       - highAvailability
       - resourceGroupName
       - subnetId
-      - route
+      - routes
       - location
       - tailscaleTags
     properties:

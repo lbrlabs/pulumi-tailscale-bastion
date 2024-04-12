@@ -90,11 +90,17 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
         [Input("resourceGroupName", required: true)]
         public Input<string> ResourceGroupName { get; set; } = null!;
 
+        [Input("routes", required: true)]
+        private InputList<string>? _routes;
+
         /// <summary>
-        /// The route you'd like to advertise via tailscale.
+        /// The routes you'd like to advertise via tailscale.
         /// </summary>
-        [Input("route", required: true)]
-        public Input<string> Route { get; set; } = null!;
+        public InputList<string> Routes
+        {
+            get => _routes ?? (_routes = new InputList<string>());
+            set => _routes = value;
+        }
 
         /// <summary>
         /// The subnet Ids to launch instances in.
