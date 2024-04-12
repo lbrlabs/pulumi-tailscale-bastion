@@ -61,6 +61,7 @@ export class Bastion extends pulumi.ComponentResource {
             resourceInputs["highAvailability"] = (args ? args.highAvailability : undefined) ?? false;
             resourceInputs["instanceSku"] = args ? args.instanceSku : undefined;
             resourceInputs["location"] = args ? args.location : undefined;
+            resourceInputs["public"] = (args ? args.public : undefined) ?? false;
             resourceInputs["resourceGroupName"] = args ? args.resourceGroupName : undefined;
             resourceInputs["route"] = args ? args.route : undefined;
             resourceInputs["subnetId"] = args ? args.subnetId : undefined;
@@ -96,6 +97,10 @@ export interface BastionArgs {
      * The Azure region you're using.
      */
     location: pulumi.Input<string>;
+    /**
+     * Whether the bastion should have a public IP.
+     */
+    public?: pulumi.Input<boolean>;
     /**
      * The Azure resource group to create the bastion in.
      */

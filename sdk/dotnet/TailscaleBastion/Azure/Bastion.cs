@@ -79,6 +79,12 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
         public Input<string> Location { get; set; } = null!;
 
         /// <summary>
+        /// Whether the bastion should have a public IP.
+        /// </summary>
+        [Input("public")]
+        public Input<bool>? Public { get; set; }
+
+        /// <summary>
         /// The Azure resource group to create the bastion in.
         /// </summary>
         [Input("resourceGroupName", required: true)]
@@ -112,6 +118,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
         {
             EnableSSH = true;
             HighAvailability = false;
+            Public = false;
         }
         public static new BastionArgs Empty => new BastionArgs();
     }

@@ -11,6 +11,6 @@ AZ_REPO=$(lsb_release -cs)
 echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |
     sudo tee /etc/apt/sources.list.d/azure-cli.list
 sudo apt-get update
-sudo apt-get install azure-cli tailscale
+sudo apt-get install -y azure-cli tailscale
 
 sudo tailscale up --advertise-connector="{{ .EnableAppConnector }}" --advertise-exit-node="{{ .EnableExitNode }}" --hostname="{{ .Hostname}}" --ssh="{{ .EnableSSH }}" --advertise-tags="{{ .TailscaleTags}}" {{if .Routes}}--advertise-routes="{{ .Routes }}"{{end}} --authkey="{{ .AuthKey }}" --host-routes --accept-dns=false
