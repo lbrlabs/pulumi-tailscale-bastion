@@ -35,8 +35,8 @@ func NewBastion(ctx *pulumi.Context,
 	if args.ResourceGroupName == nil {
 		return nil, errors.New("invalid value for required argument 'ResourceGroupName'")
 	}
-	if args.Route == nil {
-		return nil, errors.New("invalid value for required argument 'Route'")
+	if args.Routes == nil {
+		return nil, errors.New("invalid value for required argument 'Routes'")
 	}
 	if args.SubnetId == nil {
 		return nil, errors.New("invalid value for required argument 'SubnetId'")
@@ -75,8 +75,8 @@ type bastionArgs struct {
 	Public *bool `pulumi:"public"`
 	// The Azure resource group to create the bastion in.
 	ResourceGroupName string `pulumi:"resourceGroupName"`
-	// The route you'd like to advertise via tailscale.
-	Route string `pulumi:"route"`
+	// The routes you'd like to advertise via tailscale.
+	Routes []string `pulumi:"routes"`
 	// The subnet Ids to launch instances in.
 	SubnetId string `pulumi:"subnetId"`
 	// The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
@@ -97,8 +97,8 @@ type BastionArgs struct {
 	Public pulumi.BoolPtrInput
 	// The Azure resource group to create the bastion in.
 	ResourceGroupName pulumi.StringInput
-	// The route you'd like to advertise via tailscale.
-	Route pulumi.StringInput
+	// The routes you'd like to advertise via tailscale.
+	Routes pulumi.StringArrayInput
 	// The subnet Ids to launch instances in.
 	SubnetId pulumi.StringInput
 	// The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.

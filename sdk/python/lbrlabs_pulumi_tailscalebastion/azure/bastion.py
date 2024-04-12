@@ -17,7 +17,7 @@ class BastionArgs:
                  high_availability: Optional[pulumi.Input[bool]] = None,
                  location: pulumi.Input[str],
                  resource_group_name: pulumi.Input[str],
-                 route: pulumi.Input[str],
+                 routes: pulumi.Input[Sequence[pulumi.Input[str]]],
                  subnet_id: pulumi.Input[str],
                  tailscale_tags: pulumi.Input[Sequence[pulumi.Input[str]]],
                  enable_ssh: Optional[pulumi.Input[bool]] = None,
@@ -28,7 +28,7 @@ class BastionArgs:
         :param pulumi.Input[bool] high_availability: Whether the bastion should be highly available.
         :param pulumi.Input[str] location: The Azure region you're using.
         :param pulumi.Input[str] resource_group_name: The Azure resource group to create the bastion in.
-        :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] routes: The routes you'd like to advertise via tailscale.
         :param pulumi.Input[str] subnet_id: The subnet Ids to launch instances in.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
         :param pulumi.Input[bool] enable_ssh: Whether to enable SSH access to the bastion.
@@ -40,7 +40,7 @@ class BastionArgs:
         pulumi.set(__self__, "high_availability", high_availability)
         pulumi.set(__self__, "location", location)
         pulumi.set(__self__, "resource_group_name", resource_group_name)
-        pulumi.set(__self__, "route", route)
+        pulumi.set(__self__, "routes", routes)
         pulumi.set(__self__, "subnet_id", subnet_id)
         pulumi.set(__self__, "tailscale_tags", tailscale_tags)
         if enable_ssh is None:
@@ -92,15 +92,15 @@ class BastionArgs:
 
     @property
     @pulumi.getter
-    def route(self) -> pulumi.Input[str]:
+    def routes(self) -> pulumi.Input[Sequence[pulumi.Input[str]]]:
         """
-        The route you'd like to advertise via tailscale.
+        The routes you'd like to advertise via tailscale.
         """
-        return pulumi.get(self, "route")
+        return pulumi.get(self, "routes")
 
-    @route.setter
-    def route(self, value: pulumi.Input[str]):
-        pulumi.set(self, "route", value)
+    @routes.setter
+    def routes(self, value: pulumi.Input[Sequence[pulumi.Input[str]]]):
+        pulumi.set(self, "routes", value)
 
     @property
     @pulumi.getter(name="subnetId")
@@ -174,7 +174,7 @@ class Bastion(pulumi.ComponentResource):
                  location: Optional[pulumi.Input[str]] = None,
                  public: Optional[pulumi.Input[bool]] = None,
                  resource_group_name: Optional[pulumi.Input[str]] = None,
-                 route: Optional[pulumi.Input[str]] = None,
+                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  subnet_id: Optional[pulumi.Input[str]] = None,
                  tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  __props__=None):
@@ -188,7 +188,7 @@ class Bastion(pulumi.ComponentResource):
         :param pulumi.Input[str] location: The Azure region you're using.
         :param pulumi.Input[bool] public: Whether the bastion should have a public IP.
         :param pulumi.Input[str] resource_group_name: The Azure resource group to create the bastion in.
-        :param pulumi.Input[str] route: The route you'd like to advertise via tailscale.
+        :param pulumi.Input[Sequence[pulumi.Input[str]]] routes: The routes you'd like to advertise via tailscale.
         :param pulumi.Input[str] subnet_id: The subnet Ids to launch instances in.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
         """
@@ -221,7 +221,7 @@ class Bastion(pulumi.ComponentResource):
                  location: Optional[pulumi.Input[str]] = None,
                  public: Optional[pulumi.Input[bool]] = None,
                  resource_group_name: Optional[pulumi.Input[str]] = None,
-                 route: Optional[pulumi.Input[str]] = None,
+                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  subnet_id: Optional[pulumi.Input[str]] = None,
                  tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
                  __props__=None):
@@ -253,9 +253,9 @@ class Bastion(pulumi.ComponentResource):
             if resource_group_name is None and not opts.urn:
                 raise TypeError("Missing required property 'resource_group_name'")
             __props__.__dict__["resource_group_name"] = resource_group_name
-            if route is None and not opts.urn:
-                raise TypeError("Missing required property 'route'")
-            __props__.__dict__["route"] = route
+            if routes is None and not opts.urn:
+                raise TypeError("Missing required property 'routes'")
+            __props__.__dict__["routes"] = routes
             if subnet_id is None and not opts.urn:
                 raise TypeError("Missing required property 'subnet_id'")
             __props__.__dict__["subnet_id"] = subnet_id
