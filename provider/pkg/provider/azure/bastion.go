@@ -88,7 +88,7 @@ func NewBastion(ctx *pulumi.Context,
 	data := pulumi.All(tailnetKey.Key, args.Routes, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector).ApplyT(
 		func(args []interface{}) (string, error) {
 
-			tagCSV := strings.Join(args[3].([]string), ",")
+			tagCSV := strings.Join(args[2].([]string), ",")
 
 			var routesCsv string
 
