@@ -32,6 +32,7 @@ type BastionArgs struct {
 	EnableSSH          bool                    `pulumi:"enableSSH"`
 	EnableExitNode     bool                    `pulumi:"enableExitNode"`
 	EnableAppConnector bool                    `pulumi:"enableAppConnector"`
+	Public             bool                    `pulumi:"public"`
 }
 
 type UserDataArgs struct {
@@ -88,7 +89,7 @@ func NewBastion(ctx *pulumi.Context,
 	data := pulumi.All(tailnetKey.Key, args.Routes, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector).ApplyT(
 		func(args []interface{}) (string, error) {
 
-			tagCSV := strings.Join(args[3].([]string), ",")
+			tagCSV := strings.Join(args[2].([]string), ",")
 
 			var routesCsv string
 
@@ -149,6 +150,17 @@ func NewBastion(ctx *pulumi.Context,
 		size = 1
 	}
 
+	var publicIPConfig compute.LinuxVirtualMachineScaleSetNetworkInterfaceIpConfigurationPublicIpAddressArray
+
+	if args.Public {
+
+		publicIPConfig = compute.LinuxVirtualMachineScaleSetNetworkInterfaceIpConfigurationPublicIpAddressArray{
+			&compute.LinuxVirtualMachineScaleSetNetworkInterfaceIpConfigurationPublicIpAddressArgs{
+				Name: pulumi.String("public"),
+			},
+		}
+	}
+
 	scaleset, err := compute.NewLinuxVirtualMachineScaleSet(ctx, name, &compute.LinuxVirtualMachineScaleSetArgs{
 		ResourceGroupName: args.ResourceGroupName,
 		Location:          args.Location,
@@ -183,9 +195,10 @@ func NewBastion(ctx *pulumi.Context,
 				EnableIpForwarding: pulumi.Bool(true),
 				IpConfigurations: &compute.LinuxVirtualMachineScaleSetNetworkInterfaceIpConfigurationArray{
 					&compute.LinuxVirtualMachineScaleSetNetworkInterfaceIpConfigurationArgs{
-						Name:     pulumi.String("internal"),
-						Primary:  pulumi.Bool(true),
-						SubnetId: args.SubnetID,
+						Name:              pulumi.String("internal"),
+						Primary:           pulumi.Bool(true),
+						SubnetId:          args.SubnetID,
+						PublicIpAddresses: publicIPConfig,
 					},
 				},
 			},
@@ -194,6 +207,9 @@ func NewBastion(ctx *pulumi.Context,
 	if err != nil {
 		return nil, fmt.Errorf("error creating scale set: %v", err)
 	}
+
+	component.PrivateKey = key.PrivateKeyOpenssh
+	component.ScaleSetName = scaleset.Name
 
 	if err := ctx.RegisterResourceOutputs(component, pulumi.Map{
 		"scaleSetName": scaleset.Name,

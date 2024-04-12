@@ -39,6 +39,10 @@ resources:
         type: boolean
         description: "Whether the bastion should be highly available."
         default: false
+      public:
+        type: boolean
+        description: "Whether the bastion should have a public IP."
+        default: false
       tailscaleTags:
         type: array
         items:

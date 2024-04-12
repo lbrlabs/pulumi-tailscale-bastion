@@ -50,6 +50,9 @@ func NewBastion(ctx *pulumi.Context,
 	if args.HighAvailability == nil {
 		args.HighAvailability = pulumi.Bool(false)
 	}
+	if args.Public == nil {
+		args.Public = pulumi.BoolPtr(false)
+	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Bastion
 	err := ctx.RegisterRemoteComponentResource("tailscale-bastion:azure:Bastion", name, args, &resource, opts...)
@@ -68,6 +71,8 @@ type bastionArgs struct {
 	InstanceSku *string `pulumi:"instanceSku"`
 	// The Azure region you're using.
 	Location string `pulumi:"location"`
+	// Whether the bastion should have a public IP.
+	Public *bool `pulumi:"public"`
 	// The Azure resource group to create the bastion in.
 	ResourceGroupName string `pulumi:"resourceGroupName"`
 	// The route you'd like to advertise via tailscale.
@@ -88,6 +93,8 @@ type BastionArgs struct {
 	InstanceSku pulumi.StringPtrInput
 	// The Azure region you're using.
 	Location pulumi.StringInput
+	// Whether the bastion should have a public IP.
+	Public pulumi.BoolPtrInput
 	// The Azure resource group to create the bastion in.
 	ResourceGroupName pulumi.StringInput
 	// The route you'd like to advertise via tailscale.
