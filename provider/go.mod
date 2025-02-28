@@ -8,7 +8,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/pulumi/pulumi-aws/sdk/v6 v6.70.0
-	github.com/pulumi/pulumi-azure/sdk/v5 v5.23.0
+	github.com/pulumi/pulumi-azure/sdk/v6 v6.20.0
 	github.com/pulumi/pulumi-kubernetes/sdk/v4 v4.21.1
 	github.com/pulumi/pulumi-tailscale/sdk v0.18.0
 	github.com/pulumi/pulumi-tls/sdk/v4 v4.6.1
