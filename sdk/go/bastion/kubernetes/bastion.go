@@ -9,7 +9,7 @@ import (
 
 	"errors"
 	"github.com/lbrlabs/pulumi-tailscale-bastion/sdk/go/bastion/internal"
-	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v3/go/kubernetes/core/v1"
+	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/core/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 

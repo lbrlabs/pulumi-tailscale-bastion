@@ -17,9 +17,9 @@
     "dependencies": {
         "@pulumi/aws": "^6.0.0",
         "@pulumi/azure": "^5.0.0",
-        "@pulumi/kubernetes": "^3.0.0",
+        "@pulumi/kubernetes": "^4.0.0",
         "@pulumi/pulumi": "^3.142.0",
-        "@pulumi/tailscale": "^0.11.0",
+        "@pulumi/tailscale": "^0.18.0",
         "@pulumi/tls": "^4.0.0"
     },
     "devDependencies": {
