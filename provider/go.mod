@@ -10,8 +10,8 @@ require (
 	github.com/pulumi/pulumi-kubernetes/sdk/v3 v3.22.1
 	github.com/pulumi/pulumi-tailscale/sdk v0.13.2
 	github.com/pulumi/pulumi-tls/sdk/v4 v4.6.1
-	github.com/pulumi/pulumi/pkg/v3 v3.91.1
-	github.com/pulumi/pulumi/sdk/v3 v3.91.1
+	github.com/pulumi/pulumi/pkg/v3 v3.153.0
+	github.com/pulumi/pulumi/sdk/v3 v3.153.0
 )
 
 require (
