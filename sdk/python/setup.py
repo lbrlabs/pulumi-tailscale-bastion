@@ -41,7 +41,7 @@ setup(name='lbrlabs_pulumi_tailscalebastion',
           'pulumi-azure>=6.0.0,<7.0.0',
           'pulumi-kubernetes>=4.0.0,<5.0.0',
           'pulumi-tailscale>=0.0.0,<1.0.0',
-          'pulumi-tls>=4.0.0,<5.0.0',
+          'pulumi-tls>=5.0.0,<6.0.0',
           'semver>=2.8.1',
           'typing-extensions>=4.11,<5; python_version < "3.11"'
       ],

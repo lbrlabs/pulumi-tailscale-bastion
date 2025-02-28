@@ -20,7 +20,7 @@
         "@pulumi/kubernetes": "^4.0.0",
         "@pulumi/pulumi": "^3.142.0",
         "@pulumi/tailscale": "^0.18.0",
-        "@pulumi/tls": "^4.0.0"
+        "@pulumi/tls": "^5.0.0"
     },
     "devDependencies": {
         "@types/node": "^14",

@@ -11,7 +11,7 @@ import (
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/iam"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/ssm"
 	"github.com/pulumi/pulumi-tailscale/sdk/go/tailscale"
-	tls "github.com/pulumi/pulumi-tls/sdk/v4/go/tls"
+	tls "github.com/pulumi/pulumi-tls/sdk/v5/go/tls"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"strings"
 	"text/template"

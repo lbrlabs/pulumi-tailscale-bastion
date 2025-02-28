@@ -49,7 +49,7 @@
     <PackageReference Include="Pulumi.Azure" Version="6.*" ExcludeAssets="contentFiles" />
     <PackageReference Include="Pulumi.Kubernetes" Version="4.*" ExcludeAssets="contentFiles" />
     <PackageReference Include="Pulumi.Tailscale" Version="0.*" ExcludeAssets="contentFiles" />
-    <PackageReference Include="Pulumi.Tls" Version="4.*" ExcludeAssets="contentFiles" />
+    <PackageReference Include="Pulumi.Tls" Version="5.*" ExcludeAssets="contentFiles" />
   </ItemGroup>
 
   <ItemGroup>

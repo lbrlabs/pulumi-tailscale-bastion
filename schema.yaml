@@ -178,7 +178,7 @@ language:
       Pulumi.Aws: 6.*
       Pulumi.Azure: 6.*
       Pulumi.Kubernetes: 4.*
-      Pulumi.Tls: 4.*
+      Pulumi.Tls: 5.*
       Pulumi.Tailscale: 0.*
     rootNamespace: "Lbrlabs.PulumiPackage"
   go:
@@ -188,7 +188,7 @@ language:
     dependencies:
       "@pulumi/aws": "^6.0.0"
       "@pulumi/azure": "^6.0.0"
-      "@pulumi/tls": "^4.0.0"
+      "@pulumi/tls": "^5.0.0"
       "@pulumi/kubernetes": "^4.0.0"
       "@pulumi/tailscale": "^0.18.0"
     devDependencies:
@@ -203,5 +203,5 @@ language:
       pulumi-kubernetes: ">=4.0.0,<5.0.0"
       pulumi-aws: ">=6.0.0,<7.0.0"
       pulumi-azure: ">=6.0.0,<7.0.0"
-      pulumi-tls: ">=4.0.0,<5.0.0"
+      pulumi-tls: ">=5.0.0,<6.0.0"
       pulumi-tailscale: ">=0.0.0,<1.0.0"
