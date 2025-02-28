@@ -18,7 +18,7 @@ def readme():
 
 
 setup(name='lbrlabs_pulumi_tailscalebastion',
-      python_requires='>=3.7',
+      python_requires='>=3.9',
       version=VERSION,
       description="A Pulumi package for creating a tailscale bastion in AWS.",
       long_description=readme(),
@@ -38,10 +38,11 @@ setup(name='lbrlabs_pulumi_tailscalebastion',
           'parver>=0.2.1',
           'pulumi>=3.0.0,<4.0.0',
           'pulumi-aws>=6.0.0,<7.0.0',
-          'pulumi-azure>=5.0.0,<6.0.0',
-          'pulumi-kubernetes>=3.0.0,<4.0.0',
+          'pulumi-azure>=6.0.0,<7.0.0',
+          'pulumi-kubernetes>=4.0.0,<5.0.0',
           'pulumi-tailscale>=0.0.0,<1.0.0',
-          'pulumi-tls>=4.0.0,<5.0.0',
-          'semver>=2.8.1'
+          'pulumi-tls>=5.0.0,<6.0.0',
+          'semver>=2.8.1',
+          'typing-extensions>=4.11,<5; python_version < "3.11"'
       ],
       zip_safe=False)
