@@ -387,6 +387,7 @@ github.com/AlecAivazis/survey/v2 v2.0.5 h1:xpZp+Q55wi5C7Iaze+40onHnEkex1jSc34Clt
 github.com/AlecAivazis/survey/v2 v2.3.7 h1:6I/u8FvytdGsgonrYsVn2t8t4QiRnh6QSTqkkhIiSjQ=
 github.com/AlecAivazis/survey/v2 v2.3.7/go.mod h1:xUTIdE4KCOIjsBAE1JYsUPoCqYdZ1reCfTwbto0Fduo=
 github.com/Azure/azure-amqp-common-go/v3 v3.2.3/go.mod h1:7rPmbSfszeovxGfc5fSAXE4ehlXQZHpMja2OtxC2Tas=
+github.com/Azure/azure-sdk-for-go v66.0.0+incompatible h1:bmmC38SlE8/E81nNADlgmVGurPWMHDX2YNXVQMrBpEE=
 github.com/Azure/azure-sdk-for-go v66.0.0+incompatible/go.mod h1:9XXNKU+eRnpl9moKnB4QOLf1HestfXbmab5FXxiDBjc=
 github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.1 h1:tz19qLF65vuu2ibfTqGVJxG/zZAI27NEIIbvAOQwYbw=
 github.com/Azure/azure-sdk-for-go/sdk/azcore v1.10.0/go.mod h1:HDcZnuGbiyppErN6lB+idp4CKhjbc8gwjto6OPpyggM=
@@ -738,6 +739,8 @@ github.com/pulumi/pulumi-java/pkg v0.9.8/go.mod h1:c6rSw/+q4O0IImgJ9axxoC6QesbPY
 github.com/pulumi/pulumi-java/pkg v0.14.0/go.mod h1:VybuJMWJtJc9ZNbt1kcYH4TbpocMx9mEi7YWL2Co99c=
 github.com/pulumi/pulumi-tailscale/sdk v0.13.0 h1:Xav3BLPgUZMJdp0I+PCkDOF1E977+L6aW+nA/zctdwA=
 github.com/pulumi/pulumi-tailscale/sdk v0.13.0/go.mod h1:IcOwOujjq/SHRHCSGHIMAg6tgM4FKSUID9bTF7q2oYg=
+github.com/pulumi/pulumi-tailscale/sdk v0.18.0 h1:mLzI/QoPNW2uLsE/L5RB8yBDbk7HMAin1d0tELtd2YA=
+github.com/pulumi/pulumi-tailscale/sdk v0.18.0/go.mod h1:0TAgmgB08mL81I209JD7UVYp8sJCDS4afQipW4FAxB8=
 github.com/pulumi/pulumi-yaml v0.5.8/go.mod h1:rJCp0HXvJGG+hs40wII9yYxuCeBBr2+e8FytW0YnINM=
 github.com/pulumi/pulumi-yaml v0.5.9/go.mod h1:rJCp0HXvJGG+hs40wII9yYxuCeBBr2+e8FytW0YnINM=
 github.com/pulumi/pulumi-yaml v0.5.10/go.mod h1:vxV5TdH3Xk5HRHNftcDXSbsZFJcJY9ME6k4zD+xw9OY=
