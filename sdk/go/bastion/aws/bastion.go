@@ -78,6 +78,8 @@ type bastionArgs struct {
 	Hostname *string `pulumi:"hostname"`
 	// The EC2 instance type to use for the bastion.
 	InstanceType *string `pulumi:"instanceType"`
+	// An OAuth Client Secret to use for authenticating Tailscale clients.
+	OauthClientSecret *string `pulumi:"oauthClientSecret"`
 	// Whether the bastion is going in public subnets.
 	Public *bool `pulumi:"public"`
 	// The AWS region you're using.
@@ -106,6 +108,8 @@ type BastionArgs struct {
 	Hostname pulumi.StringPtrInput
 	// The EC2 instance type to use for the bastion.
 	InstanceType pulumi.StringPtrInput
+	// An OAuth Client Secret to use for authenticating Tailscale clients.
+	OauthClientSecret pulumi.StringPtrInput
 	// Whether the bastion is going in public subnets.
 	Public pulumi.BoolPtrInput
 	// The AWS region you're using.

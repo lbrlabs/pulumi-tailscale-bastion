@@ -60,6 +60,7 @@ export class Bastion extends pulumi.ComponentResource {
             resourceInputs["highAvailability"] = (args ? args.highAvailability : undefined) ?? false;
             resourceInputs["hostname"] = args ? args.hostname : undefined;
             resourceInputs["instanceType"] = args ? args.instanceType : undefined;
+            resourceInputs["oauthClientSecret"] = args ? args.oauthClientSecret : undefined;
             resourceInputs["public"] = (args ? args.public : undefined) ?? false;
             resourceInputs["region"] = args ? args.region : undefined;
             resourceInputs["routes"] = args ? args.routes : undefined;
@@ -105,6 +106,10 @@ export interface BastionArgs {
      * The EC2 instance type to use for the bastion.
      */
     instanceType?: pulumi.Input<string>;
+    /**
+     * An OAuth Client Secret to use for authenticating Tailscale clients.
+     */
+    oauthClientSecret?: pulumi.Input<string>;
     /**
      * Whether the bastion is going in public subnets.
      */

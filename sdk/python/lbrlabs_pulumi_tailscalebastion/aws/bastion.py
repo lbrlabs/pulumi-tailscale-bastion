@@ -24,6 +24,7 @@ class BastionArgs:
                  enable_ssh: Optional[pulumi.Input[bool]] = None,
                  hostname: Optional[pulumi.Input[str]] = None,
                  instance_type: Optional[pulumi.Input[str]] = None,
+                 oauth_client_secret: Optional[pulumi.Input[str]] = None,
                  public: Optional[pulumi.Input[bool]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None):
         """
@@ -38,6 +39,7 @@ class BastionArgs:
         :param pulumi.Input[bool] enable_ssh: Whether to enable SSH access to the bastion.
         :param pulumi.Input[str] hostname: The hostname of the bastion.
         :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
+        :param pulumi.Input[str] oauth_client_secret: An OAuth Client Secret to use for authenticating Tailscale clients.
         :param pulumi.Input[bool] public: Whether the bastion is going in public subnets.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] routes: The routes you'd like to advertise via tailscale.
         """
@@ -64,6 +66,8 @@ class BastionArgs:
             pulumi.set(__self__, "hostname", hostname)
         if instance_type is not None:
             pulumi.set(__self__, "instance_type", instance_type)
+        if oauth_client_secret is not None:
+            pulumi.set(__self__, "oauth_client_secret", oauth_client_secret)
         if public is None:
             public = False
         if public is not None:
@@ -192,6 +196,18 @@ class BastionArgs:
         pulumi.set(self, "instance_type", value)
 
     @property
+    @pulumi.getter(name="oauthClientSecret")
+    def oauth_client_secret(self) -> Optional[pulumi.Input[str]]:
+        """
+        An OAuth Client Secret to use for authenticating Tailscale clients.
+        """
+        return pulumi.get(self, "oauth_client_secret")
+
+    @oauth_client_secret.setter
+    def oauth_client_secret(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "oauth_client_secret", value)
+
+    @property
     @pulumi.getter
     def public(self) -> Optional[pulumi.Input[bool]]:
         """
@@ -227,6 +243,7 @@ class Bastion(pulumi.ComponentResource):
                  high_availability: Optional[pulumi.Input[bool]] = None,
                  hostname: Optional[pulumi.Input[str]] = None,
                  instance_type: Optional[pulumi.Input[str]] = None,
+                 oauth_client_secret: Optional[pulumi.Input[str]] = None,
                  public: Optional[pulumi.Input[bool]] = None,
                  region: Optional[pulumi.Input[str]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
@@ -244,6 +261,7 @@ class Bastion(pulumi.ComponentResource):
         :param pulumi.Input[bool] high_availability: Whether the bastion should be highly available.
         :param pulumi.Input[str] hostname: The hostname of the bastion.
         :param pulumi.Input[str] instance_type: The EC2 instance type to use for the bastion.
+        :param pulumi.Input[str] oauth_client_secret: An OAuth Client Secret to use for authenticating Tailscale clients.
         :param pulumi.Input[bool] public: Whether the bastion is going in public subnets.
         :param pulumi.Input[str] region: The AWS region you're using.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] routes: The routes you'd like to advertise via tailscale.
@@ -280,6 +298,7 @@ class Bastion(pulumi.ComponentResource):
                  high_availability: Optional[pulumi.Input[bool]] = None,
                  hostname: Optional[pulumi.Input[str]] = None,
                  instance_type: Optional[pulumi.Input[str]] = None,
+                 oauth_client_secret: Optional[pulumi.Input[str]] = None,
                  public: Optional[pulumi.Input[bool]] = None,
                  region: Optional[pulumi.Input[str]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[str]]]] = None,
@@ -313,6 +332,7 @@ class Bastion(pulumi.ComponentResource):
             __props__.__dict__["high_availability"] = high_availability
             __props__.__dict__["hostname"] = hostname
             __props__.__dict__["instance_type"] = instance_type
+            __props__.__dict__["oauth_client_secret"] = oauth_client_secret
             if public is None:
                 public = False
             __props__.__dict__["public"] = public

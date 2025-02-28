@@ -31,6 +31,7 @@ type BastionArgs struct {
 	Region             pulumi.StringInput      `pulumi:"region"`
 	InstanceType       pulumi.StringInput      `pulumi:"instanceType"`
 	Hostname           pulumi.StringInput      `pulumi:"hostname"`
+	OauthClientSecret  pulumi.StringInput      `pulumi:"oauthClientSecret"`
 	HighAvailability   bool                    `pulumi:"highAvailability"`
 	EnableSSH          bool                    `pulumi:"enableSSH"`
 	Public             bool                    `pulumi:"public"`
@@ -79,22 +80,34 @@ func NewBastion(ctx *pulumi.Context,
 		hostname = args.Hostname
 	}
 
-	// create a tailnet key to auth devices
-	tailnetKey, err := tailscale.NewTailnetKey(ctx, name, &tailscale.TailnetKeyArgs{
-		Ephemeral:     pulumi.Bool(true),
-		Preauthorized: pulumi.Bool(true),
-		Reusable:      pulumi.Bool(true),
-		Tags:          args.TailscaleTags,
-		Description:   pulumi.Sprintf("Auth key for %s", hostname),
-	}, pulumi.Parent(component))
-	if err != nil {
-		return nil, fmt.Errorf("error creating tailnet key: %v", err)
+	// if the oauth client secret is provided, we use that to auth the client
+	// if not, we create a tailnet key to auth the client
+
+	var tailnetKeyToUseForAuth pulumi.StringInput
+
+	if args.OauthClientSecret == nil {
+
+		// create a tailnet key to auth devices
+		tailnetKey, err := tailscale.NewTailnetKey(ctx, name, &tailscale.TailnetKeyArgs{
+			Ephemeral:     pulumi.Bool(true),
+			Preauthorized: pulumi.Bool(true),
+			Reusable:      pulumi.Bool(true),
+			Tags:          args.TailscaleTags,
+			Description:   pulumi.Sprintf("Auth key for %s", hostname),
+		}, pulumi.Parent(component))
+		if err != nil {
+			return nil, fmt.Errorf("error creating tailnet key: %v", err)
+		}
+
+		tailnetKeyToUseForAuth = tailnetKey.Key
+	} else {
+		tailnetKeyToUseForAuth = pulumi.Sprintf("%s?ephemeral=true&preauthorized=true", args.OauthClientSecret)
 	}
 
 	// store the key in an AWS SSM parameter
 	tailnetKeySsmParameter, err := ssm.NewParameter(ctx, name, &ssm.ParameterArgs{
 		Type:        ssm.ParameterTypeSecureString,
-		Value:       tailnetKey.Key,
+		Value:       tailnetKeyToUseForAuth,
 		Description: pulumi.Sprintf("Tailscale auth key for %s", hostname),
 	}, pulumi.Parent(component))
 	if err != nil {

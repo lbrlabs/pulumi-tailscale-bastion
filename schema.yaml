@@ -117,6 +117,9 @@ resources:
       instanceType:
         type: string
         description: "The EC2 instance type to use for the bastion."
+      oauthClientSecret:
+        type: string
+        description: "An OAuth Client Secret to use for authenticating Tailscale clients."
     requiredInputs:
       - highAvailability
       - vpcId

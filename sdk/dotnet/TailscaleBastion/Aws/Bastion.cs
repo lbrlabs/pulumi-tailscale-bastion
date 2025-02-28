@@ -91,6 +91,12 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         public Input<string>? InstanceType { get; set; }
 
         /// <summary>
+        /// An OAuth Client Secret to use for authenticating Tailscale clients.
+        /// </summary>
+        [Input("oauthClientSecret")]
+        public Input<string>? OauthClientSecret { get; set; }
+
+        /// <summary>
         /// Whether the bastion is going in public subnets.
         /// </summary>
         [Input("public")]
