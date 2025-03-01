@@ -24,7 +24,7 @@ builds:
   - -X github.com/lbrlabs/pulumi-tailscale-bastion/pkg/version.Version={{ .Tag }}
   main: ./cmd/pulumi-resource-tailscale-bastion/
 changelog:
-  skip: true
+  disable: true
 release:
   prerelease: auto
 snapshot:
