@@ -54,6 +54,7 @@ export class Bastion extends pulumi.ComponentResource {
             if ((!args || args.vpcId === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'vpcId'");
             }
+            resourceInputs["architecture"] = (args ? args.architecture : undefined) ?? "x86_64";
             resourceInputs["enableAppConnector"] = (args ? args.enableAppConnector : undefined) ?? false;
             resourceInputs["enableExitNode"] = (args ? args.enableExitNode : undefined) ?? false;
             resourceInputs["enableSSH"] = (args ? args.enableSSH : undefined) ?? true;
@@ -82,6 +83,10 @@ export class Bastion extends pulumi.ComponentResource {
  * The set of arguments for constructing a Bastion resource.
  */
 export interface BastionArgs {
+    /**
+     * The CPU architecture for the bastion (x86_64 or arm64).
+     */
+    architecture?: pulumi.Input<string>;
     /**
      * Whether the bastion advertises itself as an app connector.
      */

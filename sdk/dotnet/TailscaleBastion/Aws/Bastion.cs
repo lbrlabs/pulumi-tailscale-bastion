@@ -55,6 +55,12 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
     public sealed class BastionArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// The CPU architecture for the bastion (x86_64 or arm64).
+        /// </summary>
+        [Input("architecture")]
+        public Input<string>? Architecture { get; set; }
+
+        /// <summary>
         /// Whether the bastion advertises itself as an app connector.
         /// </summary>
         [Input("enableAppConnector")]
@@ -152,6 +158,7 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
 
         public BastionArgs()
         {
+            Architecture = "x86_64";
             EnableAppConnector = false;
             EnableExitNode = false;
             EnableSSH = true;
