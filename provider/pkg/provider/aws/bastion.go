@@ -257,6 +257,7 @@ func NewBastion(ctx *pulumi.Context,
 	if err != nil {
 		return nil, fmt.Errorf("error creating security group: %v", err)
 	}
+	
 
 	ami := ec2.LookupAmiOutput(ctx, ec2.LookupAmiOutputArgs{
 		Owners: pulumi.StringArray{
@@ -279,7 +280,7 @@ func NewBastion(ctx *pulumi.Context,
 			ec2.GetAmiFilterArgs{
 				Name: pulumi.String("name"),
 				Values: pulumi.StringArray{
-					pulumi.String("amzn2-ami-hvm*"),
+					pulumi.String("al2023-ami-*x86_64*"),
 				},
 			},
 		},
