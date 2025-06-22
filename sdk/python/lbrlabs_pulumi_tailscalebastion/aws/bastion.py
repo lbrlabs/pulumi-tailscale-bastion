@@ -24,6 +24,7 @@ class BastionArgs:
                  subnet_ids: pulumi.Input[Sequence[pulumi.Input[str]]],
                  tailscale_tags: pulumi.Input[Sequence[pulumi.Input[str]]],
                  vpc_id: pulumi.Input[str],
+                 architecture: Optional[pulumi.Input[str]] = None,
                  enable_app_connector: Optional[pulumi.Input[bool]] = None,
                  enable_exit_node: Optional[pulumi.Input[bool]] = None,
                  enable_ssh: Optional[pulumi.Input[bool]] = None,
@@ -39,6 +40,7 @@ class BastionArgs:
         :param pulumi.Input[Sequence[pulumi.Input[str]]] subnet_ids: The subnet Ids to launch instances in.
         :param pulumi.Input[Sequence[pulumi.Input[str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
         :param pulumi.Input[str] vpc_id: The VPC the Bastion should be created in.
+        :param pulumi.Input[str] architecture: The CPU architecture for the bastion (x86_64 or arm64).
         :param pulumi.Input[bool] enable_app_connector: Whether the bastion advertises itself as an app connector.
         :param pulumi.Input[bool] enable_exit_node: Whether the subnet router can advertise itself as an exit node.
         :param pulumi.Input[bool] enable_ssh: Whether to enable SSH access to the bastion.
@@ -55,6 +57,10 @@ class BastionArgs:
         pulumi.set(__self__, "subnet_ids", subnet_ids)
         pulumi.set(__self__, "tailscale_tags", tailscale_tags)
         pulumi.set(__self__, "vpc_id", vpc_id)
+        if architecture is None:
+            architecture = 'x86_64'
+        if architecture is not None:
+            pulumi.set(__self__, "architecture", architecture)
         if enable_app_connector is None:
             enable_app_connector = False
         if enable_app_connector is not None:
@@ -139,6 +145,18 @@ class BastionArgs:
     @vpc_id.setter
     def vpc_id(self, value: pulumi.Input[str]):
         pulumi.set(self, "vpc_id", value)
+
+    @property
+    @pulumi.getter
+    def architecture(self) -> Optional[pulumi.Input[str]]:
+        """
+        The CPU architecture for the bastion (x86_64 or arm64).
+        """
+        return pulumi.get(self, "architecture")
+
+    @architecture.setter
+    def architecture(self, value: Optional[pulumi.Input[str]]):
+        pulumi.set(self, "architecture", value)
 
     @property
     @pulumi.getter(name="enableAppConnector")
@@ -242,6 +260,7 @@ class Bastion(pulumi.ComponentResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 architecture: Optional[pulumi.Input[str]] = None,
                  enable_app_connector: Optional[pulumi.Input[bool]] = None,
                  enable_exit_node: Optional[pulumi.Input[bool]] = None,
                  enable_ssh: Optional[pulumi.Input[bool]] = None,
@@ -260,6 +279,7 @@ class Bastion(pulumi.ComponentResource):
         Create a Bastion resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[str] architecture: The CPU architecture for the bastion (x86_64 or arm64).
         :param pulumi.Input[bool] enable_app_connector: Whether the bastion advertises itself as an app connector.
         :param pulumi.Input[bool] enable_exit_node: Whether the subnet router can advertise itself as an exit node.
         :param pulumi.Input[bool] enable_ssh: Whether to enable SSH access to the bastion.
@@ -297,6 +317,7 @@ class Bastion(pulumi.ComponentResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 architecture: Optional[pulumi.Input[str]] = None,
                  enable_app_connector: Optional[pulumi.Input[bool]] = None,
                  enable_exit_node: Optional[pulumi.Input[bool]] = None,
                  enable_ssh: Optional[pulumi.Input[bool]] = None,
@@ -321,6 +342,9 @@ class Bastion(pulumi.ComponentResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = BastionArgs.__new__(BastionArgs)
 
+            if architecture is None:
+                architecture = 'x86_64'
+            __props__.__dict__["architecture"] = architecture
             if enable_app_connector is None:
                 enable_app_connector = False
             __props__.__dict__["enable_app_connector"] = enable_app_connector

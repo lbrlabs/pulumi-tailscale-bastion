@@ -40,6 +40,9 @@ func NewBastion(ctx *pulumi.Context,
 	if args.VpcId == nil {
 		return nil, errors.New("invalid value for required argument 'VpcId'")
 	}
+	if args.Architecture == nil {
+		args.Architecture = pulumi.StringPtr("x86_64")
+	}
 	if args.EnableAppConnector == nil {
 		args.EnableAppConnector = pulumi.BoolPtr(false)
 	}
@@ -65,6 +68,8 @@ func NewBastion(ctx *pulumi.Context,
 }
 
 type bastionArgs struct {
+	// The CPU architecture for the bastion (x86_64 or arm64).
+	Architecture *string `pulumi:"architecture"`
 	// Whether the bastion advertises itself as an app connector.
 	EnableAppConnector *bool `pulumi:"enableAppConnector"`
 	// Whether the subnet router can advertise itself as an exit node.
@@ -95,6 +100,8 @@ type bastionArgs struct {
 
 // The set of arguments for constructing a Bastion resource.
 type BastionArgs struct {
+	// The CPU architecture for the bastion (x86_64 or arm64).
+	Architecture pulumi.StringPtrInput
 	// Whether the bastion advertises itself as an app connector.
 	EnableAppConnector pulumi.BoolPtrInput
 	// Whether the subnet router can advertise itself as an exit node.

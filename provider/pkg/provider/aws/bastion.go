@@ -2,7 +2,7 @@ package aws
 
 import (
 	"bytes"
-	_ "embed" // embed needs to be a blank import
+	_ "embed"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -22,7 +22,13 @@ var (
 	userData string
 )
 
-// The set of arguments for creating a Bastion component resource.
+type Architecture string
+
+const (
+	ArchX86_64 Architecture = "x86_64"
+	ArchArm64  Architecture = "arm64"
+)
+
 type BastionArgs struct {
 	VpcID              pulumi.StringInput      `pulumi:"vpcId"`
 	SubnetIds          pulumi.StringArrayInput `pulumi:"subnetIds"`
@@ -37,6 +43,7 @@ type BastionArgs struct {
 	Public             bool                    `pulumi:"public"`
 	EnableExitNode     bool                    `pulumi:"enableExitNode"`
 	EnableAppConnector bool                    `pulumi:"enableAppConnector"`
+	Architecture       pulumi.StringInput      `pulumi:"architecture"`
 }
 
 type UserDataArgs struct {
@@ -50,7 +57,6 @@ type UserDataArgs struct {
 	Hostname           string
 }
 
-// The Bastion component resource.
 type Bastion struct {
 	pulumi.ResourceState
 
@@ -58,9 +64,9 @@ type Bastion struct {
 	PrivateKey pulumi.StringOutput `pulumi:"privateKey"`
 }
 
-// NewBastion creates a new Bastion component resource.
 func NewBastion(ctx *pulumi.Context,
 	name string, args *BastionArgs, opts ...pulumi.ResourceOption) (*Bastion, error) {
+
 	if args == nil {
 		args = &BastionArgs{}
 	}
@@ -73,21 +79,22 @@ func NewBastion(ctx *pulumi.Context,
 	}
 
 	var hostname pulumi.StringInput
-
 	if args.Hostname == nil {
 		hostname = pulumi.String(name)
 	} else {
 		hostname = args.Hostname
 	}
 
-	// if the oauth client secret is provided, we use that to auth the client
-	// if not, we create a tailnet key to auth the client
+	var arch pulumi.StringInput
+	if args.Architecture == nil {
+		arch = pulumi.String(string(ArchX86_64))
+	} else {
+		arch = args.Architecture
+	}
 
 	var tailnetKeyToUseForAuth pulumi.StringInput
 
 	if args.OauthClientSecret == nil {
-
-		// create a tailnet key to auth devices
 		tailnetKey, err := tailscale.NewTailnetKey(ctx, name, &tailscale.TailnetKeyArgs{
 			Ephemeral:     pulumi.Bool(true),
 			Preauthorized: pulumi.Bool(true),
@@ -98,13 +105,11 @@ func NewBastion(ctx *pulumi.Context,
 		if err != nil {
 			return nil, fmt.Errorf("error creating tailnet key: %v", err)
 		}
-
 		tailnetKeyToUseForAuth = tailnetKey.Key
 	} else {
 		tailnetKeyToUseForAuth = pulumi.Sprintf("%s?ephemeral=true&preauthorized=true", args.OauthClientSecret)
 	}
 
-	// store the key in an AWS SSM parameter
 	tailnetKeySsmParameter, err := ssm.NewParameter(ctx, name, &ssm.ParameterArgs{
 		Type:        ssm.ParameterTypeSecureString,
 		Value:       tailnetKeyToUseForAuth,
@@ -127,14 +132,11 @@ func NewBastion(ctx *pulumi.Context,
 		},
 	}
 
-	// Marshal the JSON into something the role can consume
 	assumeRolePolicyJSON, err := json.Marshal(assumeRolePolicy)
 	if err != nil {
 		return nil, fmt.Errorf("error creating AssumeRolePolicy JSON: %v", err)
 	}
 
-	// create an IAM role the bastion uses
-	// we give access to EC2 and SSM to read the parameter
 	role, err := iam.NewRole(ctx, name, &iam.RoleArgs{
 		AssumeRolePolicy: pulumi.String(string(assumeRolePolicyJSON)),
 	}, pulumi.Parent(component))
@@ -142,7 +144,6 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating IAM role: %v", err)
 	}
 
-	// FIXME: don't use the interface method here
 	ssmParameterPolicyJSON := tailnetKeySsmParameter.Arn.ApplyT(func(arn string) (string, error) {
 		policyJSON, err := json.Marshal(map[string]interface{}{
 			"Version": "2012-10-17",
@@ -178,7 +179,6 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating SSM parameter policy: %v", err)
 	}
 
-	// allow access to the SSM parameter
 	_, err = iam.NewRolePolicyAttachment(ctx, fmt.Sprintf("%s-ssm-parameter", name), &iam.RolePolicyAttachmentArgs{
 		Role:      role.Name,
 		PolicyArn: ssmParameterPolicy.Arn,
@@ -187,7 +187,6 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating SSM parameter policy attachment: %v", err)
 	}
 
-	// allow to EC2 instance to be managed by AWS SSM
 	_, err = iam.NewRolePolicyAttachment(ctx, fmt.Sprintf("%s-ssm-manager", name), &iam.RolePolicyAttachmentArgs{
 		Role:      role.Name,
 		PolicyArn: iam.ManagedPolicyAmazonSSMManagedInstanceCore,
@@ -204,9 +203,6 @@ func NewBastion(ctx *pulumi.Context,
 	}
 
 	var ingress ec2.SecurityGroupIngressArray
-
-	// if we're using public subnets, we open the UDP port
-	// this ensure we don't use DERP relays
 	if args.Public {
 		ingress = ec2.SecurityGroupIngressArray{
 			ec2.SecurityGroupIngressArgs{
@@ -217,7 +213,6 @@ func NewBastion(ctx *pulumi.Context,
 					pulumi.String("0.0.0.0/0"),
 				},
 			},
-			// allow access to udp port 41641
 			ec2.SecurityGroupIngressArgs{
 				Protocol: pulumi.String("udp"),
 				FromPort: pulumi.Int(41641),
@@ -257,7 +252,6 @@ func NewBastion(ctx *pulumi.Context,
 	if err != nil {
 		return nil, fmt.Errorf("error creating security group: %v", err)
 	}
-	
 
 	ami := ec2.LookupAmiOutput(ctx, ec2.LookupAmiOutputArgs{
 		Owners: pulumi.StringArray{
@@ -270,7 +264,6 @@ func NewBastion(ctx *pulumi.Context,
 					pulumi.String("amazon"),
 				},
 			},
-
 			ec2.GetAmiFilterArgs{
 				Name: pulumi.String("virtualization-type"),
 				Values: pulumi.StringArray{
@@ -280,7 +273,7 @@ func NewBastion(ctx *pulumi.Context,
 			ec2.GetAmiFilterArgs{
 				Name: pulumi.String("name"),
 				Values: pulumi.StringArray{
-					pulumi.String("al2023-ami-*x86_64*"),
+					pulumi.Sprintf("al2023-ami-*%s*", arch),
 				},
 			},
 		},
@@ -289,11 +282,9 @@ func NewBastion(ctx *pulumi.Context,
 
 	data := pulumi.All(tailnetKeySsmParameter.Name, args.Routes, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector).ApplyT(
 		func(args []interface{}) (string, error) {
-
 			tagCSV := strings.Join(args[3].([]string), ",")
 
 			var routesCsv string
-
 			if args[1] != nil {
 				routes := args[1].([]string)
 				routesCsv = strings.Join(routes, ",")
@@ -313,27 +304,29 @@ func NewBastion(ctx *pulumi.Context,
 			}
 
 			var userDataBytes bytes.Buffer
-
 			userDataTemplate := template.New("userdata")
 			userDataTemplate, err = userDataTemplate.Parse(userData)
 			if err != nil {
 				return "", err
 			}
-			err := userDataTemplate.Execute(&userDataBytes, d)
+			err = userDataTemplate.Execute(&userDataBytes, d)
 			if err != nil {
 				return "", err
 			}
-
 			return base64.StdEncoding.EncodeToString(userDataBytes.Bytes()), nil
-
 		},
 	).(pulumi.StringOutput)
 
-	var instanceType pulumi.String
+	var instanceType pulumi.StringInput
 	if args.InstanceType == nil {
-		instanceType = pulumi.String("t3.micro")
+		instanceType = pulumi.All(arch).ApplyT(func(v []interface{}) string {
+			if v[0].(string) == string(ArchArm64) {
+				return "t4g.micro"
+			}
+			return "t3.micro"
+		}).(pulumi.StringOutput)
 	} else {
-		instanceType = args.InstanceType.(pulumi.String)
+		instanceType = args.InstanceType
 	}
 
 	key, err := tls.NewPrivateKey(ctx, name, &tls.PrivateKeyArgs{
@@ -364,7 +357,6 @@ func NewBastion(ctx *pulumi.Context,
 	}
 
 	var size int
-
 	if args.HighAvailability {
 		size = 2
 	} else {
@@ -379,7 +371,6 @@ func NewBastion(ctx *pulumi.Context,
 				MinHealthyPercentage: pulumi.Int(50),
 			},
 		}
-
 	} else {
 		instanceRefresh = nil
 	}

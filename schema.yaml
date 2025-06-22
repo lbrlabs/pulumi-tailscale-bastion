@@ -120,6 +120,13 @@ resources:
       oauthClientSecret:
         type: string
         description: "An OAuth Client Secret to use for authenticating Tailscale clients."
+      architecture:
+        type: string
+        description: "The CPU architecture for the bastion (x86_64 or arm64)."
+        enum:
+          - x86_64
+          - arm64
+        default: x86_64
     requiredInputs:
       - highAvailability
       - vpcId
