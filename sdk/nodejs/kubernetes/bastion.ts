@@ -24,7 +24,7 @@ export class Bastion extends pulumi.ComponentResource {
     /**
      * The name of the kubernetes deployment that contains the tailscale bastion
      */
-    public /*out*/ readonly deploymentName!: pulumi.Output<string>;
+    declare public /*out*/ readonly deploymentName: pulumi.Output<string>;
 
     /**
      * Create a Bastion resource with the given unique name, arguments, and options.
@@ -37,23 +37,23 @@ export class Bastion extends pulumi.ComponentResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.createNamespace === undefined) && !opts.urn) {
+            if (args?.createNamespace === undefined && !opts.urn) {
                 throw new Error("Missing required property 'createNamespace'");
             }
-            if ((!args || args.highAvailability === undefined) && !opts.urn) {
+            if (args?.highAvailability === undefined && !opts.urn) {
                 throw new Error("Missing required property 'highAvailability'");
             }
-            if ((!args || args.routes === undefined) && !opts.urn) {
+            if (args?.routes === undefined && !opts.urn) {
                 throw new Error("Missing required property 'routes'");
             }
-            if ((!args || args.tailscaleTags === undefined) && !opts.urn) {
+            if (args?.tailscaleTags === undefined && !opts.urn) {
                 throw new Error("Missing required property 'tailscaleTags'");
             }
-            resourceInputs["createNamespace"] = args ? args.createNamespace : undefined;
-            resourceInputs["highAvailability"] = (args ? args.highAvailability : undefined) ?? false;
-            resourceInputs["namespace"] = args ? args.namespace : undefined;
-            resourceInputs["routes"] = args ? args.routes : undefined;
-            resourceInputs["tailscaleTags"] = args ? args.tailscaleTags : undefined;
+            resourceInputs["createNamespace"] = args?.createNamespace;
+            resourceInputs["highAvailability"] = (args?.highAvailability) ?? false;
+            resourceInputs["namespace"] = args?.namespace;
+            resourceInputs["routes"] = args?.routes;
+            resourceInputs["tailscaleTags"] = args?.tailscaleTags;
             resourceInputs["deploymentName"] = undefined /*out*/;
         } else {
             resourceInputs["deploymentName"] = undefined /*out*/;

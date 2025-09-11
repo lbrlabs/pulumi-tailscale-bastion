@@ -22,11 +22,11 @@ export class Bastion extends pulumi.ComponentResource {
     /**
      * The name of the ASG that managed the bastion instances
      */
-    public /*out*/ readonly asgName!: pulumi.Output<string>;
+    declare public /*out*/ readonly asgName: pulumi.Output<string>;
     /**
      * The SSH private key to access your bastion
      */
-    public /*out*/ readonly privateKey!: pulumi.Output<string>;
+    declare public /*out*/ readonly privateKey: pulumi.Output<string>;
 
     /**
      * Create a Bastion resource with the given unique name, arguments, and options.
@@ -39,35 +39,35 @@ export class Bastion extends pulumi.ComponentResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.highAvailability === undefined) && !opts.urn) {
+            if (args?.highAvailability === undefined && !opts.urn) {
                 throw new Error("Missing required property 'highAvailability'");
             }
-            if ((!args || args.region === undefined) && !opts.urn) {
+            if (args?.region === undefined && !opts.urn) {
                 throw new Error("Missing required property 'region'");
             }
-            if ((!args || args.subnetIds === undefined) && !opts.urn) {
+            if (args?.subnetIds === undefined && !opts.urn) {
                 throw new Error("Missing required property 'subnetIds'");
             }
-            if ((!args || args.tailscaleTags === undefined) && !opts.urn) {
+            if (args?.tailscaleTags === undefined && !opts.urn) {
                 throw new Error("Missing required property 'tailscaleTags'");
             }
-            if ((!args || args.vpcId === undefined) && !opts.urn) {
+            if (args?.vpcId === undefined && !opts.urn) {
                 throw new Error("Missing required property 'vpcId'");
             }
-            resourceInputs["architecture"] = (args ? args.architecture : undefined) ?? "x86_64";
-            resourceInputs["enableAppConnector"] = (args ? args.enableAppConnector : undefined) ?? false;
-            resourceInputs["enableExitNode"] = (args ? args.enableExitNode : undefined) ?? false;
-            resourceInputs["enableSSH"] = (args ? args.enableSSH : undefined) ?? true;
-            resourceInputs["highAvailability"] = (args ? args.highAvailability : undefined) ?? false;
-            resourceInputs["hostname"] = args ? args.hostname : undefined;
-            resourceInputs["instanceType"] = args ? args.instanceType : undefined;
-            resourceInputs["oauthClientSecret"] = args ? args.oauthClientSecret : undefined;
-            resourceInputs["public"] = (args ? args.public : undefined) ?? false;
-            resourceInputs["region"] = args ? args.region : undefined;
-            resourceInputs["routes"] = args ? args.routes : undefined;
-            resourceInputs["subnetIds"] = args ? args.subnetIds : undefined;
-            resourceInputs["tailscaleTags"] = args ? args.tailscaleTags : undefined;
-            resourceInputs["vpcId"] = args ? args.vpcId : undefined;
+            resourceInputs["architecture"] = (args?.architecture) ?? "x86_64";
+            resourceInputs["enableAppConnector"] = (args?.enableAppConnector) ?? false;
+            resourceInputs["enableExitNode"] = (args?.enableExitNode) ?? false;
+            resourceInputs["enableSSH"] = (args?.enableSSH) ?? true;
+            resourceInputs["highAvailability"] = (args?.highAvailability) ?? false;
+            resourceInputs["hostname"] = args?.hostname;
+            resourceInputs["instanceType"] = args?.instanceType;
+            resourceInputs["oauthClientSecret"] = args?.oauthClientSecret;
+            resourceInputs["public"] = (args?.public) ?? false;
+            resourceInputs["region"] = args?.region;
+            resourceInputs["routes"] = args?.routes;
+            resourceInputs["subnetIds"] = args?.subnetIds;
+            resourceInputs["tailscaleTags"] = args?.tailscaleTags;
+            resourceInputs["vpcId"] = args?.vpcId;
             resourceInputs["asgName"] = undefined /*out*/;
             resourceInputs["privateKey"] = undefined /*out*/;
         } else {

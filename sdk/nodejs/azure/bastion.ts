@@ -22,11 +22,11 @@ export class Bastion extends pulumi.ComponentResource {
     /**
      * The SSH private key to access your bastion
      */
-    public /*out*/ readonly privateKey!: pulumi.Output<string>;
+    declare public /*out*/ readonly privateKey: pulumi.Output<string>;
     /**
      * The name of the Scaleset that managed the bastion instances
      */
-    public /*out*/ readonly scaleSetName!: pulumi.Output<string>;
+    declare public /*out*/ readonly scaleSetName: pulumi.Output<string>;
 
     /**
      * Create a Bastion resource with the given unique name, arguments, and options.
@@ -39,33 +39,33 @@ export class Bastion extends pulumi.ComponentResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if ((!args || args.highAvailability === undefined) && !opts.urn) {
+            if (args?.highAvailability === undefined && !opts.urn) {
                 throw new Error("Missing required property 'highAvailability'");
             }
-            if ((!args || args.location === undefined) && !opts.urn) {
+            if (args?.location === undefined && !opts.urn) {
                 throw new Error("Missing required property 'location'");
             }
-            if ((!args || args.resourceGroupName === undefined) && !opts.urn) {
+            if (args?.resourceGroupName === undefined && !opts.urn) {
                 throw new Error("Missing required property 'resourceGroupName'");
             }
-            if ((!args || args.routes === undefined) && !opts.urn) {
+            if (args?.routes === undefined && !opts.urn) {
                 throw new Error("Missing required property 'routes'");
             }
-            if ((!args || args.subnetId === undefined) && !opts.urn) {
+            if (args?.subnetId === undefined && !opts.urn) {
                 throw new Error("Missing required property 'subnetId'");
             }
-            if ((!args || args.tailscaleTags === undefined) && !opts.urn) {
+            if (args?.tailscaleTags === undefined && !opts.urn) {
                 throw new Error("Missing required property 'tailscaleTags'");
             }
-            resourceInputs["enableSSH"] = (args ? args.enableSSH : undefined) ?? true;
-            resourceInputs["highAvailability"] = (args ? args.highAvailability : undefined) ?? false;
-            resourceInputs["instanceSku"] = args ? args.instanceSku : undefined;
-            resourceInputs["location"] = args ? args.location : undefined;
-            resourceInputs["public"] = (args ? args.public : undefined) ?? false;
-            resourceInputs["resourceGroupName"] = args ? args.resourceGroupName : undefined;
-            resourceInputs["routes"] = args ? args.routes : undefined;
-            resourceInputs["subnetId"] = args ? args.subnetId : undefined;
-            resourceInputs["tailscaleTags"] = args ? args.tailscaleTags : undefined;
+            resourceInputs["enableSSH"] = (args?.enableSSH) ?? true;
+            resourceInputs["highAvailability"] = (args?.highAvailability) ?? false;
+            resourceInputs["instanceSku"] = args?.instanceSku;
+            resourceInputs["location"] = args?.location;
+            resourceInputs["public"] = (args?.public) ?? false;
+            resourceInputs["resourceGroupName"] = args?.resourceGroupName;
+            resourceInputs["routes"] = args?.routes;
+            resourceInputs["subnetId"] = args?.subnetId;
+            resourceInputs["tailscaleTags"] = args?.tailscaleTags;
             resourceInputs["privateKey"] = undefined /*out*/;
             resourceInputs["scaleSetName"] = undefined /*out*/;
         } else {
