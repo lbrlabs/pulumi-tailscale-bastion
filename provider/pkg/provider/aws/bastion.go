@@ -6,6 +6,9 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"strings"
+	"text/template"
+
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/autoscaling"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/ec2"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"
@@ -13,8 +16,6 @@ import (
 	"github.com/pulumi/pulumi-tailscale/sdk/go/tailscale"
 	tls "github.com/pulumi/pulumi-tls/sdk/v5/go/tls"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-	"strings"
-	"text/template"
 )
 
 var (
@@ -341,19 +342,28 @@ func NewBastion(ctx *pulumi.Context,
 		PublicKey: key.PublicKeyOpenssh,
 	}, pulumi.Parent(component))
 
-	launchConfiguration, err := ec2.NewLaunchConfiguration(ctx, name, &ec2.LaunchConfigurationArgs{
-		InstanceType:             instanceType,
-		AssociatePublicIpAddress: pulumi.Bool(args.Public),
-		ImageId:                  ami.Id(),
-		SecurityGroups: pulumi.StringArray{
+	launchTemplate, err := ec2.NewLaunchTemplate(ctx, name, &ec2.LaunchTemplateArgs{
+		InstanceType: instanceType,
+		ImageId:      ami.Id(),
+		KeyName:      ec2Key.KeyName,
+		IamInstanceProfile: ec2.LaunchTemplateIamInstanceProfileArgs{
+			Arn: profile.Arn,
+		},
+		UserData: data,
+		VpcSecurityGroupIds: pulumi.StringArray{
 			sg.ID(),
 		},
-		KeyName:            ec2Key.KeyName,
-		IamInstanceProfile: profile.ID(),
-		UserDataBase64:     data,
+		TagSpecifications: ec2.LaunchTemplateTagSpecificationArray{
+			ec2.LaunchTemplateTagSpecificationArgs{
+				ResourceType: pulumi.String("instance"),
+				Tags: pulumi.StringMap{
+					"Name": pulumi.String(fmt.Sprintf("%s-tailscale-bastion", name)),
+				},
+			},
+		},
 	}, pulumi.Parent(component))
 	if err != nil {
-		return nil, fmt.Errorf("error creating launch configuration: %v", err)
+		return nil, fmt.Errorf("error creating launch template: %v", err)
 	}
 
 	var size int
@@ -376,7 +386,10 @@ func NewBastion(ctx *pulumi.Context,
 	}
 
 	asg, err := autoscaling.NewGroup(ctx, name, &autoscaling.GroupArgs{
-		LaunchConfiguration:    launchConfiguration.ID(),
+		LaunchTemplate: autoscaling.GroupLaunchTemplateArgs{
+			Id:      launchTemplate.ID(),
+			Version: pulumi.String("$Latest"),
+		},
 		MaxSize:                pulumi.Int(size),
 		MinSize:                pulumi.Int(size),
 		HealthCheckType:        pulumi.String("EC2"),
@@ -390,7 +403,7 @@ func NewBastion(ctx *pulumi.Context,
 				PropagateAtLaunch: pulumi.Bool(true),
 			},
 		},
-	}, pulumi.Parent(launchConfiguration))
+	}, pulumi.Parent(launchTemplate))
 	if err != nil {
 		return nil, fmt.Errorf("error creating asg: %v", err)
 	}
