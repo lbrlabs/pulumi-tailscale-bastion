@@ -70,6 +70,8 @@ type bastionArgs struct {
 	InstanceSku *string `pulumi:"instanceSku"`
 	// The Azure region you're using.
 	Location string `pulumi:"location"`
+	// Settings for configuring this node as a peer relay server.
+	PeerRelaySettings map[string]string `pulumi:"peerRelaySettings"`
 	// Whether the bastion should have a public IP.
 	Public *bool `pulumi:"public"`
 	// The Azure resource group to create the bastion in.
@@ -92,6 +94,8 @@ type BastionArgs struct {
 	InstanceSku pulumi.StringPtrInput
 	// The Azure region you're using.
 	Location pulumi.StringInput
+	// Settings for configuring this node as a peer relay server.
+	PeerRelaySettings pulumi.StringMapInput
 	// Whether the bastion should have a public IP.
 	Public pulumi.BoolPtrInput
 	// The Azure resource group to create the bastion in.

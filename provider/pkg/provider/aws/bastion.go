@@ -30,6 +30,11 @@ const (
 	ArchArm64  Architecture = "arm64"
 )
 
+type PeerRelaySettings struct {
+	Enable bool `pulumi:"enable"`
+	Port   int  `pulumi:"port"`
+}
+
 type BastionArgs struct {
 	VpcID              pulumi.StringInput      `pulumi:"vpcId"`
 	SubnetIds          pulumi.StringArrayInput `pulumi:"subnetIds"`
@@ -45,6 +50,7 @@ type BastionArgs struct {
 	EnableExitNode     bool                    `pulumi:"enableExitNode"`
 	EnableAppConnector bool                    `pulumi:"enableAppConnector"`
 	Architecture       pulumi.StringInput      `pulumi:"architecture"`
+	PeerRelaySettings  *PeerRelaySettings      `pulumi:"peerRelaySettings"`
 }
 
 type UserDataArgs struct {
@@ -56,6 +62,8 @@ type UserDataArgs struct {
 	EnableExitNode     bool
 	EnableAppConnector bool
 	Hostname           string
+	PeerRelayEnable    bool
+	PeerRelayPort      int
 }
 
 type Bastion struct {
@@ -281,7 +289,15 @@ func NewBastion(ctx *pulumi.Context,
 		MostRecent: pulumi.BoolPtr(true),
 	}, pulumi.Parent(component))
 
-	data := pulumi.All(tailnetKeySsmParameter.Name, args.Routes, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector).ApplyT(
+	// Default peer relay settings if not provided
+	peerRelayEnable := false
+	peerRelayPort := 12345
+	if args.PeerRelaySettings != nil {
+		peerRelayEnable = args.PeerRelaySettings.Enable
+		peerRelayPort = args.PeerRelaySettings.Port
+	}
+
+	data := pulumi.All(tailnetKeySsmParameter.Name, args.Routes, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector, pulumi.Bool(peerRelayEnable), pulumi.Int(peerRelayPort)).ApplyT(
 		func(args []interface{}) (string, error) {
 			tagCSV := strings.Join(args[3].([]string), ",")
 
@@ -302,6 +318,8 @@ func NewBastion(ctx *pulumi.Context,
 				Hostname:           args[5].(string),
 				EnableExitNode:     args[6].(bool),
 				EnableAppConnector: args[7].(bool),
+				PeerRelayEnable:    args[8].(bool),
+				PeerRelayPort:      args[9].(int),
 			}
 
 			var userDataBytes bytes.Buffer

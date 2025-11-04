@@ -62,6 +62,7 @@ export class Bastion extends pulumi.ComponentResource {
             resourceInputs["hostname"] = args?.hostname;
             resourceInputs["instanceType"] = args?.instanceType;
             resourceInputs["oauthClientSecret"] = args?.oauthClientSecret;
+            resourceInputs["peerRelaySettings"] = args?.peerRelaySettings;
             resourceInputs["public"] = (args?.public) ?? false;
             resourceInputs["region"] = args?.region;
             resourceInputs["routes"] = args?.routes;
@@ -115,6 +116,10 @@ export interface BastionArgs {
      * An OAuth Client Secret to use for authenticating Tailscale clients.
      */
     oauthClientSecret?: pulumi.Input<string>;
+    /**
+     * Settings for configuring this node as a peer relay server.
+     */
+    peerRelaySettings?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     /**
      * Whether the bastion is going in public subnets.
      */

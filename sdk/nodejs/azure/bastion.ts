@@ -61,6 +61,7 @@ export class Bastion extends pulumi.ComponentResource {
             resourceInputs["highAvailability"] = (args?.highAvailability) ?? false;
             resourceInputs["instanceSku"] = args?.instanceSku;
             resourceInputs["location"] = args?.location;
+            resourceInputs["peerRelaySettings"] = args?.peerRelaySettings;
             resourceInputs["public"] = (args?.public) ?? false;
             resourceInputs["resourceGroupName"] = args?.resourceGroupName;
             resourceInputs["routes"] = args?.routes;
@@ -97,6 +98,10 @@ export interface BastionArgs {
      * The Azure region you're using.
      */
     location: pulumi.Input<string>;
+    /**
+     * Settings for configuring this node as a peer relay server.
+     */
+    peerRelaySettings?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     /**
      * Whether the bastion should have a public IP.
      */

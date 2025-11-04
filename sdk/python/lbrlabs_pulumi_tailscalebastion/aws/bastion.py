@@ -31,6 +31,7 @@ class BastionArgs:
                  hostname: Optional[pulumi.Input[_builtins.str]] = None,
                  instance_type: Optional[pulumi.Input[_builtins.str]] = None,
                  oauth_client_secret: Optional[pulumi.Input[_builtins.str]] = None,
+                 peer_relay_settings: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
@@ -47,6 +48,7 @@ class BastionArgs:
         :param pulumi.Input[_builtins.str] hostname: The hostname of the bastion.
         :param pulumi.Input[_builtins.str] instance_type: The EC2 instance type to use for the bastion.
         :param pulumi.Input[_builtins.str] oauth_client_secret: An OAuth Client Secret to use for authenticating Tailscale clients.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] peer_relay_settings: Settings for configuring this node as a peer relay server.
         :param pulumi.Input[_builtins.bool] public: Whether the bastion is going in public subnets.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] routes: The routes you'd like to advertise via tailscale.
         """
@@ -79,6 +81,8 @@ class BastionArgs:
             pulumi.set(__self__, "instance_type", instance_type)
         if oauth_client_secret is not None:
             pulumi.set(__self__, "oauth_client_secret", oauth_client_secret)
+        if peer_relay_settings is not None:
+            pulumi.set(__self__, "peer_relay_settings", peer_relay_settings)
         if public is None:
             public = False
         if public is not None:
@@ -231,6 +235,18 @@ class BastionArgs:
         pulumi.set(self, "oauth_client_secret", value)
 
     @_builtins.property
+    @pulumi.getter(name="peerRelaySettings")
+    def peer_relay_settings(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+        """
+        Settings for configuring this node as a peer relay server.
+        """
+        return pulumi.get(self, "peer_relay_settings")
+
+    @peer_relay_settings.setter
+    def peer_relay_settings(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "peer_relay_settings", value)
+
+    @_builtins.property
     @pulumi.getter
     def public(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
@@ -269,6 +285,7 @@ class Bastion(pulumi.ComponentResource):
                  hostname: Optional[pulumi.Input[_builtins.str]] = None,
                  instance_type: Optional[pulumi.Input[_builtins.str]] = None,
                  oauth_client_secret: Optional[pulumi.Input[_builtins.str]] = None,
+                 peer_relay_settings: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None,
                  region: Optional[pulumi.Input[_builtins.str]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
@@ -288,6 +305,7 @@ class Bastion(pulumi.ComponentResource):
         :param pulumi.Input[_builtins.str] hostname: The hostname of the bastion.
         :param pulumi.Input[_builtins.str] instance_type: The EC2 instance type to use for the bastion.
         :param pulumi.Input[_builtins.str] oauth_client_secret: An OAuth Client Secret to use for authenticating Tailscale clients.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] peer_relay_settings: Settings for configuring this node as a peer relay server.
         :param pulumi.Input[_builtins.bool] public: Whether the bastion is going in public subnets.
         :param pulumi.Input[_builtins.str] region: The AWS region you're using.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] routes: The routes you'd like to advertise via tailscale.
@@ -326,6 +344,7 @@ class Bastion(pulumi.ComponentResource):
                  hostname: Optional[pulumi.Input[_builtins.str]] = None,
                  instance_type: Optional[pulumi.Input[_builtins.str]] = None,
                  oauth_client_secret: Optional[pulumi.Input[_builtins.str]] = None,
+                 peer_relay_settings: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None,
                  region: Optional[pulumi.Input[_builtins.str]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
@@ -363,6 +382,7 @@ class Bastion(pulumi.ComponentResource):
             __props__.__dict__["hostname"] = hostname
             __props__.__dict__["instance_type"] = instance_type
             __props__.__dict__["oauth_client_secret"] = oauth_client_secret
+            __props__.__dict__["peer_relay_settings"] = peer_relay_settings
             if public is None:
                 public = False
             __props__.__dict__["public"] = public

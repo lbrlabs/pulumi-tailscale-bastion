@@ -84,6 +84,8 @@ type bastionArgs struct {
 	InstanceType *string `pulumi:"instanceType"`
 	// An OAuth Client Secret to use for authenticating Tailscale clients.
 	OauthClientSecret *string `pulumi:"oauthClientSecret"`
+	// Settings for configuring this node as a peer relay server.
+	PeerRelaySettings map[string]string `pulumi:"peerRelaySettings"`
 	// Whether the bastion is going in public subnets.
 	Public *bool `pulumi:"public"`
 	// The AWS region you're using.
@@ -116,6 +118,8 @@ type BastionArgs struct {
 	InstanceType pulumi.StringPtrInput
 	// An OAuth Client Secret to use for authenticating Tailscale clients.
 	OauthClientSecret pulumi.StringPtrInput
+	// Settings for configuring this node as a peer relay server.
+	PeerRelaySettings pulumi.StringMapInput
 	// Whether the bastion is going in public subnets.
 	Public pulumi.BoolPtrInput
 	// The AWS region you're using.
