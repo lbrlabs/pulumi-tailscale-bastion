@@ -78,17 +78,11 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Azure
         [Input("location", required: true)]
         public Input<string> Location { get; set; } = null!;
 
-        [Input("peerRelaySettings")]
-        private InputMap<string>? _peerRelaySettings;
-
         /// <summary>
         /// Settings for configuring this node as a peer relay server.
         /// </summary>
-        public InputMap<string> PeerRelaySettings
-        {
-            get => _peerRelaySettings ?? (_peerRelaySettings = new InputMap<string>());
-            set => _peerRelaySettings = value;
-        }
+        [Input("peerRelaySettings")]
+        public Input<Lbrlabs.PulumiPackage.TailscaleBastion.Inputs.PeerRelaySettingsArgs>? PeerRelaySettings { get; set; }
 
         /// <summary>
         /// Whether the bastion should have a public IP.

@@ -102,17 +102,11 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         [Input("oauthClientSecret")]
         public Input<string>? OauthClientSecret { get; set; }
 
-        [Input("peerRelaySettings")]
-        private InputMap<string>? _peerRelaySettings;
-
         /// <summary>
         /// Settings for configuring this node as a peer relay server.
         /// </summary>
-        public InputMap<string> PeerRelaySettings
-        {
-            get => _peerRelaySettings ?? (_peerRelaySettings = new InputMap<string>());
-            set => _peerRelaySettings = value;
-        }
+        [Input("peerRelaySettings")]
+        public Input<Lbrlabs.PulumiPackage.TailscaleBastion.Inputs.PeerRelaySettingsArgs>? PeerRelaySettings { get; set; }
 
         /// <summary>
         /// Whether the bastion is going in public subnets.

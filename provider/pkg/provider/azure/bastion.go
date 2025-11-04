@@ -98,8 +98,17 @@ func NewBastion(ctx *pulumi.Context,
 	peerRelayEnable := false
 	peerRelayPort := 12345
 	if args.PeerRelaySettings != nil {
+		if args.PeerRelaySettings.Enable && !args.Public {
+			return nil, fmt.Errorf("peer relay can only be enabled when public=true")
+		}
 		peerRelayEnable = args.PeerRelaySettings.Enable
 		peerRelayPort = args.PeerRelaySettings.Port
+
+		// Note: When using peer relay in Azure, ensure your subnet's Network Security Group
+		// allows inbound TCP traffic on the specified peer relay port (%d) from 0.0.0.0/0
+		if peerRelayEnable {
+			fmt.Printf("WARNING: Peer relay enabled on port %d. Ensure your subnet's Network Security Group allows inbound TCP traffic on port %d from 0.0.0.0/0\n", peerRelayPort, peerRelayPort)
+		}
 	}
 
 	data := pulumi.All(tailnetKey.Key, args.Routes, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector, pulumi.Bool(peerRelayEnable), pulumi.Int(peerRelayPort)).ApplyT(

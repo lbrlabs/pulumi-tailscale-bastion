@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from .. import _utilities
+from .. import _inputs as _root_inputs
 
 __all__ = ['BastionArgs', 'Bastion']
 
@@ -27,7 +28,7 @@ class BastionArgs:
                  tailscale_tags: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]],
                  enable_ssh: Optional[pulumi.Input[_builtins.bool]] = None,
                  instance_sku: Optional[pulumi.Input[_builtins.str]] = None,
-                 peer_relay_settings: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 peer_relay_settings: Optional[pulumi.Input['_root_inputs.PeerRelaySettingsArgs']] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None):
         """
         The set of arguments for constructing a Bastion resource.
@@ -39,7 +40,7 @@ class BastionArgs:
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
         :param pulumi.Input[_builtins.bool] enable_ssh: Whether to enable SSH access to the bastion.
         :param pulumi.Input[_builtins.str] instance_sku: The Azure instance SKU to use for the bastion.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] peer_relay_settings: Settings for configuring this node as a peer relay server.
+        :param pulumi.Input['_root_inputs.PeerRelaySettingsArgs'] peer_relay_settings: Settings for configuring this node as a peer relay server.
         :param pulumi.Input[_builtins.bool] public: Whether the bastion should have a public IP.
         """
         if high_availability is None:
@@ -161,14 +162,14 @@ class BastionArgs:
 
     @_builtins.property
     @pulumi.getter(name="peerRelaySettings")
-    def peer_relay_settings(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+    def peer_relay_settings(self) -> Optional[pulumi.Input['_root_inputs.PeerRelaySettingsArgs']]:
         """
         Settings for configuring this node as a peer relay server.
         """
         return pulumi.get(self, "peer_relay_settings")
 
     @peer_relay_settings.setter
-    def peer_relay_settings(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+    def peer_relay_settings(self, value: Optional[pulumi.Input['_root_inputs.PeerRelaySettingsArgs']]):
         pulumi.set(self, "peer_relay_settings", value)
 
     @_builtins.property
@@ -194,7 +195,7 @@ class Bastion(pulumi.ComponentResource):
                  high_availability: Optional[pulumi.Input[_builtins.bool]] = None,
                  instance_sku: Optional[pulumi.Input[_builtins.str]] = None,
                  location: Optional[pulumi.Input[_builtins.str]] = None,
-                 peer_relay_settings: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 peer_relay_settings: Optional[pulumi.Input[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']]] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None,
                  resource_group_name: Optional[pulumi.Input[_builtins.str]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
@@ -209,7 +210,7 @@ class Bastion(pulumi.ComponentResource):
         :param pulumi.Input[_builtins.bool] high_availability: Whether the bastion should be highly available.
         :param pulumi.Input[_builtins.str] instance_sku: The Azure instance SKU to use for the bastion.
         :param pulumi.Input[_builtins.str] location: The Azure region you're using.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] peer_relay_settings: Settings for configuring this node as a peer relay server.
+        :param pulumi.Input[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']] peer_relay_settings: Settings for configuring this node as a peer relay server.
         :param pulumi.Input[_builtins.bool] public: Whether the bastion should have a public IP.
         :param pulumi.Input[_builtins.str] resource_group_name: The Azure resource group to create the bastion in.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] routes: The routes you'd like to advertise via tailscale.
@@ -243,7 +244,7 @@ class Bastion(pulumi.ComponentResource):
                  high_availability: Optional[pulumi.Input[_builtins.bool]] = None,
                  instance_sku: Optional[pulumi.Input[_builtins.str]] = None,
                  location: Optional[pulumi.Input[_builtins.str]] = None,
-                 peer_relay_settings: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 peer_relay_settings: Optional[pulumi.Input[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']]] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None,
                  resource_group_name: Optional[pulumi.Input[_builtins.str]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,

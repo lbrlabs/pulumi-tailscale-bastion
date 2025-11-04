@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from .. import _utilities
+from .. import _inputs as _root_inputs
 
 __all__ = ['BastionArgs', 'Bastion']
 
@@ -31,7 +32,7 @@ class BastionArgs:
                  hostname: Optional[pulumi.Input[_builtins.str]] = None,
                  instance_type: Optional[pulumi.Input[_builtins.str]] = None,
                  oauth_client_secret: Optional[pulumi.Input[_builtins.str]] = None,
-                 peer_relay_settings: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 peer_relay_settings: Optional[pulumi.Input['_root_inputs.PeerRelaySettingsArgs']] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None):
         """
@@ -48,7 +49,7 @@ class BastionArgs:
         :param pulumi.Input[_builtins.str] hostname: The hostname of the bastion.
         :param pulumi.Input[_builtins.str] instance_type: The EC2 instance type to use for the bastion.
         :param pulumi.Input[_builtins.str] oauth_client_secret: An OAuth Client Secret to use for authenticating Tailscale clients.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] peer_relay_settings: Settings for configuring this node as a peer relay server.
+        :param pulumi.Input['_root_inputs.PeerRelaySettingsArgs'] peer_relay_settings: Settings for configuring this node as a peer relay server.
         :param pulumi.Input[_builtins.bool] public: Whether the bastion is going in public subnets.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] routes: The routes you'd like to advertise via tailscale.
         """
@@ -236,14 +237,14 @@ class BastionArgs:
 
     @_builtins.property
     @pulumi.getter(name="peerRelaySettings")
-    def peer_relay_settings(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+    def peer_relay_settings(self) -> Optional[pulumi.Input['_root_inputs.PeerRelaySettingsArgs']]:
         """
         Settings for configuring this node as a peer relay server.
         """
         return pulumi.get(self, "peer_relay_settings")
 
     @peer_relay_settings.setter
-    def peer_relay_settings(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+    def peer_relay_settings(self, value: Optional[pulumi.Input['_root_inputs.PeerRelaySettingsArgs']]):
         pulumi.set(self, "peer_relay_settings", value)
 
     @_builtins.property
@@ -285,7 +286,7 @@ class Bastion(pulumi.ComponentResource):
                  hostname: Optional[pulumi.Input[_builtins.str]] = None,
                  instance_type: Optional[pulumi.Input[_builtins.str]] = None,
                  oauth_client_secret: Optional[pulumi.Input[_builtins.str]] = None,
-                 peer_relay_settings: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 peer_relay_settings: Optional[pulumi.Input[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']]] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None,
                  region: Optional[pulumi.Input[_builtins.str]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
@@ -305,7 +306,7 @@ class Bastion(pulumi.ComponentResource):
         :param pulumi.Input[_builtins.str] hostname: The hostname of the bastion.
         :param pulumi.Input[_builtins.str] instance_type: The EC2 instance type to use for the bastion.
         :param pulumi.Input[_builtins.str] oauth_client_secret: An OAuth Client Secret to use for authenticating Tailscale clients.
-        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] peer_relay_settings: Settings for configuring this node as a peer relay server.
+        :param pulumi.Input[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']] peer_relay_settings: Settings for configuring this node as a peer relay server.
         :param pulumi.Input[_builtins.bool] public: Whether the bastion is going in public subnets.
         :param pulumi.Input[_builtins.str] region: The AWS region you're using.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] routes: The routes you'd like to advertise via tailscale.
@@ -344,7 +345,7 @@ class Bastion(pulumi.ComponentResource):
                  hostname: Optional[pulumi.Input[_builtins.str]] = None,
                  instance_type: Optional[pulumi.Input[_builtins.str]] = None,
                  oauth_client_secret: Optional[pulumi.Input[_builtins.str]] = None,
-                 peer_relay_settings: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 peer_relay_settings: Optional[pulumi.Input[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']]] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None,
                  region: Optional[pulumi.Input[_builtins.str]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,

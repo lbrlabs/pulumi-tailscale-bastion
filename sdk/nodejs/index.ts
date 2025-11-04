@@ -15,11 +15,13 @@ utilities.lazyLoad(exports, ["Provider"], () => require("./provider"));
 import * as aws from "./aws";
 import * as azure from "./azure";
 import * as kubernetes from "./kubernetes";
+import * as types from "./types";
 
 export {
     aws,
     azure,
     kubernetes,
+    types,
 };
 pulumi.runtime.registerResourcePackage("tailscale-bastion", {
     version: utilities.getVersion(),

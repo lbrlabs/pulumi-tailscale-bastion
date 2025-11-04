@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/lbrlabs/pulumi-tailscale-bastion/sdk/go/bastion"
 	"github.com/lbrlabs/pulumi-tailscale-bastion/sdk/go/bastion/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -49,6 +50,9 @@ func NewBastion(ctx *pulumi.Context,
 	if args.HighAvailability == nil {
 		args.HighAvailability = pulumi.Bool(false)
 	}
+	if args.PeerRelaySettings != nil {
+		args.PeerRelaySettings = args.PeerRelaySettings.ToPeerRelaySettingsPtrOutput().ApplyT(func(v *bastion.PeerRelaySettings) *bastion.PeerRelaySettings { return v.Defaults() }).(bastion.PeerRelaySettingsPtrOutput)
+	}
 	if args.Public == nil {
 		args.Public = pulumi.BoolPtr(false)
 	}
@@ -71,7 +75,7 @@ type bastionArgs struct {
 	// The Azure region you're using.
 	Location string `pulumi:"location"`
 	// Settings for configuring this node as a peer relay server.
-	PeerRelaySettings map[string]string `pulumi:"peerRelaySettings"`
+	PeerRelaySettings *bastion.PeerRelaySettings `pulumi:"peerRelaySettings"`
 	// Whether the bastion should have a public IP.
 	Public *bool `pulumi:"public"`
 	// The Azure resource group to create the bastion in.
@@ -95,7 +99,7 @@ type BastionArgs struct {
 	// The Azure region you're using.
 	Location pulumi.StringInput
 	// Settings for configuring this node as a peer relay server.
-	PeerRelaySettings pulumi.StringMapInput
+	PeerRelaySettings bastion.PeerRelaySettingsPtrInput
 	// Whether the bastion should have a public IP.
 	Public pulumi.BoolPtrInput
 	// The Azure resource group to create the bastion in.

@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"errors"
+	"github.com/lbrlabs/pulumi-tailscale-bastion/sdk/go/bastion"
 	"github.com/lbrlabs/pulumi-tailscale-bastion/sdk/go/bastion/internal"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -55,6 +56,9 @@ func NewBastion(ctx *pulumi.Context,
 	if args.HighAvailability == nil {
 		args.HighAvailability = pulumi.Bool(false)
 	}
+	if args.PeerRelaySettings != nil {
+		args.PeerRelaySettings = args.PeerRelaySettings.ToPeerRelaySettingsPtrOutput().ApplyT(func(v *bastion.PeerRelaySettings) *bastion.PeerRelaySettings { return v.Defaults() }).(bastion.PeerRelaySettingsPtrOutput)
+	}
 	if args.Public == nil {
 		args.Public = pulumi.BoolPtr(false)
 	}
@@ -85,7 +89,7 @@ type bastionArgs struct {
 	// An OAuth Client Secret to use for authenticating Tailscale clients.
 	OauthClientSecret *string `pulumi:"oauthClientSecret"`
 	// Settings for configuring this node as a peer relay server.
-	PeerRelaySettings map[string]string `pulumi:"peerRelaySettings"`
+	PeerRelaySettings *bastion.PeerRelaySettings `pulumi:"peerRelaySettings"`
 	// Whether the bastion is going in public subnets.
 	Public *bool `pulumi:"public"`
 	// The AWS region you're using.
@@ -119,7 +123,7 @@ type BastionArgs struct {
 	// An OAuth Client Secret to use for authenticating Tailscale clients.
 	OauthClientSecret pulumi.StringPtrInput
 	// Settings for configuring this node as a peer relay server.
-	PeerRelaySettings pulumi.StringMapInput
+	PeerRelaySettings bastion.PeerRelaySettingsPtrInput
 	// Whether the bastion is going in public subnets.
 	Public pulumi.BoolPtrInput
 	// The AWS region you're using.

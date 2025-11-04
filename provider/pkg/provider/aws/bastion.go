@@ -211,6 +211,17 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating IAM instance profile: %v", err)
 	}
 
+	// Default peer relay settings if not provided
+	peerRelayEnable := false
+	peerRelayPort := 12345
+	if args.PeerRelaySettings != nil {
+		if args.PeerRelaySettings.Enable && !args.Public {
+			return nil, fmt.Errorf("peer relay can only be enabled when public=true")
+		}
+		peerRelayEnable = args.PeerRelaySettings.Enable
+		peerRelayPort = args.PeerRelaySettings.Port
+	}
+
 	var ingress ec2.SecurityGroupIngressArray
 	if args.Public {
 		ingress = ec2.SecurityGroupIngressArray{
@@ -230,6 +241,18 @@ func NewBastion(ctx *pulumi.Context,
 					pulumi.String("0.0.0.0/0"),
 				},
 			},
+		}
+
+		// Add peer relay port if enabled
+		if peerRelayEnable {
+			ingress = append(ingress, ec2.SecurityGroupIngressArgs{
+				Protocol: pulumi.String("udp"),
+				FromPort: pulumi.Int(peerRelayPort),
+				ToPort:   pulumi.Int(peerRelayPort),
+				CidrBlocks: pulumi.StringArray{
+					pulumi.String("0.0.0.0/0"),
+				},
+			})
 		}
 	} else {
 		ingress = ec2.SecurityGroupIngressArray{
@@ -288,14 +311,6 @@ func NewBastion(ctx *pulumi.Context,
 		},
 		MostRecent: pulumi.BoolPtr(true),
 	}, pulumi.Parent(component))
-
-	// Default peer relay settings if not provided
-	peerRelayEnable := false
-	peerRelayPort := 12345
-	if args.PeerRelaySettings != nil {
-		peerRelayEnable = args.PeerRelaySettings.Enable
-		peerRelayPort = args.PeerRelaySettings.Port
-	}
 
 	data := pulumi.All(tailnetKeySsmParameter.Name, args.Routes, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector, pulumi.Bool(peerRelayEnable), pulumi.Int(peerRelayPort)).ApplyT(
 		func(args []interface{}) (string, error) {

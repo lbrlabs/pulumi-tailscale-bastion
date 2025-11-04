@@ -2,6 +2,8 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import * as inputs from "../types/input";
+import * as outputs from "../types/output";
 import * as utilities from "../utilities";
 
 export class Bastion extends pulumi.ComponentResource {
@@ -61,7 +63,7 @@ export class Bastion extends pulumi.ComponentResource {
             resourceInputs["highAvailability"] = (args?.highAvailability) ?? false;
             resourceInputs["instanceSku"] = args?.instanceSku;
             resourceInputs["location"] = args?.location;
-            resourceInputs["peerRelaySettings"] = args?.peerRelaySettings;
+            resourceInputs["peerRelaySettings"] = args ? (args.peerRelaySettings ? pulumi.output(args.peerRelaySettings).apply(inputs.peerRelaySettingsArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["public"] = (args?.public) ?? false;
             resourceInputs["resourceGroupName"] = args?.resourceGroupName;
             resourceInputs["routes"] = args?.routes;
@@ -101,7 +103,7 @@ export interface BastionArgs {
     /**
      * Settings for configuring this node as a peer relay server.
      */
-    peerRelaySettings?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+    peerRelaySettings?: pulumi.Input<inputs.PeerRelaySettingsArgs>;
     /**
      * Whether the bastion should have a public IP.
      */
