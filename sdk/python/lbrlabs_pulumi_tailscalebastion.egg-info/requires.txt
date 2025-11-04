@@ -1,0 +1,11 @@
+parver>=0.2.1
+pulumi<4.0.0,>=3.0.0
+pulumi-aws<8.0.0,>=7.0.0
+pulumi-azure<7.0.0,>=6.0.0
+pulumi-kubernetes<5.0.0,>=4.0.0
+pulumi-tailscale<1.0.0,>=0.0.0
+pulumi-tls<6.0.0,>=5.0.0
+semver>=2.8.1
+
+[:python_version < "3.11"]
+typing-extensions<5,>=4.11

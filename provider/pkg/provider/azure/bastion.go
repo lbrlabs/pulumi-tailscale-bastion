@@ -19,6 +19,11 @@ var (
 	userData string
 )
 
+type PeerRelaySettings struct {
+	Enable bool `pulumi:"enable"`
+	Port   int  `pulumi:"port"`
+}
+
 // The set of arguments for creating a Bastion component resource.
 type BastionArgs struct {
 	ResourceGroupName  pulumi.StringInput      `pulumi:"resourceGroupName"`
@@ -33,6 +38,7 @@ type BastionArgs struct {
 	EnableExitNode     bool                    `pulumi:"enableExitNode"`
 	EnableAppConnector bool                    `pulumi:"enableAppConnector"`
 	Public             bool                    `pulumi:"public"`
+	PeerRelaySettings  *PeerRelaySettings      `pulumi:"peerRelaySettings"`
 }
 
 type UserDataArgs struct {
@@ -43,6 +49,8 @@ type UserDataArgs struct {
 	EnableExitNode     bool
 	EnableAppConnector bool
 	Hostname           string
+	PeerRelayEnable    bool
+	PeerRelayPort      int
 }
 
 // The Bastion component resource.
@@ -86,7 +94,24 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating tailnet key: %v", err)
 	}
 
-	data := pulumi.All(tailnetKey.Key, args.Routes, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector).ApplyT(
+	// Default peer relay settings if not provided
+	peerRelayEnable := false
+	peerRelayPort := 12345
+	if args.PeerRelaySettings != nil {
+		if args.PeerRelaySettings.Enable && !args.Public {
+			return nil, fmt.Errorf("peer relay can only be enabled when public=true")
+		}
+		peerRelayEnable = args.PeerRelaySettings.Enable
+		peerRelayPort = args.PeerRelaySettings.Port
+
+		// Note: When using peer relay in Azure, ensure your subnet's Network Security Group
+		// allows inbound TCP traffic on the specified peer relay port (%d) from 0.0.0.0/0
+		if peerRelayEnable {
+			fmt.Printf("WARNING: Peer relay enabled on port %d. Ensure your subnet's Network Security Group allows inbound TCP traffic on port %d from 0.0.0.0/0\n", peerRelayPort, peerRelayPort)
+		}
+	}
+
+	data := pulumi.All(tailnetKey.Key, args.Routes, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector, pulumi.Bool(peerRelayEnable), pulumi.Int(peerRelayPort)).ApplyT(
 		func(args []interface{}) (string, error) {
 
 			tagCSV := strings.Join(args[2].([]string), ",")
@@ -108,6 +133,8 @@ func NewBastion(ctx *pulumi.Context,
 				Hostname:           args[4].(string),
 				EnableExitNode:     args[5].(bool),
 				EnableAppConnector: args[6].(bool),
+				PeerRelayEnable:    args[7].(bool),
+				PeerRelayPort:      args[8].(int),
 			}
 
 			var userDataBytes bytes.Buffer
