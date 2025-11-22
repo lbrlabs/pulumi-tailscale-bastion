@@ -9,6 +9,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/autoscaling"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/ec2"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"
@@ -57,6 +58,7 @@ type UserDataArgs struct {
 	ParameterName      string
 	Routes             string
 	Region             string
+	Partition          string
 	TailscaleTags      string
 	EnableSSH          bool
 	EnableExitNode     bool
@@ -86,6 +88,9 @@ func NewBastion(ctx *pulumi.Context,
 	if err != nil {
 		return nil, err
 	}
+
+	// Get partition information for the current AWS region
+	partition := aws.GetPartitionOutput(ctx, aws.GetPartitionOutputArgs{}, pulumi.Parent(component))
 
 	var hostname pulumi.StringInput
 	if args.Hostname == nil {
@@ -128,26 +133,29 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating SSM parameter: %v", err)
 	}
 
-	assumeRolePolicy := &AssumeRolePolicy{
-		Version: "2012-10-17",
-		Statement: []Statement{
-			{
-				Effect: "Allow",
-				Action: "sts:AssumeRole",
-				Principal: Principal{
-					Service: []string{"ec2.amazonaws.com", "ssm.amazonaws.com"},
-				},
-			},
-		},
-	}
-
-	assumeRolePolicyJSON, err := json.Marshal(assumeRolePolicy)
-	if err != nil {
-		return nil, fmt.Errorf("error creating AssumeRolePolicy JSON: %v", err)
-	}
-
 	role, err := iam.NewRole(ctx, name, &iam.RoleArgs{
-		AssumeRolePolicy: pulumi.String(string(assumeRolePolicyJSON)),
+		AssumeRolePolicy: partition.DnsSuffix().ApplyT(func(dnsSuffix string) (string, error) {
+			assumeRolePolicy := &AssumeRolePolicy{
+				Version: "2012-10-17",
+				Statement: []Statement{
+					{
+						Effect: "Allow",
+						Action: "sts:AssumeRole",
+						Principal: Principal{
+							Service: []string{
+								fmt.Sprintf("ec2.%s", dnsSuffix),
+								fmt.Sprintf("ssm.%s", dnsSuffix),
+							},
+						},
+					},
+				},
+			}
+			assumeRolePolicyJSON, err := json.Marshal(assumeRolePolicy)
+			if err != nil {
+				return "", err
+			}
+			return string(assumeRolePolicyJSON), nil
+		}).(pulumi.StringOutput),
 	}, pulumi.Parent(component))
 	if err != nil {
 		return nil, fmt.Errorf("error creating IAM role: %v", err)
@@ -197,8 +205,10 @@ func NewBastion(ctx *pulumi.Context,
 	}
 
 	_, err = iam.NewRolePolicyAttachment(ctx, fmt.Sprintf("%s-ssm-manager", name), &iam.RolePolicyAttachmentArgs{
-		Role:      role.Name,
-		PolicyArn: iam.ManagedPolicyAmazonSSMManagedInstanceCore,
+		Role: role.Name,
+		PolicyArn: partition.Partition().ApplyT(func(partitionName string) string {
+			return fmt.Sprintf("arn:%s:iam::aws:policy/AmazonSSMManagedInstanceCore", partitionName)
+		}).(pulumi.StringOutput),
 	}, pulumi.Parent(role))
 	if err != nil {
 		return nil, fmt.Errorf("error creating SSM manager policy attachment: %v", err)
@@ -312,7 +322,7 @@ func NewBastion(ctx *pulumi.Context,
 		MostRecent: pulumi.BoolPtr(true),
 	}, pulumi.Parent(component))
 
-	data := pulumi.All(tailnetKeySsmParameter.Name, args.Routes, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector, pulumi.Bool(peerRelayEnable), pulumi.Int(peerRelayPort)).ApplyT(
+	data := pulumi.All(tailnetKeySsmParameter.Name, args.Routes, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector, pulumi.Bool(peerRelayEnable), pulumi.Int(peerRelayPort), partition.DnsSuffix()).ApplyT(
 		func(args []interface{}) (string, error) {
 			tagCSV := strings.Join(args[3].([]string), ",")
 
@@ -328,6 +338,7 @@ func NewBastion(ctx *pulumi.Context,
 				ParameterName:      args[0].(string),
 				Routes:             routesCsv,
 				Region:             args[2].(string),
+				Partition:          args[10].(string),
 				TailscaleTags:      tagCSV,
 				EnableSSH:          args[4].(bool),
 				Hostname:           args[5].(string),
