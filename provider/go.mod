@@ -2,8 +2,6 @@ module github.com/lbrlabs/pulumi-tailscale-bastion
 
 go 1.26.2
 
-toolchain go1.26.2
-
 require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/pkg/errors v0.9.1
@@ -14,6 +12,7 @@ require (
 	github.com/pulumi/pulumi-tls/sdk/v5 v5.1.0
 	github.com/pulumi/pulumi/pkg/v3 v3.191.0
 	github.com/pulumi/pulumi/sdk/v3 v3.191.0
+	github.com/pulumiverse/pulumi-time/sdk v0.1.0
 )
 
 require (

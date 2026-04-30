@@ -62,7 +62,9 @@ func emitSDK(language, outdir, schemaPath string) error {
 		return errors.Wrapf(err, "generating %s package", language)
 	}
 	if language == "nodejs" {
-		fixNodeJSImportPaths(files)
+		if err := postProcessNodeJSFiles(files); err != nil {
+			return err
+		}
 	}
 	if language == "python" {
 		fixPythonImportPaths(files)
@@ -77,25 +79,43 @@ func emitSDK(language, outdir, schemaPath string) error {
 	return nil
 }
 
-func fixNodeJSImportPaths(files map[string][]byte) {
+func postProcessNodeJSFiles(files map[string][]byte) error {
 	for filename, contents := range files {
-		if filename == "package.json" && !strings.Contains(string(contents), "\"packageManager\"") {
-			packageJSON := strings.TrimRight(string(contents), "\n")
-			insertAt := strings.LastIndex(packageJSON, "\n}")
-			if insertAt >= 0 {
-				files[filename] = []byte(packageJSON[:insertAt] + ",\n    \"packageManager\": \"yarn@1.22.22\"" + packageJSON[insertAt:] + "\n")
+		switch {
+		case filename == "package.json":
+			packageJSON, err := addNodePackageManager(contents)
+			if err != nil {
+				return errors.Wrap(err, "adding packageManager to package.json")
 			}
-			continue
+			files[filename] = packageJSON
+		case strings.HasSuffix(filename, ".ts") && strings.Contains(filename, "/"):
+			files[filename] = fixNodeJSImportPaths(contents)
 		}
-
-		if !strings.HasSuffix(filename, ".ts") || !strings.Contains(filename, "/") {
-			continue
-		}
-
-		updated := strings.ReplaceAll(string(contents), "from \"./types/", "from \"../types/")
-		updated = strings.ReplaceAll(updated, "from \"./utilities\"", "from \"../utilities\"")
-		files[filename] = []byte(updated)
 	}
+
+	return nil
+}
+
+func addNodePackageManager(contents []byte) ([]byte, error) {
+	var packageJSON map[string]interface{}
+	if err := json.Unmarshal(contents, &packageJSON); err != nil {
+		return nil, err
+	}
+	if _, ok := packageJSON["packageManager"]; !ok {
+		packageJSON["packageManager"] = "yarn@1.22.22"
+	}
+
+	updated, err := json.MarshalIndent(packageJSON, "", "    ")
+	if err != nil {
+		return nil, err
+	}
+	return append(updated, '\n'), nil
+}
+
+func fixNodeJSImportPaths(contents []byte) []byte {
+	updated := strings.ReplaceAll(string(contents), "from \"./types/", "from \"../types/")
+	updated = strings.ReplaceAll(updated, "from \"./utilities\"", "from \"../utilities\"")
+	return []byte(updated)
 }
 
 func fixPythonImportPaths(files map[string][]byte) {

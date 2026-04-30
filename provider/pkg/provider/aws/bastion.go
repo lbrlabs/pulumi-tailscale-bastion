@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"strings"
 	"text/template"
-	"time"
 
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/autoscaling"
@@ -18,6 +17,7 @@ import (
 	"github.com/pulumi/pulumi-tailscale/sdk/go/tailscale"
 	tls "github.com/pulumi/pulumi-tls/sdk/v5/go/tls"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+	pulumitime "github.com/pulumiverse/pulumi-time/sdk/go/time"
 )
 
 var (
@@ -371,8 +371,15 @@ func NewBastion(ctx *pulumi.Context,
 		PublicKey: key.PublicKeyOpenssh,
 	}, pulumi.Parent(component))
 
+	amiRefresh, err := pulumitime.NewRotating(ctx, fmt.Sprintf("%s-ami-refresh", name), &pulumitime.RotatingArgs{
+		RotationDays: pulumi.Int(1),
+	}, pulumi.Parent(component))
+	if err != nil {
+		return nil, fmt.Errorf("error creating AMI refresh marker: %v", err)
+	}
+
 	launchTemplate, err := ec2.NewLaunchTemplate(ctx, name, &ec2.LaunchTemplateArgs{
-		Description:          pulumi.String(fmt.Sprintf("Updated by Pulumi at %s", time.Now().UTC().Format(time.RFC3339))),
+		Description:          pulumi.Sprintf("AMI refresh marker: %s", amiRefresh.Rfc3339),
 		InstanceType:         instanceType,
 		ImageId:              amiParameter,
 		UpdateDefaultVersion: pulumi.Bool(true),
@@ -404,16 +411,14 @@ func NewBastion(ctx *pulumi.Context,
 		size = 1
 	}
 
-	minHealthyPercentage := 0
+	var instanceRefresh autoscaling.GroupInstanceRefreshPtrInput
 	if args.HighAvailability {
-		minHealthyPercentage = 50
-	}
-
-	instanceRefresh := autoscaling.GroupInstanceRefreshArgs{
-		Strategy: pulumi.String("Rolling"),
-		Preferences: autoscaling.GroupInstanceRefreshPreferencesArgs{
-			MinHealthyPercentage: pulumi.Int(minHealthyPercentage),
-		},
+		instanceRefresh = autoscaling.GroupInstanceRefreshArgs{
+			Strategy: pulumi.String("Rolling"),
+			Preferences: autoscaling.GroupInstanceRefreshPreferencesArgs{
+				MinHealthyPercentage: pulumi.Int(50),
+			},
+		}
 	}
 
 	asg, err := autoscaling.NewGroup(ctx, name, &autoscaling.GroupArgs{
