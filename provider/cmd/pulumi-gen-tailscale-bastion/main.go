@@ -61,6 +61,14 @@ func emitSDK(language, outdir, schemaPath string) error {
 	if err != nil {
 		return errors.Wrapf(err, "generating %s package", language)
 	}
+	if language == "nodejs" {
+		if err := postProcessNodeJSFiles(files); err != nil {
+			return err
+		}
+	}
+	if language == "python" {
+		fixPythonImportPaths(files)
+	}
 
 	for f, contents := range files {
 		if err := emitFile(outdir, f, contents); err != nil {
@@ -69,6 +77,55 @@ func emitSDK(language, outdir, schemaPath string) error {
 	}
 
 	return nil
+}
+
+func postProcessNodeJSFiles(files map[string][]byte) error {
+	for filename, contents := range files {
+		switch {
+		case filename == "package.json":
+			packageJSON, err := addNodePackageManager(contents)
+			if err != nil {
+				return errors.Wrap(err, "adding packageManager to package.json")
+			}
+			files[filename] = packageJSON
+		case strings.HasSuffix(filename, ".ts") && strings.Contains(filename, "/"):
+			files[filename] = fixNodeJSImportPaths(contents)
+		}
+	}
+
+	return nil
+}
+
+func addNodePackageManager(contents []byte) ([]byte, error) {
+	var packageJSON map[string]interface{}
+	if err := json.Unmarshal(contents, &packageJSON); err != nil {
+		return nil, err
+	}
+	if _, ok := packageJSON["packageManager"]; !ok {
+		packageJSON["packageManager"] = "yarn@1.22.22"
+	}
+
+	updated, err := json.MarshalIndent(packageJSON, "", "    ")
+	if err != nil {
+		return nil, err
+	}
+	return append(updated, '\n'), nil
+}
+
+func fixNodeJSImportPaths(contents []byte) []byte {
+	updated := strings.ReplaceAll(string(contents), "from \"./types/", "from \"../types/")
+	updated = strings.ReplaceAll(updated, "from \"./utilities\"", "from \"../utilities\"")
+	return []byte(updated)
+}
+
+func fixPythonImportPaths(files map[string][]byte) {
+	for filename, contents := range files {
+		if !strings.HasSuffix(filename, ".py") || strings.Count(filename, "/") < 2 {
+			continue
+		}
+
+		files[filename] = []byte(strings.ReplaceAll(string(contents), "from . import _utilities", "from .. import _utilities"))
+	}
 }
 
 func readSchema(schemaPath string) (*schema.Package, error) {

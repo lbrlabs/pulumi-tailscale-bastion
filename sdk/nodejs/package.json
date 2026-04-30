@@ -1,19 +1,4 @@
 {
-    "name": "@lbrlabs/pulumi-tailscalebastion",
-    "version": "${VERSION}",
-    "keywords": [
-        "aws",
-        "tailscale",
-        "lbrlabs",
-        "kind/component",
-        "category/network"
-    ],
-    "repository": "https://github.com/lbrlabs/pulumi-tailscale-bastion",
-    "main": "bin/index.js",
-    "scripts": {
-        "build": "tsc",
-        "postinstall": "node ./scripts/postinstall.js"
-    },
     "dependencies": {
         "@pulumi/aws": "^6.0.0",
         "@pulumi/azure": "^6.0.0",
@@ -27,11 +12,27 @@
     "devDependencies": {
         "glob": "^9.0.0",
         "minimatch": "^5.0.0",
-        "typescript": "^3.7.0"
+        "typescript": "^5.6.0"
     },
+    "keywords": [
+        "aws",
+        "tailscale",
+        "lbrlabs",
+        "kind/component",
+        "category/network"
+    ],
+    "main": "bin/index.js",
+    "name": "@lbrlabs/pulumi-tailscalebastion",
+    "packageManager": "yarn@1.22.22",
     "pulumi": {
-        "resource": true,
         "name": "tailscale-bastion",
+        "resource": true,
         "server": "github://api.github.com/lbrlabs"
-    }
+    },
+    "repository": "https://github.com/lbrlabs/pulumi-tailscale-bastion",
+    "scripts": {
+        "build": "tsc",
+        "postinstall": "node ./scripts/postinstall.js"
+    },
+    "version": "${VERSION}"
 }

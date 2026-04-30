@@ -1,8 +1,8 @@
 module github.com/lbrlabs/pulumi-tailscale-bastion/sdk
 
-go 1.22
+go 1.26.2
 
-toolchain go1.23.2
+toolchain go1.26.2
 
 require (
 	github.com/blang/semver v3.5.1+incompatible
