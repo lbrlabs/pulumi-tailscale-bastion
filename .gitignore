@@ -17,3 +17,6 @@ ci-scripts/
 
 /provider/cmd/pulumi-resource-*/schema.go
 **/__pycache__
+
+**/.gocache
+**/.yarn*

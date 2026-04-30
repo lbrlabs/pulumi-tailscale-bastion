@@ -27,11 +27,12 @@
     "devDependencies": {
         "glob": "^9.0.0",
         "minimatch": "^5.0.0",
-        "typescript": "^3.7.0"
+        "typescript": "^5.6.0"
     },
     "pulumi": {
         "resource": true,
         "name": "tailscale-bastion",
         "server": "github://api.github.com/lbrlabs"
-    }
+    },
+    "packageManager": "yarn@1.22.22"
 }

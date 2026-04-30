@@ -61,6 +61,12 @@ func emitSDK(language, outdir, schemaPath string) error {
 	if err != nil {
 		return errors.Wrapf(err, "generating %s package", language)
 	}
+	if language == "nodejs" {
+		fixNodeJSImportPaths(files)
+	}
+	if language == "python" {
+		fixPythonImportPaths(files)
+	}
 
 	for f, contents := range files {
 		if err := emitFile(outdir, f, contents); err != nil {
@@ -69,6 +75,37 @@ func emitSDK(language, outdir, schemaPath string) error {
 	}
 
 	return nil
+}
+
+func fixNodeJSImportPaths(files map[string][]byte) {
+	for filename, contents := range files {
+		if filename == "package.json" && !strings.Contains(string(contents), "\"packageManager\"") {
+			packageJSON := strings.TrimRight(string(contents), "\n")
+			insertAt := strings.LastIndex(packageJSON, "\n}")
+			if insertAt >= 0 {
+				files[filename] = []byte(packageJSON[:insertAt] + ",\n    \"packageManager\": \"yarn@1.22.22\"" + packageJSON[insertAt:] + "\n")
+			}
+			continue
+		}
+
+		if !strings.HasSuffix(filename, ".ts") || !strings.Contains(filename, "/") {
+			continue
+		}
+
+		updated := strings.ReplaceAll(string(contents), "from \"./types/", "from \"../types/")
+		updated = strings.ReplaceAll(updated, "from \"./utilities\"", "from \"../utilities\"")
+		files[filename] = []byte(updated)
+	}
+}
+
+func fixPythonImportPaths(files map[string][]byte) {
+	for filename, contents := range files {
+		if !strings.HasSuffix(filename, ".py") || strings.Count(filename, "/") < 2 {
+			continue
+		}
+
+		files[filename] = []byte(strings.ReplaceAll(string(contents), "from . import _utilities", "from .. import _utilities"))
+	}
 }
 
 func readSchema(schemaPath string) (*schema.Package, error) {

@@ -218,7 +218,7 @@ language:
       "@pulumi/kubernetes": "^4.0.0"
       "@pulumi/tailscale": "^0.18.0"
     devDependencies:
-      typescript: "^3.7.0"
+      typescript: "^5.6.0"
       glob: "^9.0.0"
       minimatch: "^5.0.0"
     packageName: "@lbrlabs/pulumi-tailscalebastion"

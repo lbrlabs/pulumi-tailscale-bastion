@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/autoscaling"
@@ -295,32 +296,16 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating security group: %v", err)
 	}
 
-	ami := ec2.LookupAmiOutput(ctx, ec2.LookupAmiOutputArgs{
-		Owners: pulumi.StringArray{
-			pulumi.String("amazon"),
-		},
-		Filters: ec2.GetAmiFilterArray{
-			ec2.GetAmiFilterArgs{
-				Name: pulumi.String("owner-alias"),
-				Values: pulumi.StringArray{
-					pulumi.String("amazon"),
-				},
-			},
-			ec2.GetAmiFilterArgs{
-				Name: pulumi.String("virtualization-type"),
-				Values: pulumi.StringArray{
-					pulumi.String("hvm"),
-				},
-			},
-			ec2.GetAmiFilterArgs{
-				Name: pulumi.String("name"),
-				Values: pulumi.StringArray{
-					pulumi.Sprintf("al2023-ami-*%s*", arch),
-				},
-			},
-		},
-		MostRecent: pulumi.BoolPtr(true),
-	}, pulumi.Parent(component))
+	amiParameter := pulumi.All(arch).ApplyT(func(v []interface{}) (string, error) {
+		switch v[0].(string) {
+		case string(ArchArm64):
+			return "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64", nil
+		case string(ArchX86_64):
+			return "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64", nil
+		default:
+			return "", fmt.Errorf("unsupported architecture: %s", v[0].(string))
+		}
+	}).(pulumi.StringOutput)
 
 	data := pulumi.All(tailnetKeySsmParameter.Name, args.Routes, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector, pulumi.Bool(peerRelayEnable), pulumi.Int(peerRelayPort), partition.DnsSuffix()).ApplyT(
 		func(args []interface{}) (string, error) {
@@ -387,9 +372,11 @@ func NewBastion(ctx *pulumi.Context,
 	}, pulumi.Parent(component))
 
 	launchTemplate, err := ec2.NewLaunchTemplate(ctx, name, &ec2.LaunchTemplateArgs{
-		InstanceType: instanceType,
-		ImageId:      ami.Id(),
-		KeyName:      ec2Key.KeyName,
+		Description:          pulumi.String(fmt.Sprintf("Updated by Pulumi at %s", time.Now().UTC().Format(time.RFC3339))),
+		InstanceType:         instanceType,
+		ImageId:              amiParameter,
+		UpdateDefaultVersion: pulumi.Bool(true),
+		KeyName:              ec2Key.KeyName,
 		IamInstanceProfile: ec2.LaunchTemplateIamInstanceProfileArgs{
 			Arn: profile.Arn,
 		},
@@ -417,22 +404,22 @@ func NewBastion(ctx *pulumi.Context,
 		size = 1
 	}
 
-	var instanceRefresh autoscaling.GroupInstanceRefreshPtrInput
+	minHealthyPercentage := 0
 	if args.HighAvailability {
-		instanceRefresh = autoscaling.GroupInstanceRefreshArgs{
-			Strategy: pulumi.String("Rolling"),
-			Preferences: autoscaling.GroupInstanceRefreshPreferencesArgs{
-				MinHealthyPercentage: pulumi.Int(50),
-			},
-		}
-	} else {
-		instanceRefresh = nil
+		minHealthyPercentage = 50
+	}
+
+	instanceRefresh := autoscaling.GroupInstanceRefreshArgs{
+		Strategy: pulumi.String("Rolling"),
+		Preferences: autoscaling.GroupInstanceRefreshPreferencesArgs{
+			MinHealthyPercentage: pulumi.Int(minHealthyPercentage),
+		},
 	}
 
 	asg, err := autoscaling.NewGroup(ctx, name, &autoscaling.GroupArgs{
 		LaunchTemplate: autoscaling.GroupLaunchTemplateArgs{
 			Id:      launchTemplate.ID(),
-			Version: pulumi.String("$Latest"),
+			Version: pulumi.Sprintf("%d", launchTemplate.LatestVersion),
 		},
 		MaxSize:                pulumi.Int(size),
 		MinSize:                pulumi.Int(size),
