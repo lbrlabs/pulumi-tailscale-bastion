@@ -94,7 +94,7 @@ jobs:
         - dotnet
         - go
         nodeversion:
-        - 21.x
+        - 22.x
         pythonversion:
         - "3.10"
   prerequisites:
@@ -162,7 +162,7 @@ jobs:
         goversion:
         - 1.26.x
         nodeversion:
-        - 21.x
+        - 22.x
         pythonversion:
         - "3.10"
   publish:
@@ -203,7 +203,7 @@ jobs:
         goversion:
         - 1.26.x
         nodeversion:
-        - 21.x
+        - 22.x
         pythonversion:
         - "3.10"
   publish_sdk:
@@ -281,7 +281,7 @@ jobs:
         goversion:
         - 1.26.x
         nodeversion:
-        - 21.x
+        - 22.x
         pythonversion:
         - "3.10"
   test:
@@ -366,7 +366,7 @@ jobs:
         - dotnet
         - go
         nodeversion:
-        - 21.x
+        - 22.x
         pythonversion:
         - "3.10"
 name: prerelease
