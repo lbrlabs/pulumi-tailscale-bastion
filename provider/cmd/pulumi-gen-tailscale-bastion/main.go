@@ -104,6 +104,10 @@ func addNodePackageManager(contents []byte) ([]byte, error) {
 	if _, ok := packageJSON["packageManager"]; !ok {
 		packageJSON["packageManager"] = "yarn@1.22.22"
 	}
+	packageJSON["repository"] = map[string]interface{}{
+		"type": "git",
+		"url":  "git+https://github.com/lbrlabs/pulumi-tailscale-bastion.git",
+	}
 
 	updated, err := json.MarshalIndent(packageJSON, "", "    ")
 	if err != nil {
