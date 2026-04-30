@@ -1,0 +1,37 @@
+schema: spec-driven
+
+context: |
+  Project: Pulumi component provider for Tailscale bastions across AWS, Azure, and Kubernetes.
+  Source of truth: schema.yaml defines the package schema and language settings. SDKs under sdk/ are generated from schema.yaml by provider/cmd/pulumi-gen-tailscale-bastion.
+  Provider implementation: Go code under provider/pkg/provider. AWS bastion logic is in provider/pkg/provider/aws/bastion.go.
+  Build workflow: make provider and make build_sdks drive schema generation, provider build, and SDK generation for Node.js, Python, Go, and .NET.
+  Toolchain:
+    - Go modules use Go 1.26.x.
+    - CI workflows should install Go 1.26.x.
+    - CI workflows should use Node 22.x; Node 21.x is not supported by current Node dependency resolution.
+    - Generated Node SDK package.json pins packageManager to yarn@1.22.22.
+    - The time provider plugin is required by the provider build because AWS AMI refresh uses pulumiverse/time.
+  Generated SDK caveats:
+    - Node.js generated subdirectory imports are post-processed so nested modules import ../types and ../utilities.
+    - Python generated subpackages are post-processed so nested modules import root _utilities via ..
+    - Keep generated SDK edits reproducible through the generator or schema; do not hand-edit generated SDK files as the durable fix.
+  AWS AMI behavior:
+    - AWS launch templates use AL2023 public SSM AMI aliases via resolve:ssm.
+    - Do not use time.Now() or other per-run values to force launch template changes.
+    - AMI refresh is controlled by a stateful pulumiverse/time Rotating resource so launch template churn is bounded.
+    - InstanceRefresh should remain HA-only unless single-instance downtime is explicitly accepted or extra capacity is configured.
+
+rules:
+  proposal:
+    - Include the affected provider surface, generated SDK impact, and migration behavior.
+    - Call out whether the change requires schema.yaml updates, generator changes, SDK regeneration, or plugin installation.
+    - Identify downtime, replacement, or resource churn risks for infrastructure changes.
+  tasks:
+    - Include verification steps for make, targeted Go tests, and any affected SDK build.
+    - Include CI/toolchain updates when module or package manager versions change.
+    - Include generated-file regeneration steps when schema.yaml or codegen changes.
+  implementation:
+    - Prefer schema or generator changes over hand-editing generated SDK files.
+    - Keep provider behavior stable across repeated pulumi up runs unless a controlled rotation resource is used.
+    - Avoid non-deterministic resource inputs such as time.Now() in Pulumi resource arguments.
+    - Do not enable rolling replacement for single-instance ASGs unless preserving availability is handled explicitly.
