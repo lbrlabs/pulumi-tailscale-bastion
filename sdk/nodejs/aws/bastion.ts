@@ -29,6 +29,10 @@ export class Bastion extends pulumi.ComponentResource {
      * The SSH private key to access your bastion
      */
     declare public /*out*/ readonly privateKey: pulumi.Output<string>;
+    /**
+     * The instance IAM role ARN to match in the Tailscale federated identity trust configuration.
+     */
+    declare public /*out*/ readonly roleArn: pulumi.Output<string | undefined>;
 
     /**
      * Create a Bastion resource with the given unique name, arguments, and options.
@@ -71,11 +75,14 @@ export class Bastion extends pulumi.ComponentResource {
             resourceInputs["subnetIds"] = args?.subnetIds;
             resourceInputs["tailscaleTags"] = args?.tailscaleTags;
             resourceInputs["vpcId"] = args?.vpcId;
+            resourceInputs["workloadIdentity"] = args?.workloadIdentity;
             resourceInputs["asgName"] = undefined /*out*/;
             resourceInputs["privateKey"] = undefined /*out*/;
+            resourceInputs["roleArn"] = undefined /*out*/;
         } else {
             resourceInputs["asgName"] = undefined /*out*/;
             resourceInputs["privateKey"] = undefined /*out*/;
+            resourceInputs["roleArn"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Bastion.__pulumiType, name, resourceInputs, opts, true /*remote*/);
@@ -146,4 +153,8 @@ export interface BastionArgs {
      * The VPC the Bastion should be created in.
      */
     vpcId: pulumi.Input<string>;
+    /**
+     * Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
+     */
+    workloadIdentity?: pulumi.Input<inputs.aws.WorkloadIdentityArgs>;
 }

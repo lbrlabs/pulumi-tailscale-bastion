@@ -30,3 +30,18 @@ export function peerRelaySettingsArgsProvideDefaults(val: PeerRelaySettingsArgs)
         port: (val.port) ?? 12345,
     };
 }
+export namespace aws {
+    /**
+     * Tailscale federated identity for automatic AWS workload authentication (Tailscale 1.94+).
+     */
+    export interface WorkloadIdentityArgs {
+        /**
+         * The audience configured for the Tailscale federated identity.
+         */
+        audience: pulumi.Input<string>;
+        /**
+         * The Tailscale federated identity client ID.
+         */
+        clientId: pulumi.Input<string>;
+    }
+}

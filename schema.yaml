@@ -13,6 +13,19 @@ keywords:
   - kind/component
   - category/network
 types:
+  tailscale-bastion:aws:WorkloadIdentity:
+    type: object
+    description: "Tailscale federated identity for automatic AWS workload authentication (Tailscale 1.94+)."
+    properties:
+      clientId:
+        type: string
+        description: "The Tailscale federated identity client ID."
+      audience:
+        type: string
+        description: "The audience configured for the Tailscale federated identity."
+    required:
+      - clientId
+      - audience
   tailscale-bastion:index:PeerRelaySettings:
     type: object
     description: "Settings for configuring this node as a peer relay server."
@@ -139,6 +152,9 @@ resources:
       oauthClientSecret:
         type: string
         description: "An OAuth Client Secret to use for authenticating Tailscale clients."
+      workloadIdentity:
+        "$ref": "#/types/tailscale-bastion:aws:WorkloadIdentity"
+        description: "Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret."
       architecture:
         type: string
         description: "The CPU architecture for the bastion (x86_64 or arm64)."
@@ -156,6 +172,9 @@ resources:
       asgName:
         type: string
         description: "The name of the ASG that managed the bastion instances"
+      roleArn:
+        type: string
+        description: "The instance IAM role ARN to match in the Tailscale federated identity trust configuration."
       privateKey:
         type: string
         description: "The SSH private key to access your bastion"

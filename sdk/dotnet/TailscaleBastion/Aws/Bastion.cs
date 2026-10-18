@@ -25,6 +25,12 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         [Output("privateKey")]
         public Output<string> PrivateKey { get; private set; } = null!;
 
+        /// <summary>
+        /// The instance IAM role ARN to match in the Tailscale federated identity trust configuration.
+        /// </summary>
+        [Output("roleArn")]
+        public Output<string?> RoleArn { get; private set; } = null!;
+
 
         /// <summary>
         /// Create a Bastion resource with the given unique name, arguments, and options.
@@ -161,6 +167,12 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         /// </summary>
         [Input("vpcId", required: true)]
         public Input<string> VpcId { get; set; } = null!;
+
+        /// <summary>
+        /// Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
+        /// </summary>
+        [Input("workloadIdentity")]
+        public Input<Inputs.WorkloadIdentityArgs>? WorkloadIdentity { get; set; }
 
         public BastionArgs()
         {

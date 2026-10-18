@@ -1,0 +1,116 @@
+#!/bin/sh
+
+# Function to resolve a value that may have file: or command: prefix
+# Returns the resolved value via stdout
+resolve_value() {
+  local value="$1"
+  
+  case "$value" in
+    file:*)
+      cat "$${value#file:}" | tr -d '\n'
+      ;;
+    command:*)
+      eval "$${value#command:}" | tr -d '\n'
+      ;;
+    *)
+      printf '%s' "$value"
+      ;;
+  esac
+}
+
+# Function to add a flag with a resolved value to the tailscale command
+# Usage: add_flag_with_value <flag_name> <value>
+add_flag_with_value() {
+  local flag_name="$1"
+  local value="$2"
+  
+  if [ -n "$value" ]; then
+    resolved_value=$(resolve_value "$value")
+    tailscale_cmd="$tailscale_cmd --$flag_name=\"$resolved_value\""
+  fi
+}
+
+# Verify we have internet connectivity
+max_retries=${MAX_RETRIES}
+retry_delay=${RETRY_DELAY}
+i=1
+
+while [ $i -le $max_retries ]
+do
+  sudo systemctl enable --now tailscaled
+  
+  # Construct the tailscale up command with connection/auth flags
+  tailscale_cmd="tailscale up \
+    --json=\"${JSON}\" \
+    --login-server=\"${LOGIN_SERVER}\" \
+    --reset=\"${RESET}\" \
+    --timeout=\"${TIMEOUT}\" \
+    --force-reauth=\"${FORCE_REAUTH}\""
+  
+  # Add authentication - either authkey or workload identity (id-token + client-id/client-secret)
+  add_flag_with_value "authkey" "${AUTH_KEY}"
+  add_flag_with_value "id-token" "${ID_TOKEN}"
+  add_flag_with_value "client-id" "${CLIENT_ID}"
+  add_flag_with_value "client-secret" "${CLIENT_SECRET}"
+
+  if [ -n "${AUDIENCE}" ]; then
+    tailscale_cmd="$tailscale_cmd --audience=\"${AUDIENCE}\""
+  fi
+  
+  if [ -n "${HOSTNAME}" ]; then
+    tailscale_cmd="$tailscale_cmd --hostname=\"${HOSTNAME}\""
+  fi
+  
+  # Add advertise-tags to up command (required for oauth authkeys)
+  if [ -n "${ADVERTISE_TAGS}" ]; then
+    tailscale_cmd="$tailscale_cmd --advertise-tags=\"${ADVERTISE_TAGS}\""
+  fi
+  
+  # Add advertise-routes to up command (required for oauth authkeys)
+  if [ -n "${ADVERTISE_ROUTES}" ]; then
+    tailscale_cmd="$tailscale_cmd --advertise-routes=\"${ADVERTISE_ROUTES}\""
+  fi
+  
+  # Execute the tailscale up command
+  eval "$tailscale_cmd"
+  
+  # Check the exit status of the tailscale up command
+  if [ $? -eq 0 ]; then
+    echo "Tailscale up succeeded, now configuring settings..."
+    
+    # Configure settings using tailscale set
+    tailscale set --accept-dns="${ACCEPT_DNS}"
+    tailscale set --accept-routes="${ACCEPT_ROUTES}"
+    tailscale set --advertise-exit-node="${ADVERTISE_EXIT_NODE}"
+    tailscale set --advertise-connector="${ADVERTISE_CONNECTOR}"
+    tailscale set --shields-up="${SHIELDS_UP}"
+    tailscale set --ssh="${TAILSCALE_SSH}"
+    tailscale set --snat-subnet-routes="${SNAT_SUBNET_ROUTES}"
+    tailscale set --netfilter-mode="${NETFILTER_MODE}"
+    tailscale set --stateful-filtering="${STATEFUL_FILTERING}"
+    
+    if [ -n "${EXIT_NODE}" ]; then
+      tailscale set --exit-node="${EXIT_NODE}"
+    fi
+    
+    if [ -n "${EXIT_NODE_ALLOW_LAN_ACCESS}" ] && [ "${EXIT_NODE_ALLOW_LAN_ACCESS}" = "true" ]; then
+      tailscale set --exit-node-allow-lan-access="${EXIT_NODE_ALLOW_LAN_ACCESS}"
+    fi
+    
+    if [ -n "${OPERATOR}" ]; then
+      tailscale set --operator="${OPERATOR}"
+    fi
+
+    if [ -n "${RELAY_SERVER_PORT}" ]; then
+      tailscale set --relay-server-port="${RELAY_SERVER_PORT}"
+    fi
+    
+    echo "Tailscale installation and configuration succeeded"
+    exit 0
+  else
+    echo "Tailscale up failed. Retry attempt $i"
+    sleep $retry_delay
+  fi
+  
+  i=$((i + 1))
+done

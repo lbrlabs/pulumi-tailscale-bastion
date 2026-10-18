@@ -14,6 +14,7 @@ else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from .. import _utilities
 from .. import _inputs as _root_inputs
+from ._inputs import *
 
 __all__ = ['BastionArgs', 'Bastion']
 
@@ -34,7 +35,8 @@ class BastionArgs:
                  oauth_client_secret: Optional[pulumi.Input[_builtins.str]] = None,
                  peer_relay_settings: Optional[pulumi.Input['_root_inputs.PeerRelaySettingsArgs']] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None,
-                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None):
+                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 workload_identity: Optional[pulumi.Input['WorkloadIdentityArgs']] = None):
         """
         The set of arguments for constructing a Bastion resource.
         :param pulumi.Input[_builtins.bool] high_availability: Whether the bastion should be highly available.
@@ -52,6 +54,7 @@ class BastionArgs:
         :param pulumi.Input['_root_inputs.PeerRelaySettingsArgs'] peer_relay_settings: Settings for configuring this node as a peer relay server.
         :param pulumi.Input[_builtins.bool] public: Whether the bastion is going in public subnets.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] routes: The routes you'd like to advertise via tailscale.
+        :param pulumi.Input['WorkloadIdentityArgs'] workload_identity: Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
         """
         if high_availability is None:
             high_availability = False
@@ -90,6 +93,8 @@ class BastionArgs:
             pulumi.set(__self__, "public", public)
         if routes is not None:
             pulumi.set(__self__, "routes", routes)
+        if workload_identity is not None:
+            pulumi.set(__self__, "workload_identity", workload_identity)
 
     @_builtins.property
     @pulumi.getter(name="highAvailability")
@@ -271,6 +276,18 @@ class BastionArgs:
     def routes(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "routes", value)
 
+    @_builtins.property
+    @pulumi.getter(name="workloadIdentity")
+    def workload_identity(self) -> Optional[pulumi.Input['WorkloadIdentityArgs']]:
+        """
+        Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
+        """
+        return pulumi.get(self, "workload_identity")
+
+    @workload_identity.setter
+    def workload_identity(self, value: Optional[pulumi.Input['WorkloadIdentityArgs']]):
+        pulumi.set(self, "workload_identity", value)
+
 
 @pulumi.type_token("tailscale-bastion:aws:Bastion")
 class Bastion(pulumi.ComponentResource):
@@ -293,6 +310,7 @@ class Bastion(pulumi.ComponentResource):
                  subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  vpc_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 workload_identity: Optional[pulumi.Input[Union['WorkloadIdentityArgs', 'WorkloadIdentityArgsDict']]] = None,
                  __props__=None):
         """
         Create a Bastion resource with the given unique name, props, and options.
@@ -313,6 +331,7 @@ class Bastion(pulumi.ComponentResource):
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] subnet_ids: The subnet Ids to launch instances in.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
         :param pulumi.Input[_builtins.str] vpc_id: The VPC the Bastion should be created in.
+        :param pulumi.Input[Union['WorkloadIdentityArgs', 'WorkloadIdentityArgsDict']] workload_identity: Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
         """
         ...
     @overload
@@ -352,6 +371,7 @@ class Bastion(pulumi.ComponentResource):
                  subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  vpc_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 workload_identity: Optional[pulumi.Input[Union['WorkloadIdentityArgs', 'WorkloadIdentityArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -400,8 +420,10 @@ class Bastion(pulumi.ComponentResource):
             if vpc_id is None and not opts.urn:
                 raise TypeError("Missing required property 'vpc_id'")
             __props__.__dict__["vpc_id"] = vpc_id
+            __props__.__dict__["workload_identity"] = workload_identity
             __props__.__dict__["asg_name"] = None
             __props__.__dict__["private_key"] = None
+            __props__.__dict__["role_arn"] = None
         super(Bastion, __self__).__init__(
             'tailscale-bastion:aws:Bastion',
             resource_name,
@@ -424,4 +446,12 @@ class Bastion(pulumi.ComponentResource):
         The SSH private key to access your bastion
         """
         return pulumi.get(self, "private_key")
+
+    @_builtins.property
+    @pulumi.getter(name="roleArn")
+    def role_arn(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The instance IAM role ARN to match in the Tailscale federated identity trust configuration.
+        """
+        return pulumi.get(self, "role_arn")
 

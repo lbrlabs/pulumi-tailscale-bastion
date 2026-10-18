@@ -20,6 +20,8 @@ type Bastion struct {
 	AsgName pulumi.StringOutput `pulumi:"asgName"`
 	// The SSH private key to access your bastion
 	PrivateKey pulumi.StringOutput `pulumi:"privateKey"`
+	// The instance IAM role ARN to match in the Tailscale federated identity trust configuration.
+	RoleArn pulumi.StringPtrOutput `pulumi:"roleArn"`
 }
 
 // NewBastion registers a new resource with the given unique name, arguments, and options.
@@ -102,6 +104,8 @@ type bastionArgs struct {
 	TailscaleTags []string `pulumi:"tailscaleTags"`
 	// The VPC the Bastion should be created in.
 	VpcId string `pulumi:"vpcId"`
+	// Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
+	WorkloadIdentity *WorkloadIdentity `pulumi:"workloadIdentity"`
 }
 
 // The set of arguments for constructing a Bastion resource.
@@ -136,6 +140,8 @@ type BastionArgs struct {
 	TailscaleTags pulumi.StringArrayInput
 	// The VPC the Bastion should be created in.
 	VpcId pulumi.StringInput
+	// Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
+	WorkloadIdentity WorkloadIdentityPtrInput
 }
 
 func (BastionArgs) ElementType() reflect.Type {
@@ -233,6 +239,11 @@ func (o BastionOutput) AsgName() pulumi.StringOutput {
 // The SSH private key to access your bastion
 func (o BastionOutput) PrivateKey() pulumi.StringOutput {
 	return o.ApplyT(func(v *Bastion) pulumi.StringOutput { return v.PrivateKey }).(pulumi.StringOutput)
+}
+
+// The instance IAM role ARN to match in the Tailscale federated identity trust configuration.
+func (o BastionOutput) RoleArn() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Bastion) pulumi.StringPtrOutput { return v.RoleArn }).(pulumi.StringPtrOutput)
 }
 
 type BastionArrayOutput struct{ *pulumi.OutputState }
