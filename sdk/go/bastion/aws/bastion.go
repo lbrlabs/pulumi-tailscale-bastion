@@ -20,6 +20,8 @@ type Bastion struct {
 	AsgName pulumi.StringOutput `pulumi:"asgName"`
 	// The SSH private key to access your bastion
 	PrivateKey pulumi.StringOutput `pulumi:"privateKey"`
+	// The instance IAM role ARN to match in the Tailscale federated identity trust configuration.
+	RoleArn pulumi.StringPtrOutput `pulumi:"roleArn"`
 }
 
 // NewBastion registers a new resource with the given unique name, arguments, and options.
@@ -41,6 +43,12 @@ func NewBastion(ctx *pulumi.Context,
 	if args.VpcId == nil {
 		return nil, errors.New("invalid value for required argument 'VpcId'")
 	}
+	if args.AcceptDNS == nil {
+		args.AcceptDNS = pulumi.BoolPtr(true)
+	}
+	if args.AcceptRoutes == nil {
+		args.AcceptRoutes = pulumi.BoolPtr(false)
+	}
 	if args.Architecture == nil {
 		args.Architecture = pulumi.StringPtr("x86_64")
 	}
@@ -53,14 +61,59 @@ func NewBastion(ctx *pulumi.Context,
 	if args.EnableSSH == nil {
 		args.EnableSSH = pulumi.BoolPtr(true)
 	}
+	if args.ExitNode == nil {
+		args.ExitNode = pulumi.StringPtr("")
+	}
+	if args.ExitNodeAllowLANAccess == nil {
+		args.ExitNodeAllowLANAccess = pulumi.BoolPtr(false)
+	}
+	if args.ForceReauth == nil {
+		args.ForceReauth = pulumi.BoolPtr(false)
+	}
 	if args.HighAvailability == nil {
 		args.HighAvailability = pulumi.Bool(false)
+	}
+	if args.Json == nil {
+		args.Json = pulumi.BoolPtr(false)
+	}
+	if args.LoginServer == nil {
+		args.LoginServer = pulumi.StringPtr("https://controlplane.tailscale.com")
+	}
+	if args.MaxRetries == nil {
+		args.MaxRetries = pulumi.IntPtr(10)
+	}
+	if args.NetfilterMode == nil {
+		args.NetfilterMode = pulumi.StringPtr("on")
+	}
+	if args.Operator == nil {
+		args.Operator = pulumi.StringPtr("")
 	}
 	if args.PeerRelaySettings != nil {
 		args.PeerRelaySettings = args.PeerRelaySettings.ToPeerRelaySettingsPtrOutput().ApplyT(func(v *bastion.PeerRelaySettings) *bastion.PeerRelaySettings { return v.Defaults() }).(bastion.PeerRelaySettingsPtrOutput)
 	}
 	if args.Public == nil {
 		args.Public = pulumi.BoolPtr(false)
+	}
+	if args.Reset == nil {
+		args.Reset = pulumi.BoolPtr(false)
+	}
+	if args.RetryDelay == nil {
+		args.RetryDelay = pulumi.IntPtr(10)
+	}
+	if args.ShieldsUp == nil {
+		args.ShieldsUp = pulumi.BoolPtr(false)
+	}
+	if args.SnatSubnetRoutes == nil {
+		args.SnatSubnetRoutes = pulumi.BoolPtr(true)
+	}
+	if args.StatefulFiltering == nil {
+		args.StatefulFiltering = pulumi.BoolPtr(false)
+	}
+	if args.Timeout == nil {
+		args.Timeout = pulumi.StringPtr("60s")
+	}
+	if args.Track == nil {
+		args.Track = pulumi.StringPtr("stable")
 	}
 	opts = internal.PkgResourceDefaultOpts(opts)
 	var resource Bastion
@@ -72,6 +125,10 @@ func NewBastion(ctx *pulumi.Context,
 }
 
 type bastionArgs struct {
+	// Accept DNS configuration from the tailnet.
+	AcceptDNS *bool `pulumi:"acceptDNS"`
+	// Accept subnet routes advertised by other tailnet nodes.
+	AcceptRoutes *bool `pulumi:"acceptRoutes"`
 	// The CPU architecture for the bastion (x86_64 or arm64).
 	Architecture *string `pulumi:"architecture"`
 	// Whether the bastion advertises itself as an app connector.
@@ -80,32 +137,68 @@ type bastionArgs struct {
 	EnableExitNode *bool `pulumi:"enableExitNode"`
 	// Whether to enable SSH access to the bastion.
 	EnableSSH *bool `pulumi:"enableSSH"`
+	// IP address or name of the exit node to use for outgoing traffic.
+	ExitNode *string `pulumi:"exitNode"`
+	// Allow direct access to the local network while using an exit node.
+	ExitNodeAllowLANAccess *bool `pulumi:"exitNodeAllowLANAccess"`
+	// Force reauthentication when running tailscale up.
+	ForceReauth *bool `pulumi:"forceReauth"`
 	// Whether the bastion should be highly available.
 	HighAvailability bool `pulumi:"highAvailability"`
 	// The hostname of the bastion.
 	Hostname *string `pulumi:"hostname"`
 	// The EC2 instance type to use for the bastion.
 	InstanceType *string `pulumi:"instanceType"`
+	// Whether tailscale up emits JSON output.
+	Json *bool `pulumi:"json"`
+	// Tailscale control server URL.
+	LoginServer *string `pulumi:"loginServer"`
+	// Maximum installation and authentication attempts. Must be at least 1.
+	MaxRetries *int `pulumi:"maxRetries"`
+	// Netfilter management mode: on, off, or nodivert.
+	NetfilterMode *string `pulumi:"netfilterMode"`
 	// An OAuth Client Secret to use for authenticating Tailscale clients.
 	OauthClientSecret *string `pulumi:"oauthClientSecret"`
+	// Local Unix user allowed to operate tailscaled without sudo.
+	Operator *string `pulumi:"operator"`
 	// Settings for configuring this node as a peer relay server.
 	PeerRelaySettings *bastion.PeerRelaySettings `pulumi:"peerRelaySettings"`
 	// Whether the bastion is going in public subnets.
 	Public *bool `pulumi:"public"`
 	// The AWS region you're using.
 	Region string `pulumi:"region"`
+	// Reset unspecified preferences to defaults when running tailscale up.
+	Reset *bool `pulumi:"reset"`
+	// Seconds between installation and authentication attempts. Must be non-negative.
+	RetryDelay *int `pulumi:"retryDelay"`
 	// The routes you'd like to advertise via tailscale.
 	Routes []string `pulumi:"routes"`
+	// Block incoming connections from other tailnet nodes.
+	ShieldsUp *bool `pulumi:"shieldsUp"`
+	// Source NAT traffic to advertised subnet routes.
+	SnatSubnetRoutes *bool `pulumi:"snatSubnetRoutes"`
+	// Enable stateful filtering for forwarded packets.
+	StatefulFiltering *bool `pulumi:"statefulFiltering"`
 	// The subnet Ids to launch instances in.
 	SubnetIds []string `pulumi:"subnetIds"`
 	// The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
 	TailscaleTags []string `pulumi:"tailscaleTags"`
+	// Maximum time to wait for tailscale up, as a Go duration. Zero waits indefinitely.
+	Timeout *string `pulumi:"timeout"`
+	// Tailscale installation release track: stable or unstable.
+	Track *string `pulumi:"track"`
 	// The VPC the Bastion should be created in.
 	VpcId string `pulumi:"vpcId"`
+	// Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
+	WorkloadIdentity *WorkloadIdentity `pulumi:"workloadIdentity"`
 }
 
 // The set of arguments for constructing a Bastion resource.
 type BastionArgs struct {
+	// Accept DNS configuration from the tailnet.
+	AcceptDNS pulumi.BoolPtrInput
+	// Accept subnet routes advertised by other tailnet nodes.
+	AcceptRoutes pulumi.BoolPtrInput
 	// The CPU architecture for the bastion (x86_64 or arm64).
 	Architecture pulumi.StringPtrInput
 	// Whether the bastion advertises itself as an app connector.
@@ -114,28 +207,60 @@ type BastionArgs struct {
 	EnableExitNode pulumi.BoolPtrInput
 	// Whether to enable SSH access to the bastion.
 	EnableSSH pulumi.BoolPtrInput
+	// IP address or name of the exit node to use for outgoing traffic.
+	ExitNode pulumi.StringPtrInput
+	// Allow direct access to the local network while using an exit node.
+	ExitNodeAllowLANAccess pulumi.BoolPtrInput
+	// Force reauthentication when running tailscale up.
+	ForceReauth pulumi.BoolPtrInput
 	// Whether the bastion should be highly available.
 	HighAvailability pulumi.BoolInput
 	// The hostname of the bastion.
 	Hostname pulumi.StringPtrInput
 	// The EC2 instance type to use for the bastion.
 	InstanceType pulumi.StringPtrInput
+	// Whether tailscale up emits JSON output.
+	Json pulumi.BoolPtrInput
+	// Tailscale control server URL.
+	LoginServer pulumi.StringPtrInput
+	// Maximum installation and authentication attempts. Must be at least 1.
+	MaxRetries pulumi.IntPtrInput
+	// Netfilter management mode: on, off, or nodivert.
+	NetfilterMode pulumi.StringPtrInput
 	// An OAuth Client Secret to use for authenticating Tailscale clients.
 	OauthClientSecret pulumi.StringPtrInput
+	// Local Unix user allowed to operate tailscaled without sudo.
+	Operator pulumi.StringPtrInput
 	// Settings for configuring this node as a peer relay server.
 	PeerRelaySettings bastion.PeerRelaySettingsPtrInput
 	// Whether the bastion is going in public subnets.
 	Public pulumi.BoolPtrInput
 	// The AWS region you're using.
 	Region pulumi.StringInput
+	// Reset unspecified preferences to defaults when running tailscale up.
+	Reset pulumi.BoolPtrInput
+	// Seconds between installation and authentication attempts. Must be non-negative.
+	RetryDelay pulumi.IntPtrInput
 	// The routes you'd like to advertise via tailscale.
 	Routes pulumi.StringArrayInput
+	// Block incoming connections from other tailnet nodes.
+	ShieldsUp pulumi.BoolPtrInput
+	// Source NAT traffic to advertised subnet routes.
+	SnatSubnetRoutes pulumi.BoolPtrInput
+	// Enable stateful filtering for forwarded packets.
+	StatefulFiltering pulumi.BoolPtrInput
 	// The subnet Ids to launch instances in.
 	SubnetIds pulumi.StringArrayInput
 	// The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
 	TailscaleTags pulumi.StringArrayInput
+	// Maximum time to wait for tailscale up, as a Go duration. Zero waits indefinitely.
+	Timeout pulumi.StringPtrInput
+	// Tailscale installation release track: stable or unstable.
+	Track pulumi.StringPtrInput
 	// The VPC the Bastion should be created in.
 	VpcId pulumi.StringInput
+	// Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
+	WorkloadIdentity WorkloadIdentityPtrInput
 }
 
 func (BastionArgs) ElementType() reflect.Type {
@@ -233,6 +358,11 @@ func (o BastionOutput) AsgName() pulumi.StringOutput {
 // The SSH private key to access your bastion
 func (o BastionOutput) PrivateKey() pulumi.StringOutput {
 	return o.ApplyT(func(v *Bastion) pulumi.StringOutput { return v.PrivateKey }).(pulumi.StringOutput)
+}
+
+// The instance IAM role ARN to match in the Tailscale federated identity trust configuration.
+func (o BastionOutput) RoleArn() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *Bastion) pulumi.StringPtrOutput { return v.RoleArn }).(pulumi.StringPtrOutput)
 }
 
 type BastionArrayOutput struct{ *pulumi.OutputState }

@@ -25,6 +25,12 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         [Output("privateKey")]
         public Output<string> PrivateKey { get; private set; } = null!;
 
+        /// <summary>
+        /// The instance IAM role ARN to match in the Tailscale federated identity trust configuration.
+        /// </summary>
+        [Output("roleArn")]
+        public Output<string?> RoleArn { get; private set; } = null!;
+
 
         /// <summary>
         /// Create a Bastion resource with the given unique name, arguments, and options.
@@ -55,6 +61,18 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
     public sealed class BastionArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
+        /// Accept DNS configuration from the tailnet.
+        /// </summary>
+        [Input("acceptDNS")]
+        public Input<bool>? AcceptDNS { get; set; }
+
+        /// <summary>
+        /// Accept subnet routes advertised by other tailnet nodes.
+        /// </summary>
+        [Input("acceptRoutes")]
+        public Input<bool>? AcceptRoutes { get; set; }
+
+        /// <summary>
         /// The CPU architecture for the bastion (x86_64 or arm64).
         /// </summary>
         [Input("architecture")]
@@ -79,6 +97,24 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         public Input<bool>? EnableSSH { get; set; }
 
         /// <summary>
+        /// IP address or name of the exit node to use for outgoing traffic.
+        /// </summary>
+        [Input("exitNode")]
+        public Input<string>? ExitNode { get; set; }
+
+        /// <summary>
+        /// Allow direct access to the local network while using an exit node.
+        /// </summary>
+        [Input("exitNodeAllowLANAccess")]
+        public Input<bool>? ExitNodeAllowLANAccess { get; set; }
+
+        /// <summary>
+        /// Force reauthentication when running tailscale up.
+        /// </summary>
+        [Input("forceReauth")]
+        public Input<bool>? ForceReauth { get; set; }
+
+        /// <summary>
         /// Whether the bastion should be highly available.
         /// </summary>
         [Input("highAvailability", required: true)]
@@ -97,10 +133,40 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         public Input<string>? InstanceType { get; set; }
 
         /// <summary>
+        /// Whether tailscale up emits JSON output.
+        /// </summary>
+        [Input("json")]
+        public Input<bool>? Json { get; set; }
+
+        /// <summary>
+        /// Tailscale control server URL.
+        /// </summary>
+        [Input("loginServer")]
+        public Input<string>? LoginServer { get; set; }
+
+        /// <summary>
+        /// Maximum installation and authentication attempts. Must be at least 1.
+        /// </summary>
+        [Input("maxRetries")]
+        public Input<int>? MaxRetries { get; set; }
+
+        /// <summary>
+        /// Netfilter management mode: on, off, or nodivert.
+        /// </summary>
+        [Input("netfilterMode")]
+        public Input<string>? NetfilterMode { get; set; }
+
+        /// <summary>
         /// An OAuth Client Secret to use for authenticating Tailscale clients.
         /// </summary>
         [Input("oauthClientSecret")]
         public Input<string>? OauthClientSecret { get; set; }
+
+        /// <summary>
+        /// Local Unix user allowed to operate tailscaled without sudo.
+        /// </summary>
+        [Input("operator")]
+        public Input<string>? Operator { get; set; }
 
         /// <summary>
         /// Settings for configuring this node as a peer relay server.
@@ -120,6 +186,18 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         [Input("region", required: true)]
         public Input<string> Region { get; set; } = null!;
 
+        /// <summary>
+        /// Reset unspecified preferences to defaults when running tailscale up.
+        /// </summary>
+        [Input("reset")]
+        public Input<bool>? Reset { get; set; }
+
+        /// <summary>
+        /// Seconds between installation and authentication attempts. Must be non-negative.
+        /// </summary>
+        [Input("retryDelay")]
+        public Input<int>? RetryDelay { get; set; }
+
         [Input("routes")]
         private InputList<string>? _routes;
 
@@ -131,6 +209,24 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
             get => _routes ?? (_routes = new InputList<string>());
             set => _routes = value;
         }
+
+        /// <summary>
+        /// Block incoming connections from other tailnet nodes.
+        /// </summary>
+        [Input("shieldsUp")]
+        public Input<bool>? ShieldsUp { get; set; }
+
+        /// <summary>
+        /// Source NAT traffic to advertised subnet routes.
+        /// </summary>
+        [Input("snatSubnetRoutes")]
+        public Input<bool>? SnatSubnetRoutes { get; set; }
+
+        /// <summary>
+        /// Enable stateful filtering for forwarded packets.
+        /// </summary>
+        [Input("statefulFiltering")]
+        public Input<bool>? StatefulFiltering { get; set; }
 
         [Input("subnetIds", required: true)]
         private InputList<string>? _subnetIds;
@@ -157,19 +253,54 @@ namespace Lbrlabs.PulumiPackage.TailscaleBastion.Aws
         }
 
         /// <summary>
+        /// Maximum time to wait for tailscale up, as a Go duration. Zero waits indefinitely.
+        /// </summary>
+        [Input("timeout")]
+        public Input<string>? Timeout { get; set; }
+
+        /// <summary>
+        /// Tailscale installation release track: stable or unstable.
+        /// </summary>
+        [Input("track")]
+        public Input<string>? Track { get; set; }
+
+        /// <summary>
         /// The VPC the Bastion should be created in.
         /// </summary>
         [Input("vpcId", required: true)]
         public Input<string> VpcId { get; set; } = null!;
 
+        /// <summary>
+        /// Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
+        /// </summary>
+        [Input("workloadIdentity")]
+        public Input<Inputs.WorkloadIdentityArgs>? WorkloadIdentity { get; set; }
+
         public BastionArgs()
         {
+            AcceptDNS = true;
+            AcceptRoutes = false;
             Architecture = "x86_64";
             EnableAppConnector = false;
             EnableExitNode = false;
             EnableSSH = true;
+            ExitNode = "";
+            ExitNodeAllowLANAccess = false;
+            ForceReauth = false;
             HighAvailability = false;
+            Json = false;
+            LoginServer = "https://controlplane.tailscale.com";
+            MaxRetries = 10;
+            NetfilterMode = "on";
+            Operator = "";
             Public = false;
+            Reset = false;
+            RetryDelay = 10;
+            ShieldsUp = false;
+            SnatSubnetRoutes = true;
+            StatefulFiltering = false;
+            Timeout = "60s";
+            Track = "stable";
         }
         public static new BastionArgs Empty => new BastionArgs();
     }

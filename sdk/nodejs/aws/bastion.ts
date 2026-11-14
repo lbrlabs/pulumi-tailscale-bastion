@@ -29,6 +29,10 @@ export class Bastion extends pulumi.ComponentResource {
      * The SSH private key to access your bastion
      */
     declare public /*out*/ readonly privateKey: pulumi.Output<string>;
+    /**
+     * The instance IAM role ARN to match in the Tailscale federated identity trust configuration.
+     */
+    declare public /*out*/ readonly roleArn: pulumi.Output<string | undefined>;
 
     /**
      * Create a Bastion resource with the given unique name, arguments, and options.
@@ -56,26 +60,46 @@ export class Bastion extends pulumi.ComponentResource {
             if (args?.vpcId === undefined && !opts.urn) {
                 throw new Error("Missing required property 'vpcId'");
             }
+            resourceInputs["acceptDNS"] = (args?.acceptDNS) ?? true;
+            resourceInputs["acceptRoutes"] = (args?.acceptRoutes) ?? false;
             resourceInputs["architecture"] = (args?.architecture) ?? "x86_64";
             resourceInputs["enableAppConnector"] = (args?.enableAppConnector) ?? false;
             resourceInputs["enableExitNode"] = (args?.enableExitNode) ?? false;
             resourceInputs["enableSSH"] = (args?.enableSSH) ?? true;
+            resourceInputs["exitNode"] = (args?.exitNode) ?? "";
+            resourceInputs["exitNodeAllowLANAccess"] = (args?.exitNodeAllowLANAccess) ?? false;
+            resourceInputs["forceReauth"] = (args?.forceReauth) ?? false;
             resourceInputs["highAvailability"] = (args?.highAvailability) ?? false;
             resourceInputs["hostname"] = args?.hostname;
             resourceInputs["instanceType"] = args?.instanceType;
+            resourceInputs["json"] = (args?.json) ?? false;
+            resourceInputs["loginServer"] = (args?.loginServer) ?? "https://controlplane.tailscale.com";
+            resourceInputs["maxRetries"] = (args?.maxRetries) ?? 10;
+            resourceInputs["netfilterMode"] = (args?.netfilterMode) ?? "on";
             resourceInputs["oauthClientSecret"] = args?.oauthClientSecret;
+            resourceInputs["operator"] = (args?.operator) ?? "";
             resourceInputs["peerRelaySettings"] = args ? (args.peerRelaySettings ? pulumi.output(args.peerRelaySettings).apply(inputs.peerRelaySettingsArgsProvideDefaults) : undefined) : undefined;
             resourceInputs["public"] = (args?.public) ?? false;
             resourceInputs["region"] = args?.region;
+            resourceInputs["reset"] = (args?.reset) ?? false;
+            resourceInputs["retryDelay"] = (args?.retryDelay) ?? 10;
             resourceInputs["routes"] = args?.routes;
+            resourceInputs["shieldsUp"] = (args?.shieldsUp) ?? false;
+            resourceInputs["snatSubnetRoutes"] = (args?.snatSubnetRoutes) ?? true;
+            resourceInputs["statefulFiltering"] = (args?.statefulFiltering) ?? false;
             resourceInputs["subnetIds"] = args?.subnetIds;
             resourceInputs["tailscaleTags"] = args?.tailscaleTags;
+            resourceInputs["timeout"] = (args?.timeout) ?? "60s";
+            resourceInputs["track"] = (args?.track) ?? "stable";
             resourceInputs["vpcId"] = args?.vpcId;
+            resourceInputs["workloadIdentity"] = args?.workloadIdentity;
             resourceInputs["asgName"] = undefined /*out*/;
             resourceInputs["privateKey"] = undefined /*out*/;
+            resourceInputs["roleArn"] = undefined /*out*/;
         } else {
             resourceInputs["asgName"] = undefined /*out*/;
             resourceInputs["privateKey"] = undefined /*out*/;
+            resourceInputs["roleArn"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
         super(Bastion.__pulumiType, name, resourceInputs, opts, true /*remote*/);
@@ -86,6 +110,14 @@ export class Bastion extends pulumi.ComponentResource {
  * The set of arguments for constructing a Bastion resource.
  */
 export interface BastionArgs {
+    /**
+     * Accept DNS configuration from the tailnet.
+     */
+    acceptDNS?: pulumi.Input<boolean>;
+    /**
+     * Accept subnet routes advertised by other tailnet nodes.
+     */
+    acceptRoutes?: pulumi.Input<boolean>;
     /**
      * The CPU architecture for the bastion (x86_64 or arm64).
      */
@@ -103,6 +135,18 @@ export interface BastionArgs {
      */
     enableSSH?: pulumi.Input<boolean>;
     /**
+     * IP address or name of the exit node to use for outgoing traffic.
+     */
+    exitNode?: pulumi.Input<string>;
+    /**
+     * Allow direct access to the local network while using an exit node.
+     */
+    exitNodeAllowLANAccess?: pulumi.Input<boolean>;
+    /**
+     * Force reauthentication when running tailscale up.
+     */
+    forceReauth?: pulumi.Input<boolean>;
+    /**
      * Whether the bastion should be highly available.
      */
     highAvailability: pulumi.Input<boolean>;
@@ -115,9 +159,29 @@ export interface BastionArgs {
      */
     instanceType?: pulumi.Input<string>;
     /**
+     * Whether tailscale up emits JSON output.
+     */
+    json?: pulumi.Input<boolean>;
+    /**
+     * Tailscale control server URL.
+     */
+    loginServer?: pulumi.Input<string>;
+    /**
+     * Maximum installation and authentication attempts. Must be at least 1.
+     */
+    maxRetries?: pulumi.Input<number>;
+    /**
+     * Netfilter management mode: on, off, or nodivert.
+     */
+    netfilterMode?: pulumi.Input<string>;
+    /**
      * An OAuth Client Secret to use for authenticating Tailscale clients.
      */
     oauthClientSecret?: pulumi.Input<string>;
+    /**
+     * Local Unix user allowed to operate tailscaled without sudo.
+     */
+    operator?: pulumi.Input<string>;
     /**
      * Settings for configuring this node as a peer relay server.
      */
@@ -131,9 +195,29 @@ export interface BastionArgs {
      */
     region: pulumi.Input<string>;
     /**
+     * Reset unspecified preferences to defaults when running tailscale up.
+     */
+    reset?: pulumi.Input<boolean>;
+    /**
+     * Seconds between installation and authentication attempts. Must be non-negative.
+     */
+    retryDelay?: pulumi.Input<number>;
+    /**
      * The routes you'd like to advertise via tailscale.
      */
     routes?: pulumi.Input<pulumi.Input<string>[]>;
+    /**
+     * Block incoming connections from other tailnet nodes.
+     */
+    shieldsUp?: pulumi.Input<boolean>;
+    /**
+     * Source NAT traffic to advertised subnet routes.
+     */
+    snatSubnetRoutes?: pulumi.Input<boolean>;
+    /**
+     * Enable stateful filtering for forwarded packets.
+     */
+    statefulFiltering?: pulumi.Input<boolean>;
     /**
      * The subnet Ids to launch instances in.
      */
@@ -143,7 +227,19 @@ export interface BastionArgs {
      */
     tailscaleTags: pulumi.Input<pulumi.Input<string>[]>;
     /**
+     * Maximum time to wait for tailscale up, as a Go duration. Zero waits indefinitely.
+     */
+    timeout?: pulumi.Input<string>;
+    /**
+     * Tailscale installation release track: stable or unstable.
+     */
+    track?: pulumi.Input<string>;
+    /**
      * The VPC the Bastion should be created in.
      */
     vpcId: pulumi.Input<string>;
+    /**
+     * Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
+     */
+    workloadIdentity?: pulumi.Input<inputs.aws.WorkloadIdentityArgs>;
 }

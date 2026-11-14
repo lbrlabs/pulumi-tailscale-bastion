@@ -1,13 +1,9 @@
 package aws
 
 import (
-	"bytes"
-	_ "embed"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"strings"
-	"text/template"
 
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/autoscaling"
@@ -18,11 +14,6 @@ import (
 	tls "github.com/pulumi/pulumi-tls/sdk/v5/go/tls"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	pulumitime "github.com/pulumiverse/pulumi-time/sdk/go/time"
-)
-
-var (
-	//go:embed userdata.tmpl
-	userData string
 )
 
 type Architecture string
@@ -38,24 +29,50 @@ type PeerRelaySettings struct {
 }
 
 type BastionArgs struct {
-	VpcID              pulumi.StringInput      `pulumi:"vpcId"`
-	SubnetIds          pulumi.StringArrayInput `pulumi:"subnetIds"`
-	TailscaleTags      pulumi.StringArrayInput `pulumi:"tailscaleTags"`
-	Routes             pulumi.StringArrayInput `pulumi:"routes"`
-	Region             pulumi.StringInput      `pulumi:"region"`
-	InstanceType       pulumi.StringInput      `pulumi:"instanceType"`
-	Hostname           pulumi.StringInput      `pulumi:"hostname"`
-	OauthClientSecret  pulumi.StringInput      `pulumi:"oauthClientSecret"`
-	HighAvailability   bool                    `pulumi:"highAvailability"`
-	EnableSSH          bool                    `pulumi:"enableSSH"`
-	Public             bool                    `pulumi:"public"`
-	EnableExitNode     bool                    `pulumi:"enableExitNode"`
-	EnableAppConnector bool                    `pulumi:"enableAppConnector"`
-	Architecture       pulumi.StringInput      `pulumi:"architecture"`
-	PeerRelaySettings  *PeerRelaySettings      `pulumi:"peerRelaySettings"`
+	Track                  pulumi.StringInput      `pulumi:"track"`
+	MaxRetries             pulumi.IntInput         `pulumi:"maxRetries"`
+	RetryDelay             pulumi.IntInput         `pulumi:"retryDelay"`
+	JSON                   pulumi.BoolInput        `pulumi:"json"`
+	LoginServer            pulumi.StringInput      `pulumi:"loginServer"`
+	Reset                  pulumi.BoolInput        `pulumi:"reset"`
+	Timeout                pulumi.StringInput      `pulumi:"timeout"`
+	ForceReauth            pulumi.BoolInput        `pulumi:"forceReauth"`
+	AcceptDNS              pulumi.BoolInput        `pulumi:"acceptDNS"`
+	AcceptRoutes           pulumi.BoolInput        `pulumi:"acceptRoutes"`
+	ShieldsUp              pulumi.BoolInput        `pulumi:"shieldsUp"`
+	SNATSubnetRoutes       pulumi.BoolInput        `pulumi:"snatSubnetRoutes"`
+	NetfilterMode          pulumi.StringInput      `pulumi:"netfilterMode"`
+	StatefulFiltering      pulumi.BoolInput        `pulumi:"statefulFiltering"`
+	ExitNode               pulumi.StringInput      `pulumi:"exitNode"`
+	ExitNodeAllowLANAccess pulumi.BoolInput        `pulumi:"exitNodeAllowLANAccess"`
+	Operator               pulumi.StringInput      `pulumi:"operator"`
+	WorkloadIdentity       *WorkloadIdentity       `pulumi:"workloadIdentity"`
+	VpcID                  pulumi.StringInput      `pulumi:"vpcId"`
+	SubnetIds              pulumi.StringArrayInput `pulumi:"subnetIds"`
+	TailscaleTags          pulumi.StringArrayInput `pulumi:"tailscaleTags"`
+	Routes                 pulumi.StringArrayInput `pulumi:"routes"`
+	Region                 pulumi.StringInput      `pulumi:"region"`
+	InstanceType           pulumi.StringInput      `pulumi:"instanceType"`
+	Hostname               pulumi.StringInput      `pulumi:"hostname"`
+	OauthClientSecret      pulumi.StringInput      `pulumi:"oauthClientSecret"`
+	HighAvailability       bool                    `pulumi:"highAvailability"`
+	EnableSSH              bool                    `pulumi:"enableSSH"`
+	Public                 bool                    `pulumi:"public"`
+	EnableExitNode         bool                    `pulumi:"enableExitNode"`
+	EnableAppConnector     bool                    `pulumi:"enableAppConnector"`
+	Architecture           pulumi.StringInput      `pulumi:"architecture"`
+	PeerRelaySettings      *PeerRelaySettings      `pulumi:"peerRelaySettings"`
+}
+
+type WorkloadIdentity struct {
+	ClientID pulumi.StringInput `pulumi:"clientId"`
+	Audience pulumi.StringInput `pulumi:"audience"`
 }
 
 type UserDataArgs struct {
+	Options            map[string]interface{}
+	ClientID           string
+	Audience           string
 	ParameterName      string
 	Routes             string
 	Region             string
@@ -74,6 +91,7 @@ type Bastion struct {
 
 	AsgName    pulumi.StringOutput `pulumi:"asgName"`
 	PrivateKey pulumi.StringOutput `pulumi:"privateKey"`
+	RoleArn    pulumi.StringOutput `pulumi:"roleArn"`
 }
 
 func NewBastion(ctx *pulumi.Context,
@@ -81,6 +99,14 @@ func NewBastion(ctx *pulumi.Context,
 
 	if args == nil {
 		args = &BastionArgs{}
+	}
+	if args.WorkloadIdentity != nil {
+		if args.OauthClientSecret != nil {
+			return nil, fmt.Errorf("workloadIdentity and oauthClientSecret are mutually exclusive")
+		}
+		if args.WorkloadIdentity.ClientID == nil || args.WorkloadIdentity.Audience == nil {
+			return nil, fmt.Errorf("workloadIdentity requires clientId and audience")
+		}
 	}
 
 	component := &Bastion{}
@@ -108,30 +134,35 @@ func NewBastion(ctx *pulumi.Context,
 	}
 
 	var tailnetKeyToUseForAuth pulumi.StringInput
+	var parameterName pulumi.StringInput = pulumi.String("")
+	var tailnetKeySsmParameter *ssm.Parameter
 
-	if args.OauthClientSecret == nil {
-		tailnetKey, err := tailscale.NewTailnetKey(ctx, name, &tailscale.TailnetKeyArgs{
-			Ephemeral:     pulumi.Bool(true),
-			Preauthorized: pulumi.Bool(true),
-			Reusable:      pulumi.Bool(true),
-			Tags:          args.TailscaleTags,
-			Description:   pulumi.Sprintf("Auth key for %s", hostname),
+	if args.WorkloadIdentity == nil {
+		if args.OauthClientSecret == nil {
+			tailnetKey, err := tailscale.NewTailnetKey(ctx, name, &tailscale.TailnetKeyArgs{
+				Ephemeral:     pulumi.Bool(true),
+				Preauthorized: pulumi.Bool(true),
+				Reusable:      pulumi.Bool(true),
+				Tags:          args.TailscaleTags,
+				Description:   pulumi.Sprintf("Auth key for %s", hostname),
+			}, pulumi.Parent(component))
+			if err != nil {
+				return nil, fmt.Errorf("error creating tailnet key: %v", err)
+			}
+			tailnetKeyToUseForAuth = tailnetKey.Key
+		} else {
+			tailnetKeyToUseForAuth = pulumi.Sprintf("%s?ephemeral=true&preauthorized=true", args.OauthClientSecret)
+		}
+
+		tailnetKeySsmParameter, err = ssm.NewParameter(ctx, name, &ssm.ParameterArgs{
+			Type:        ssm.ParameterTypeSecureString,
+			Value:       tailnetKeyToUseForAuth,
+			Description: pulumi.Sprintf("Tailscale auth key for %s", hostname),
 		}, pulumi.Parent(component))
 		if err != nil {
-			return nil, fmt.Errorf("error creating tailnet key: %v", err)
+			return nil, fmt.Errorf("error creating SSM parameter: %v", err)
 		}
-		tailnetKeyToUseForAuth = tailnetKey.Key
-	} else {
-		tailnetKeyToUseForAuth = pulumi.Sprintf("%s?ephemeral=true&preauthorized=true", args.OauthClientSecret)
-	}
-
-	tailnetKeySsmParameter, err := ssm.NewParameter(ctx, name, &ssm.ParameterArgs{
-		Type:        ssm.ParameterTypeSecureString,
-		Value:       tailnetKeyToUseForAuth,
-		Description: pulumi.Sprintf("Tailscale auth key for %s", hostname),
-	}, pulumi.Parent(component))
-	if err != nil {
-		return nil, fmt.Errorf("error creating SSM parameter: %v", err)
+		parameterName = tailnetKeySsmParameter.Name
 	}
 
 	role, err := iam.NewRole(ctx, name, &iam.RoleArgs{
@@ -162,47 +193,75 @@ func NewBastion(ctx *pulumi.Context,
 		return nil, fmt.Errorf("error creating IAM role: %v", err)
 	}
 
-	ssmParameterPolicyJSON := tailnetKeySsmParameter.Arn.ApplyT(func(arn string) (string, error) {
-		policyJSON, err := json.Marshal(map[string]interface{}{
-			"Version": "2012-10-17",
-			"Statement": []interface{}{
-				map[string]interface{}{
-					"Action": []string{
-						"ssm:GetParameters",
+	if tailnetKeySsmParameter != nil {
+		ssmParameterPolicyJSON := tailnetKeySsmParameter.Arn.ApplyT(func(arn string) (string, error) {
+			policyJSON, err := json.Marshal(map[string]interface{}{
+				"Version": "2012-10-17",
+				"Statement": []interface{}{
+					map[string]interface{}{
+						"Action": []string{
+							"ssm:GetParameter",
+						},
+						"Effect": "Allow",
+						"Resource": []string{
+							arn,
+						},
 					},
-					"Effect": "Allow",
-					"Resource": []string{
-						arn,
+					map[string]interface{}{
+						"Action": []string{
+							"ssm:DescribeParameters",
+						},
+						"Effect":   "Allow",
+						"Resource": "*",
 					},
 				},
-				map[string]interface{}{
-					"Action": []string{
-						"ssm:DescribeParameters",
-					},
-					"Effect":   "Allow",
-					"Resource": "*",
-				},
-			},
+			})
+			if err != nil {
+				return "", err
+			}
+			return string(policyJSON), nil
 		})
+
+		ssmParameterPolicy, err := iam.NewPolicy(ctx, name, &iam.PolicyArgs{
+			Policy: ssmParameterPolicyJSON,
+		}, pulumi.Parent(role))
 		if err != nil {
-			return "", err
+			return nil, fmt.Errorf("error creating SSM parameter policy: %v", err)
 		}
-		return string(policyJSON), nil
-	})
 
-	ssmParameterPolicy, err := iam.NewPolicy(ctx, name, &iam.PolicyArgs{
-		Policy: ssmParameterPolicyJSON,
-	}, pulumi.Parent(role))
-	if err != nil {
-		return nil, fmt.Errorf("error creating SSM parameter policy: %v", err)
+		_, err = iam.NewRolePolicyAttachment(ctx, fmt.Sprintf("%s-ssm-parameter", name), &iam.RolePolicyAttachmentArgs{
+			Role:      role.Name,
+			PolicyArn: ssmParameterPolicy.Arn,
+		}, pulumi.Parent(role))
+		if err != nil {
+			return nil, fmt.Errorf("error creating SSM parameter policy attachment: %v", err)
+		}
 	}
-
-	_, err = iam.NewRolePolicyAttachment(ctx, fmt.Sprintf("%s-ssm-parameter", name), &iam.RolePolicyAttachmentArgs{
-		Role:      role.Name,
-		PolicyArn: ssmParameterPolicy.Arn,
-	}, pulumi.Parent(role))
-	if err != nil {
-		return nil, fmt.Errorf("error creating SSM parameter policy attachment: %v", err)
+	var clientID, audience pulumi.StringInput = pulumi.String(""), pulumi.String("")
+	if args.WorkloadIdentity != nil {
+		clientID, audience = args.WorkloadIdentity.ClientID, args.WorkloadIdentity.Audience
+		_, err = iam.NewRolePolicy(ctx, name+"-workload-identity", &iam.RolePolicyArgs{
+			Role: role.Name,
+			Policy: audience.ToStringOutput().ApplyT(func(audience string) (string, error) {
+				if strings.TrimSpace(audience) == "" {
+					return "", fmt.Errorf("workloadIdentity audience must not be empty")
+				}
+				policy, err := json.Marshal(map[string]interface{}{
+					"Version": "2012-10-17",
+					"Statement": []interface{}{map[string]interface{}{
+						"Effect": "Allow", "Action": "sts:GetWebIdentityToken", "Resource": "*",
+						"Condition": map[string]interface{}{
+							"ForAnyValue:StringEquals": map[string]string{"sts:IdentityTokenAudience": audience},
+							"NumericLessThanEquals":    map[string]string{"sts:DurationSeconds": "300"},
+						},
+					}},
+				})
+				return string(policy), err
+			}).(pulumi.StringOutput),
+		}, pulumi.Parent(role))
+		if err != nil {
+			return nil, fmt.Errorf("error creating workload identity policy: %w", err)
+		}
 	}
 
 	_, err = iam.NewRolePolicyAttachment(ctx, fmt.Sprintf("%s-ssm-manager", name), &iam.RolePolicyAttachmentArgs{
@@ -307,7 +366,7 @@ func NewBastion(ctx *pulumi.Context,
 		}
 	}).(pulumi.StringOutput)
 
-	data := pulumi.All(tailnetKeySsmParameter.Name, args.Routes, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector, pulumi.Bool(peerRelayEnable), pulumi.Int(peerRelayPort), partition.DnsSuffix()).ApplyT(
+	data := pulumi.All(parameterName, args.Routes, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector, pulumi.Bool(peerRelayEnable), pulumi.Int(peerRelayPort), partition.DnsSuffix(), clientID, audience, cloudInitOptions(args)).ApplyT(
 		func(args []interface{}) (string, error) {
 			tagCSV := strings.Join(args[3].([]string), ",")
 
@@ -320,6 +379,9 @@ func NewBastion(ctx *pulumi.Context,
 			}
 
 			d := UserDataArgs{
+				Options:            args[13].(map[string]interface{}),
+				ClientID:           args[11].(string),
+				Audience:           args[12].(string),
 				ParameterName:      args[0].(string),
 				Routes:             routesCsv,
 				Region:             args[2].(string),
@@ -333,17 +395,7 @@ func NewBastion(ctx *pulumi.Context,
 				PeerRelayPort:      args[9].(int),
 			}
 
-			var userDataBytes bytes.Buffer
-			userDataTemplate := template.New("userdata")
-			userDataTemplate, err = userDataTemplate.Parse(userData)
-			if err != nil {
-				return "", err
-			}
-			err = userDataTemplate.Execute(&userDataBytes, d)
-			if err != nil {
-				return "", err
-			}
-			return base64.StdEncoding.EncodeToString(userDataBytes.Bytes()), nil
+			return renderUserData(d)
 		},
 	).(pulumi.StringOutput)
 
@@ -446,10 +498,12 @@ func NewBastion(ctx *pulumi.Context,
 
 	component.AsgName = asg.Name
 	component.PrivateKey = key.PrivateKeyOpenssh
+	component.RoleArn = role.Arn
 
 	if err := ctx.RegisterResourceOutputs(component, pulumi.Map{
 		"asgName":    asg.Name,
 		"privateKey": key.PrivateKeyOpenssh,
+		"roleArn":    role.Arn,
 	}); err != nil {
 		return nil, err
 	}
