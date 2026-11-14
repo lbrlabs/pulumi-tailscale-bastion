@@ -19,31 +19,27 @@ __all__ = [
     'PeerRelaySettingsArgsDict',
 ]
 
-MYPY = False
-
-if not MYPY:
-    class PeerRelaySettingsArgsDict(TypedDict):
-        """
-        Settings for configuring this node as a peer relay server.
-        """
-        enable: NotRequired[pulumi.Input[_builtins.bool]]
-        """
-        Whether to enable peer relay functionality.
-        """
-        port: NotRequired[pulumi.Input[_builtins.int]]
-        """
-        The port to use for the relay server.
-        """
-elif False:
-    PeerRelaySettingsArgsDict: TypeAlias = Mapping[str, Any]
+class PeerRelaySettingsArgsDict(TypedDict):
+    """
+    Settings for configuring this node as a peer relay server.
+    """
+    enable: NotRequired[pulumi.Input[Optional[_builtins.bool]]]
+    """
+    Whether to enable peer relay functionality.
+    """
+    port: NotRequired[pulumi.Input[Optional[_builtins.int]]]
+    """
+    The port to use for the relay server.
+    """
 
 @pulumi.input_type
 class PeerRelaySettingsArgs:
     def __init__(__self__, *,
-                 enable: Optional[pulumi.Input[_builtins.bool]] = None,
-                 port: Optional[pulumi.Input[_builtins.int]] = None):
+                 enable: pulumi.Input[Optional[_builtins.bool]] = None,
+                 port: pulumi.Input[Optional[_builtins.int]] = None):
         """
         Settings for configuring this node as a peer relay server.
+
         :param pulumi.Input[_builtins.bool] enable: Whether to enable peer relay functionality.
         :param pulumi.Input[_builtins.int] port: The port to use for the relay server.
         """
@@ -58,26 +54,26 @@ class PeerRelaySettingsArgs:
 
     @_builtins.property
     @pulumi.getter
-    def enable(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def enable(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Whether to enable peer relay functionality.
         """
         return pulumi.get(self, "enable")
 
     @enable.setter
-    def enable(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def enable(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "enable", value)
 
     @_builtins.property
     @pulumi.getter
-    def port(self) -> Optional[pulumi.Input[_builtins.int]]:
+    def port(self) -> pulumi.Input[Optional[_builtins.int]]:
         """
         The port to use for the relay server.
         """
         return pulumi.get(self, "port")
 
     @port.setter
-    def port(self, value: Optional[pulumi.Input[_builtins.int]]):
+    def port(self, value: pulumi.Input[Optional[_builtins.int]]):
         pulumi.set(self, "port", value)
 
 

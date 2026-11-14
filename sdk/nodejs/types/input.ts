@@ -14,11 +14,11 @@ export interface PeerRelaySettingsArgs {
     /**
      * Whether to enable peer relay functionality.
      */
-    enable?: pulumi.Input<boolean>;
+    enable?: pulumi.Input<boolean | undefined>;
     /**
      * The port to use for the relay server.
      */
-    port?: pulumi.Input<number>;
+    port?: pulumi.Input<number | undefined>;
 }
 /**
  * peerRelaySettingsArgsProvideDefaults sets the appropriate defaults for PeerRelaySettingsArgs

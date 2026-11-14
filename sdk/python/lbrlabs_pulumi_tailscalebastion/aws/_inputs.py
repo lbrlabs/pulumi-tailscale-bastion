@@ -19,23 +19,18 @@ __all__ = [
     'WorkloadIdentityArgsDict',
 ]
 
-MYPY = False
-
-if not MYPY:
-    class WorkloadIdentityArgsDict(TypedDict):
-        """
-        Tailscale federated identity for automatic AWS workload authentication (Tailscale 1.94+).
-        """
-        audience: pulumi.Input[_builtins.str]
-        """
-        The audience configured for the Tailscale federated identity.
-        """
-        client_id: pulumi.Input[_builtins.str]
-        """
-        The Tailscale federated identity client ID.
-        """
-elif False:
-    WorkloadIdentityArgsDict: TypeAlias = Mapping[str, Any]
+class WorkloadIdentityArgsDict(TypedDict):
+    """
+    Tailscale federated identity for automatic AWS workload authentication (Tailscale 1.94+).
+    """
+    audience: pulumi.Input[_builtins.str]
+    """
+    The audience configured for the Tailscale federated identity.
+    """
+    client_id: pulumi.Input[_builtins.str]
+    """
+    The Tailscale federated identity client ID.
+    """
 
 @pulumi.input_type
 class WorkloadIdentityArgs:
@@ -44,6 +39,7 @@ class WorkloadIdentityArgs:
                  client_id: pulumi.Input[_builtins.str]):
         """
         Tailscale federated identity for automatic AWS workload authentication (Tailscale 1.94+).
+
         :param pulumi.Input[_builtins.str] audience: The audience configured for the Tailscale federated identity.
         :param pulumi.Input[_builtins.str] client_id: The Tailscale federated identity client ID.
         """

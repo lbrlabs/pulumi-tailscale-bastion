@@ -21,12 +21,13 @@ __all__ = ['BastionArgs', 'Bastion']
 class BastionArgs:
     def __init__(__self__, *,
                  create_namespace: _builtins.bool,
-                 high_availability: Optional[pulumi.Input[_builtins.bool]] = None,
+                 high_availability: pulumi.Input[Optional[_builtins.bool]] = None,
                  routes: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]],
                  tailscale_tags: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]],
-                 namespace: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']] = None):
+                 namespace: pulumi.Input[Optional['pulumi_kubernetes.core.v1.Namespace']] = None):
         """
         The set of arguments for constructing a Bastion resource.
+
         :param _builtins.bool create_namespace: Whether we should create a new namespace.
         :param pulumi.Input[_builtins.bool] high_availability: Whether the bastion should be highly available.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] routes: The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
@@ -92,14 +93,14 @@ class BastionArgs:
 
     @_builtins.property
     @pulumi.getter
-    def namespace(self) -> Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']]:
+    def namespace(self) -> pulumi.Input[Optional['pulumi_kubernetes.core.v1.Namespace']]:
         """
         The bucket resource.
         """
         return pulumi.get(self, "namespace")
 
     @namespace.setter
-    def namespace(self, value: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']]):
+    def namespace(self, value: pulumi.Input[Optional['pulumi_kubernetes.core.v1.Namespace']]):
         pulumi.set(self, "namespace", value)
 
 
@@ -110,13 +111,14 @@ class Bastion(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  create_namespace: Optional[_builtins.bool] = None,
-                 high_availability: Optional[pulumi.Input[_builtins.bool]] = None,
-                 namespace: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']] = None,
-                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 high_availability: pulumi.Input[Optional[_builtins.bool]] = None,
+                 namespace: pulumi.Input[Optional['pulumi_kubernetes.core.v1.Namespace']] = None,
+                 routes: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 tailscale_tags: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  __props__=None):
         """
         Create a Bastion resource with the given unique name, props, and options.
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param _builtins.bool create_namespace: Whether we should create a new namespace.
@@ -133,6 +135,7 @@ class Bastion(pulumi.ComponentResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Create a Bastion resource with the given unique name, props, and options.
+
         :param str resource_name: The name of the resource.
         :param BastionArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -149,10 +152,10 @@ class Bastion(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  create_namespace: Optional[_builtins.bool] = None,
-                 high_availability: Optional[pulumi.Input[_builtins.bool]] = None,
-                 namespace: Optional[pulumi.Input['pulumi_kubernetes.core.v1.Namespace']] = None,
-                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 high_availability: pulumi.Input[Optional[_builtins.bool]] = None,
+                 namespace: pulumi.Input[Optional['pulumi_kubernetes.core.v1.Namespace']] = None,
+                 routes: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 tailscale_tags: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):

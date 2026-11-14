@@ -20,18 +20,19 @@ __all__ = ['BastionArgs', 'Bastion']
 @pulumi.input_type
 class BastionArgs:
     def __init__(__self__, *,
-                 high_availability: Optional[pulumi.Input[_builtins.bool]] = None,
+                 high_availability: pulumi.Input[Optional[_builtins.bool]] = None,
                  location: pulumi.Input[_builtins.str],
                  resource_group_name: pulumi.Input[_builtins.str],
                  routes: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]],
                  subnet_id: pulumi.Input[_builtins.str],
                  tailscale_tags: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]],
-                 enable_ssh: Optional[pulumi.Input[_builtins.bool]] = None,
-                 instance_sku: Optional[pulumi.Input[_builtins.str]] = None,
-                 peer_relay_settings: Optional[pulumi.Input['_root_inputs.PeerRelaySettingsArgs']] = None,
-                 public: Optional[pulumi.Input[_builtins.bool]] = None):
+                 enable_ssh: pulumi.Input[Optional[_builtins.bool]] = None,
+                 instance_sku: pulumi.Input[Optional[_builtins.str]] = None,
+                 peer_relay_settings: pulumi.Input[Optional['_root_inputs.PeerRelaySettingsArgs']] = None,
+                 public: pulumi.Input[Optional[_builtins.bool]] = None):
         """
         The set of arguments for constructing a Bastion resource.
+
         :param pulumi.Input[_builtins.bool] high_availability: Whether the bastion should be highly available.
         :param pulumi.Input[_builtins.str] location: The Azure region you're using.
         :param pulumi.Input[_builtins.str] resource_group_name: The Azure resource group to create the bastion in.
@@ -138,50 +139,50 @@ class BastionArgs:
 
     @_builtins.property
     @pulumi.getter(name="enableSSH")
-    def enable_ssh(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def enable_ssh(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Whether to enable SSH access to the bastion.
         """
         return pulumi.get(self, "enable_ssh")
 
     @enable_ssh.setter
-    def enable_ssh(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def enable_ssh(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "enable_ssh", value)
 
     @_builtins.property
     @pulumi.getter(name="instanceSku")
-    def instance_sku(self) -> Optional[pulumi.Input[_builtins.str]]:
+    def instance_sku(self) -> pulumi.Input[Optional[_builtins.str]]:
         """
         The Azure instance SKU to use for the bastion.
         """
         return pulumi.get(self, "instance_sku")
 
     @instance_sku.setter
-    def instance_sku(self, value: Optional[pulumi.Input[_builtins.str]]):
+    def instance_sku(self, value: pulumi.Input[Optional[_builtins.str]]):
         pulumi.set(self, "instance_sku", value)
 
     @_builtins.property
     @pulumi.getter(name="peerRelaySettings")
-    def peer_relay_settings(self) -> Optional[pulumi.Input['_root_inputs.PeerRelaySettingsArgs']]:
+    def peer_relay_settings(self) -> pulumi.Input[Optional['_root_inputs.PeerRelaySettingsArgs']]:
         """
         Settings for configuring this node as a peer relay server.
         """
         return pulumi.get(self, "peer_relay_settings")
 
     @peer_relay_settings.setter
-    def peer_relay_settings(self, value: Optional[pulumi.Input['_root_inputs.PeerRelaySettingsArgs']]):
+    def peer_relay_settings(self, value: pulumi.Input[Optional['_root_inputs.PeerRelaySettingsArgs']]):
         pulumi.set(self, "peer_relay_settings", value)
 
     @_builtins.property
     @pulumi.getter
-    def public(self) -> Optional[pulumi.Input[_builtins.bool]]:
+    def public(self) -> pulumi.Input[Optional[_builtins.bool]]:
         """
         Whether the bastion should have a public IP.
         """
         return pulumi.get(self, "public")
 
     @public.setter
-    def public(self, value: Optional[pulumi.Input[_builtins.bool]]):
+    def public(self, value: pulumi.Input[Optional[_builtins.bool]]):
         pulumi.set(self, "public", value)
 
 
@@ -191,19 +192,20 @@ class Bastion(pulumi.ComponentResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 enable_ssh: Optional[pulumi.Input[_builtins.bool]] = None,
-                 high_availability: Optional[pulumi.Input[_builtins.bool]] = None,
-                 instance_sku: Optional[pulumi.Input[_builtins.str]] = None,
-                 location: Optional[pulumi.Input[_builtins.str]] = None,
-                 peer_relay_settings: Optional[pulumi.Input[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']]] = None,
-                 public: Optional[pulumi.Input[_builtins.bool]] = None,
-                 resource_group_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 subnet_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 enable_ssh: pulumi.Input[Optional[_builtins.bool]] = None,
+                 high_availability: pulumi.Input[Optional[_builtins.bool]] = None,
+                 instance_sku: pulumi.Input[Optional[_builtins.str]] = None,
+                 location: pulumi.Input[Optional[_builtins.str]] = None,
+                 peer_relay_settings: pulumi.Input[Optional[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']]] = None,
+                 public: pulumi.Input[Optional[_builtins.bool]] = None,
+                 resource_group_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 routes: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 subnet_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 tailscale_tags: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  __props__=None):
         """
         Create a Bastion resource with the given unique name, props, and options.
+
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[_builtins.bool] enable_ssh: Whether to enable SSH access to the bastion.
@@ -225,6 +227,7 @@ class Bastion(pulumi.ComponentResource):
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
         Create a Bastion resource with the given unique name, props, and options.
+
         :param str resource_name: The name of the resource.
         :param BastionArgs args: The arguments to use to populate this resource's properties.
         :param pulumi.ResourceOptions opts: Options for the resource.
@@ -240,16 +243,16 @@ class Bastion(pulumi.ComponentResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
-                 enable_ssh: Optional[pulumi.Input[_builtins.bool]] = None,
-                 high_availability: Optional[pulumi.Input[_builtins.bool]] = None,
-                 instance_sku: Optional[pulumi.Input[_builtins.str]] = None,
-                 location: Optional[pulumi.Input[_builtins.str]] = None,
-                 peer_relay_settings: Optional[pulumi.Input[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']]] = None,
-                 public: Optional[pulumi.Input[_builtins.bool]] = None,
-                 resource_group_name: Optional[pulumi.Input[_builtins.str]] = None,
-                 routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
-                 subnet_id: Optional[pulumi.Input[_builtins.str]] = None,
-                 tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 enable_ssh: pulumi.Input[Optional[_builtins.bool]] = None,
+                 high_availability: pulumi.Input[Optional[_builtins.bool]] = None,
+                 instance_sku: pulumi.Input[Optional[_builtins.str]] = None,
+                 location: pulumi.Input[Optional[_builtins.str]] = None,
+                 peer_relay_settings: pulumi.Input[Optional[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']]] = None,
+                 public: pulumi.Input[Optional[_builtins.bool]] = None,
+                 resource_group_name: pulumi.Input[Optional[_builtins.str]] = None,
+                 routes: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 subnet_id: pulumi.Input[Optional[_builtins.str]] = None,
+                 tailscale_tags: pulumi.Input[Optional[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
