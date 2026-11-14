@@ -78,7 +78,7 @@ export interface BastionArgs {
     /**
      * The bucket resource.
      */
-    namespace?: pulumi.Input<pulumiKubernetes.core.v1.Namespace>;
+    namespace?: pulumi.Input<pulumiKubernetes.core.v1.Namespace | undefined>;
     /**
      * The routes to advertise to tailscale. This is likely the Pod and Service CIDR.
      */

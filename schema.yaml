@@ -266,7 +266,7 @@ resources:
         description: "Whether we should create a new namespace."
         plain: true
       namespace:
-        "$ref": "/kubernetes/v4.21.1/schema.json#/resources/kubernetes:core%2Fv1:Namespace"
+        "$ref": "/kubernetes/v4.34.3/schema.json#/resources/kubernetes:core%2Fv1:Namespace"
         description: The bucket resource.
       routes:
         type: array
@@ -288,7 +288,7 @@ language:
   csharp:
     packageReferences:
       Pulumi: 3.*
-      Pulumi.Aws: 6.*
+      Pulumi.Aws: 7.*
       Pulumi.Azure: 6.*
       Pulumi.Kubernetes: 4.*
       Pulumi.Tls: 5.*
@@ -299,22 +299,22 @@ language:
     importBasePath: github.com/lbrlabs/pulumi-tailscale-bastion/sdk/go/bastion
   nodejs:
     dependencies:
-      "@pulumi/aws": "^6.0.0"
-      "@pulumi/azure": "^6.0.0"
-      "@pulumi/tls": "^5.0.0"
-      "@pulumi/kubernetes": "^4.0.0"
-      "@pulumi/tailscale": "^0.18.0"
+      "@pulumi/aws": "^7.55.0"
+      "@pulumi/azure": "^6.40.2"
+      "@pulumi/tls": "^5.6.3"
+      "@pulumi/kubernetes": "^4.34.3"
+      "@pulumi/tailscale": "^0.30.0"
     devDependencies:
-      typescript: "^5.6.0"
-      glob: "^9.0.0"
-      minimatch: "^5.0.0"
+      typescript: "^6.0.3"
+      glob: "^14.0.6"
+      minimatch: "^11.0.8"
     packageName: "@lbrlabs/pulumi-tailscalebastion"
   python:
     packageName: "lbrlabs_pulumi_tailscalebastion"
     requires:
-      pulumi: ">=3.0.0,<4.0.0"
-      pulumi-kubernetes: ">=4.0.0,<5.0.0"
-      pulumi-aws: ">=7.0.0,<8.0.0"
-      pulumi-azure: ">=6.0.0,<7.0.0"
-      pulumi-tls: ">=5.0.0,<6.0.0"
-      pulumi-tailscale: ">=0.0.0,<1.0.0"
+      pulumi: ">=3.276.0,<4.0.0"
+      pulumi-kubernetes: ">=4.34.3,<5.0.0"
+      pulumi-aws: ">=7.55.0,<8.0.0"
+      pulumi-azure: ">=6.40.2,<7.0.0"
+      pulumi-tls: ">=5.6.3,<6.0.0"
+      pulumi-tailscale: ">=0.30.0,<1.0.0"

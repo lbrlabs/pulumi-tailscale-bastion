@@ -13,7 +13,7 @@ bastion = tailscale.aws.Bastion(
     "example",
     vpc_id=vpc.vpc_id,
     subnet_ids=vpc.public_subnet_ids,
-    route="172.20.0.0/22",
+    routes=["172.20.0.0/22"],
     tailscale_tags=["tag:bastion"],
     region="us-west-2",
     high_availability=True,

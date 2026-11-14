@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -9,11 +10,15 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
-	dotnetgen "github.com/pulumi/pulumi/pkg/v3/codegen/dotnet"
+	dotnetgen "github.com/pulumi/pulumi-dotnet/pulumi-language-dotnet/v3/codegen"
 	gogen "github.com/pulumi/pulumi/pkg/v3/codegen/go"
 	nodejsgen "github.com/pulumi/pulumi/pkg/v3/codegen/nodejs"
 	pygen "github.com/pulumi/pulumi/pkg/v3/codegen/python"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
+	pkghost "github.com/pulumi/pulumi/pkg/v3/host"
+	"github.com/pulumi/pulumi/pkg/v3/resource/plugin"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/diag"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/diag/colors"
 )
 
 func main() {
@@ -69,6 +74,15 @@ func emitSDK(language, outdir, schemaPath string) error {
 	if language == "python" {
 		fixPythonImportPaths(files)
 	}
+	if language == "dotnet" {
+		for filename, contents := range files {
+			if strings.HasSuffix(filename, ".csproj") {
+				files[filename] = []byte(strings.ReplaceAll(string(contents),
+					`Include="Microsoft.SourceLink.GitHub" Version="1.0.0"`,
+					`Include="Microsoft.SourceLink.GitHub" Version="8.0.0"`))
+			}
+		}
+	}
 
 	for f, contents := range files {
 		if err := emitFile(outdir, f, contents); err != nil {
@@ -104,6 +118,13 @@ func addNodePackageManager(contents []byte) ([]byte, error) {
 	if _, ok := packageJSON["packageManager"]; !ok {
 		packageJSON["packageManager"] = "yarn@1.22.22"
 	}
+	dependencies, ok := packageJSON["dependencies"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("generated Node.js package has no dependencies")
+	}
+	dependencies["@pulumi/pulumi"] = "^3.276.0"
+	dependencies["@types/node"] = "^24"
+	dependencies["typescript"] = "^6.0.3"
 	packageJSON["repository"] = map[string]interface{}{
 		"type": "git",
 		"url":  "git+https://github.com/lbrlabs/pulumi-tailscale-bastion.git",
@@ -150,7 +171,22 @@ func readSchema(schemaPath string) (*schema.Package, error) {
 		return nil, errors.Wrap(err, "unmarshalling schema")
 	}
 
-	pkg, err := schema.ImportSpec(spec, nil, schema.ValidationOptions{})
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, errors.Wrap(err, "getting working directory")
+	}
+	sink := diag.DefaultSink(os.Stdout, os.Stderr, diag.FormatOptions{Color: colors.Never})
+	host, err := pkghost.New(context.Background(), sink, sink, nil, nil, schema.NewLoaderServerFromContext, nil, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating plugin host")
+	}
+	defer host.Close()
+	pctx, err := plugin.NewContext(context.Background(), sink, sink, host, nil, cwd, nil, false, nil, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating plugin context")
+	}
+	defer pctx.Close()
+	pkg, err := schema.ImportSpec(spec, nil, schema.NewPluginLoader(pctx), schema.ValidationOptions{})
 	if err != nil {
 		return nil, errors.Wrap(err, "importing schema")
 	}
