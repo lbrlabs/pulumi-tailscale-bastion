@@ -74,6 +74,11 @@ func renderUserData(d UserDataArgs) (string, error) {
 	if d.ParameterName == "" && (strings.TrimSpace(d.ClientID) == "" || strings.TrimSpace(d.Audience) == "") {
 		return "", fmt.Errorf("workloadIdentity requires non-empty clientId and audience")
 	}
+	// Upstream resolves these prefixes as commands or file paths; client IDs
+	// are literal identifiers and must never invoke the credential resolver.
+	if strings.HasPrefix(d.ClientID, "command:") || strings.HasPrefix(d.ClientID, "file:") {
+		return "", fmt.Errorf("workloadIdentity clientId must not use command: or file: prefixes")
+	}
 	values := map[string]string{
 		"TRACK": "stable", "MAX_RETRIES": "10", "RETRY_DELAY": "10",
 		"JSON": "false", "LOGIN_SERVER": "https://controlplane.tailscale.com",

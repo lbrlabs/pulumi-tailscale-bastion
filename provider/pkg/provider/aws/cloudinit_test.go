@@ -189,3 +189,17 @@ func TestCloudInitRejectsInvalidIdentity(t *testing.T) {
 		}
 	}
 }
+
+func TestCloudInitRejectsClientIDResolverPrefixes(t *testing.T) {
+	for _, clientID := range []string{"command:touch /tmp/marker; printf client #", "file:/etc/passwd"} {
+		t.Run(clientID, func(t *testing.T) {
+			_, err := renderUserData(UserDataArgs{ClientID: clientID, Audience: "audience"})
+			if err == nil || !strings.Contains(err.Error(), "clientId must not use") {
+				t.Fatalf("expected resolver prefix rejection, got %v", err)
+			}
+		})
+	}
+	if _, err := renderUserData(UserDataArgs{ClientID: "client-command:123", Audience: "audience"}); err != nil {
+		t.Fatalf("valid literal client ID rejected: %v", err)
+	}
+}
