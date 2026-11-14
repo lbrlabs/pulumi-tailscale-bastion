@@ -29,22 +29,39 @@ type PeerRelaySettings struct {
 }
 
 type BastionArgs struct {
-	WorkloadIdentity   *WorkloadIdentity       `pulumi:"workloadIdentity"`
-	VpcID              pulumi.StringInput      `pulumi:"vpcId"`
-	SubnetIds          pulumi.StringArrayInput `pulumi:"subnetIds"`
-	TailscaleTags      pulumi.StringArrayInput `pulumi:"tailscaleTags"`
-	Routes             pulumi.StringArrayInput `pulumi:"routes"`
-	Region             pulumi.StringInput      `pulumi:"region"`
-	InstanceType       pulumi.StringInput      `pulumi:"instanceType"`
-	Hostname           pulumi.StringInput      `pulumi:"hostname"`
-	OauthClientSecret  pulumi.StringInput      `pulumi:"oauthClientSecret"`
-	HighAvailability   bool                    `pulumi:"highAvailability"`
-	EnableSSH          bool                    `pulumi:"enableSSH"`
-	Public             bool                    `pulumi:"public"`
-	EnableExitNode     bool                    `pulumi:"enableExitNode"`
-	EnableAppConnector bool                    `pulumi:"enableAppConnector"`
-	Architecture       pulumi.StringInput      `pulumi:"architecture"`
-	PeerRelaySettings  *PeerRelaySettings      `pulumi:"peerRelaySettings"`
+	Track                  pulumi.StringInput      `pulumi:"track"`
+	MaxRetries             pulumi.IntInput         `pulumi:"maxRetries"`
+	RetryDelay             pulumi.IntInput         `pulumi:"retryDelay"`
+	JSON                   pulumi.BoolInput        `pulumi:"json"`
+	LoginServer            pulumi.StringInput      `pulumi:"loginServer"`
+	Reset                  pulumi.BoolInput        `pulumi:"reset"`
+	Timeout                pulumi.StringInput      `pulumi:"timeout"`
+	ForceReauth            pulumi.BoolInput        `pulumi:"forceReauth"`
+	AcceptDNS              pulumi.BoolInput        `pulumi:"acceptDNS"`
+	AcceptRoutes           pulumi.BoolInput        `pulumi:"acceptRoutes"`
+	ShieldsUp              pulumi.BoolInput        `pulumi:"shieldsUp"`
+	SNATSubnetRoutes       pulumi.BoolInput        `pulumi:"snatSubnetRoutes"`
+	NetfilterMode          pulumi.StringInput      `pulumi:"netfilterMode"`
+	StatefulFiltering      pulumi.BoolInput        `pulumi:"statefulFiltering"`
+	ExitNode               pulumi.StringInput      `pulumi:"exitNode"`
+	ExitNodeAllowLANAccess pulumi.BoolInput        `pulumi:"exitNodeAllowLANAccess"`
+	Operator               pulumi.StringInput      `pulumi:"operator"`
+	WorkloadIdentity       *WorkloadIdentity       `pulumi:"workloadIdentity"`
+	VpcID                  pulumi.StringInput      `pulumi:"vpcId"`
+	SubnetIds              pulumi.StringArrayInput `pulumi:"subnetIds"`
+	TailscaleTags          pulumi.StringArrayInput `pulumi:"tailscaleTags"`
+	Routes                 pulumi.StringArrayInput `pulumi:"routes"`
+	Region                 pulumi.StringInput      `pulumi:"region"`
+	InstanceType           pulumi.StringInput      `pulumi:"instanceType"`
+	Hostname               pulumi.StringInput      `pulumi:"hostname"`
+	OauthClientSecret      pulumi.StringInput      `pulumi:"oauthClientSecret"`
+	HighAvailability       bool                    `pulumi:"highAvailability"`
+	EnableSSH              bool                    `pulumi:"enableSSH"`
+	Public                 bool                    `pulumi:"public"`
+	EnableExitNode         bool                    `pulumi:"enableExitNode"`
+	EnableAppConnector     bool                    `pulumi:"enableAppConnector"`
+	Architecture           pulumi.StringInput      `pulumi:"architecture"`
+	PeerRelaySettings      *PeerRelaySettings      `pulumi:"peerRelaySettings"`
 }
 
 type WorkloadIdentity struct {
@@ -53,6 +70,7 @@ type WorkloadIdentity struct {
 }
 
 type UserDataArgs struct {
+	Options            map[string]interface{}
 	ClientID           string
 	Audience           string
 	ParameterName      string
@@ -348,7 +366,7 @@ func NewBastion(ctx *pulumi.Context,
 		}
 	}).(pulumi.StringOutput)
 
-	data := pulumi.All(parameterName, args.Routes, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector, pulumi.Bool(peerRelayEnable), pulumi.Int(peerRelayPort), partition.DnsSuffix(), clientID, audience).ApplyT(
+	data := pulumi.All(parameterName, args.Routes, args.Region, args.TailscaleTags, args.EnableSSH, hostname, args.EnableExitNode, args.EnableAppConnector, pulumi.Bool(peerRelayEnable), pulumi.Int(peerRelayPort), partition.DnsSuffix(), clientID, audience, cloudInitOptions(args)).ApplyT(
 		func(args []interface{}) (string, error) {
 			tagCSV := strings.Join(args[3].([]string), ",")
 
@@ -361,6 +379,7 @@ func NewBastion(ctx *pulumi.Context,
 			}
 
 			d := UserDataArgs{
+				Options:            args[13].(map[string]interface{}),
 				ClientID:           args[11].(string),
 				Audience:           args[12].(string),
 				ParameterName:      args[0].(string),

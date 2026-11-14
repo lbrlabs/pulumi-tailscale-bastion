@@ -10,12 +10,36 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
 //go:embed cloudinit/*.sh cloudinit/*.tmpl
 var cloudinitFiles embed.FS
 
 var terraformVariable = regexp.MustCompile(`\$\{([A-Z_]+)\}`)
+
+// Omitted inputs retain the renderer defaults; explicit false and zero values
+// must survive resolution of Pulumi outputs.
+func cloudInitOptions(args *BastionArgs) pulumi.Map {
+	options := pulumi.Map{}
+	for key, value := range map[string]pulumi.Input{
+		"TRACK": args.Track, "MAX_RETRIES": args.MaxRetries, "RETRY_DELAY": args.RetryDelay,
+		"JSON": args.JSON, "LOGIN_SERVER": args.LoginServer, "RESET": args.Reset,
+		"TIMEOUT": args.Timeout, "FORCE_REAUTH": args.ForceReauth,
+		"ACCEPT_DNS": args.AcceptDNS, "ACCEPT_ROUTES": args.AcceptRoutes,
+		"SHIELDS_UP": args.ShieldsUp, "SNAT_SUBNET_ROUTES": args.SNATSubnetRoutes,
+		"NETFILTER_MODE": args.NetfilterMode, "STATEFUL_FILTERING": args.StatefulFiltering,
+		"EXIT_NODE": args.ExitNode, "EXIT_NODE_ALLOW_LAN_ACCESS": args.ExitNodeAllowLANAccess,
+		"OPERATOR": args.Operator,
+	} {
+		if value != nil {
+			options[key] = value
+		}
+	}
+	return options
+}
 
 // renderUpstream renders the simple interpolation subset used by the pinned
 // upstream templates. Fail on unknown variables so upstream updates are explicit.
@@ -63,6 +87,28 @@ func renderUserData(d UserDataArgs) (string, error) {
 		"SNAT_SUBNET_ROUTES": "true", "NETFILTER_MODE": "on", "STATEFUL_FILTERING": "false",
 		"EXIT_NODE": "", "EXIT_NODE_ALLOW_LAN_ACCESS": "false", "OPERATOR": "", "RELAY_SERVER_PORT": "",
 	}
+	for key, value := range d.Options {
+		text := fmt.Sprint(value)
+		if strings.ContainsAny(text, "\"'`$\\\r\n") {
+			return "", fmt.Errorf("cloud-init setting %s contains unsupported shell characters", key)
+		}
+		values[key] = text
+	}
+	if values["TRACK"] != "stable" && values["TRACK"] != "unstable" {
+		return "", fmt.Errorf("track must be stable or unstable")
+	}
+	if mode := values["NETFILTER_MODE"]; mode != "on" && mode != "off" && mode != "nodivert" {
+		return "", fmt.Errorf("netfilterMode must be on, off, or nodivert")
+	}
+	for key, minimum := range map[string]int{"MAX_RETRIES": 1, "RETRY_DELAY": 0} {
+		value, err := strconv.Atoi(values[key])
+		if err != nil || value < minimum {
+			return "", fmt.Errorf("%s must be an integer >= %d", key, minimum)
+		}
+	}
+	if duration, err := time.ParseDuration(values["TIMEOUT"]); err != nil || duration < 0 {
+		return "", fmt.Errorf("timeout must be a non-negative duration (for example 60s)")
+	}
 	if d.ClientID != "" {
 		values["CLIENT_ID"] = d.ClientID + "?ephemeral=true&preauthorized=true"
 	} else {
@@ -103,7 +149,14 @@ func renderUserData(d UserDataArgs) (string, error) {
 			if d.ParameterName != "" {
 				prefix += fmt.Sprintf("umask 077\naws ssm get-parameter --name '%s' --region '%s' --with-decryption --query Parameter.Value --output text > /run/tailscale-authkey\ntrap 'rm -f /run/tailscale-authkey' EXIT\n", d.ParameterName, d.Region)
 			}
-			// Preserve upstream's retry loop; make exhaustion fail cloud-init.
+			// Keep errexit disabled for the upstream authentication retry loop,
+			// then enable it before applying preferences so failures are reported.
+			success := `echo "Tailscale up succeeded, now configuring settings..."`
+			if strings.Count(script, success) != 1 {
+				return "", fmt.Errorf("upstream setup script has unexpected success marker")
+			}
+			script = strings.Replace(script, success, "set -e\n    "+success, 1)
+			// Make exhausted authentication retries fail cloud-init.
 			script = prefix + "set +e\n" + script + "\nexit 1\n"
 		}
 		if err := writePart(fmt.Sprintf("%02d-%s", i+1, strings.TrimSuffix(name, ".tmpl")), script); err != nil {

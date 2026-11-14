@@ -26,16 +26,33 @@ class BastionArgs:
                  subnet_ids: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]],
                  tailscale_tags: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]],
                  vpc_id: pulumi.Input[_builtins.str],
+                 accept_dns: Optional[pulumi.Input[_builtins.bool]] = None,
+                 accept_routes: Optional[pulumi.Input[_builtins.bool]] = None,
                  architecture: Optional[pulumi.Input[_builtins.str]] = None,
                  enable_app_connector: Optional[pulumi.Input[_builtins.bool]] = None,
                  enable_exit_node: Optional[pulumi.Input[_builtins.bool]] = None,
                  enable_ssh: Optional[pulumi.Input[_builtins.bool]] = None,
+                 exit_node: Optional[pulumi.Input[_builtins.str]] = None,
+                 exit_node_allow_lan_access: Optional[pulumi.Input[_builtins.bool]] = None,
+                 force_reauth: Optional[pulumi.Input[_builtins.bool]] = None,
                  hostname: Optional[pulumi.Input[_builtins.str]] = None,
                  instance_type: Optional[pulumi.Input[_builtins.str]] = None,
+                 json: Optional[pulumi.Input[_builtins.bool]] = None,
+                 login_server: Optional[pulumi.Input[_builtins.str]] = None,
+                 max_retries: Optional[pulumi.Input[_builtins.int]] = None,
+                 netfilter_mode: Optional[pulumi.Input[_builtins.str]] = None,
                  oauth_client_secret: Optional[pulumi.Input[_builtins.str]] = None,
+                 operator: Optional[pulumi.Input[_builtins.str]] = None,
                  peer_relay_settings: Optional[pulumi.Input['_root_inputs.PeerRelaySettingsArgs']] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None,
+                 reset: Optional[pulumi.Input[_builtins.bool]] = None,
+                 retry_delay: Optional[pulumi.Input[_builtins.int]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 shields_up: Optional[pulumi.Input[_builtins.bool]] = None,
+                 snat_subnet_routes: Optional[pulumi.Input[_builtins.bool]] = None,
+                 stateful_filtering: Optional[pulumi.Input[_builtins.bool]] = None,
+                 timeout: Optional[pulumi.Input[_builtins.str]] = None,
+                 track: Optional[pulumi.Input[_builtins.str]] = None,
                  workload_identity: Optional[pulumi.Input['WorkloadIdentityArgs']] = None):
         """
         The set of arguments for constructing a Bastion resource.
@@ -44,16 +61,33 @@ class BastionArgs:
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] subnet_ids: The subnet Ids to launch instances in.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
         :param pulumi.Input[_builtins.str] vpc_id: The VPC the Bastion should be created in.
+        :param pulumi.Input[_builtins.bool] accept_dns: Accept DNS configuration from the tailnet.
+        :param pulumi.Input[_builtins.bool] accept_routes: Accept subnet routes advertised by other tailnet nodes.
         :param pulumi.Input[_builtins.str] architecture: The CPU architecture for the bastion (x86_64 or arm64).
         :param pulumi.Input[_builtins.bool] enable_app_connector: Whether the bastion advertises itself as an app connector.
         :param pulumi.Input[_builtins.bool] enable_exit_node: Whether the subnet router can advertise itself as an exit node.
         :param pulumi.Input[_builtins.bool] enable_ssh: Whether to enable SSH access to the bastion.
+        :param pulumi.Input[_builtins.str] exit_node: IP address or name of the exit node to use for outgoing traffic.
+        :param pulumi.Input[_builtins.bool] exit_node_allow_lan_access: Allow direct access to the local network while using an exit node.
+        :param pulumi.Input[_builtins.bool] force_reauth: Force reauthentication when running tailscale up.
         :param pulumi.Input[_builtins.str] hostname: The hostname of the bastion.
         :param pulumi.Input[_builtins.str] instance_type: The EC2 instance type to use for the bastion.
+        :param pulumi.Input[_builtins.bool] json: Whether tailscale up emits JSON output.
+        :param pulumi.Input[_builtins.str] login_server: Tailscale control server URL.
+        :param pulumi.Input[_builtins.int] max_retries: Maximum installation and authentication attempts. Must be at least 1.
+        :param pulumi.Input[_builtins.str] netfilter_mode: Netfilter management mode: on, off, or nodivert.
         :param pulumi.Input[_builtins.str] oauth_client_secret: An OAuth Client Secret to use for authenticating Tailscale clients.
+        :param pulumi.Input[_builtins.str] operator: Local Unix user allowed to operate tailscaled without sudo.
         :param pulumi.Input['_root_inputs.PeerRelaySettingsArgs'] peer_relay_settings: Settings for configuring this node as a peer relay server.
         :param pulumi.Input[_builtins.bool] public: Whether the bastion is going in public subnets.
+        :param pulumi.Input[_builtins.bool] reset: Reset unspecified preferences to defaults when running tailscale up.
+        :param pulumi.Input[_builtins.int] retry_delay: Seconds between installation and authentication attempts. Must be non-negative.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] routes: The routes you'd like to advertise via tailscale.
+        :param pulumi.Input[_builtins.bool] shields_up: Block incoming connections from other tailnet nodes.
+        :param pulumi.Input[_builtins.bool] snat_subnet_routes: Source NAT traffic to advertised subnet routes.
+        :param pulumi.Input[_builtins.bool] stateful_filtering: Enable stateful filtering for forwarded packets.
+        :param pulumi.Input[_builtins.str] timeout: Maximum time to wait for tailscale up, as a Go duration. Zero waits indefinitely.
+        :param pulumi.Input[_builtins.str] track: Tailscale installation release track: stable or unstable.
         :param pulumi.Input['WorkloadIdentityArgs'] workload_identity: Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
         """
         if high_availability is None:
@@ -63,6 +97,14 @@ class BastionArgs:
         pulumi.set(__self__, "subnet_ids", subnet_ids)
         pulumi.set(__self__, "tailscale_tags", tailscale_tags)
         pulumi.set(__self__, "vpc_id", vpc_id)
+        if accept_dns is None:
+            accept_dns = True
+        if accept_dns is not None:
+            pulumi.set(__self__, "accept_dns", accept_dns)
+        if accept_routes is None:
+            accept_routes = False
+        if accept_routes is not None:
+            pulumi.set(__self__, "accept_routes", accept_routes)
         if architecture is None:
             architecture = 'x86_64'
         if architecture is not None:
@@ -79,20 +121,80 @@ class BastionArgs:
             enable_ssh = True
         if enable_ssh is not None:
             pulumi.set(__self__, "enable_ssh", enable_ssh)
+        if exit_node is None:
+            exit_node = ''
+        if exit_node is not None:
+            pulumi.set(__self__, "exit_node", exit_node)
+        if exit_node_allow_lan_access is None:
+            exit_node_allow_lan_access = False
+        if exit_node_allow_lan_access is not None:
+            pulumi.set(__self__, "exit_node_allow_lan_access", exit_node_allow_lan_access)
+        if force_reauth is None:
+            force_reauth = False
+        if force_reauth is not None:
+            pulumi.set(__self__, "force_reauth", force_reauth)
         if hostname is not None:
             pulumi.set(__self__, "hostname", hostname)
         if instance_type is not None:
             pulumi.set(__self__, "instance_type", instance_type)
+        if json is None:
+            json = False
+        if json is not None:
+            pulumi.set(__self__, "json", json)
+        if login_server is None:
+            login_server = 'https://controlplane.tailscale.com'
+        if login_server is not None:
+            pulumi.set(__self__, "login_server", login_server)
+        if max_retries is None:
+            max_retries = 10
+        if max_retries is not None:
+            pulumi.set(__self__, "max_retries", max_retries)
+        if netfilter_mode is None:
+            netfilter_mode = 'on'
+        if netfilter_mode is not None:
+            pulumi.set(__self__, "netfilter_mode", netfilter_mode)
         if oauth_client_secret is not None:
             pulumi.set(__self__, "oauth_client_secret", oauth_client_secret)
+        if operator is None:
+            operator = ''
+        if operator is not None:
+            pulumi.set(__self__, "operator", operator)
         if peer_relay_settings is not None:
             pulumi.set(__self__, "peer_relay_settings", peer_relay_settings)
         if public is None:
             public = False
         if public is not None:
             pulumi.set(__self__, "public", public)
+        if reset is None:
+            reset = False
+        if reset is not None:
+            pulumi.set(__self__, "reset", reset)
+        if retry_delay is None:
+            retry_delay = 10
+        if retry_delay is not None:
+            pulumi.set(__self__, "retry_delay", retry_delay)
         if routes is not None:
             pulumi.set(__self__, "routes", routes)
+        if shields_up is None:
+            shields_up = False
+        if shields_up is not None:
+            pulumi.set(__self__, "shields_up", shields_up)
+        if snat_subnet_routes is None:
+            snat_subnet_routes = True
+        if snat_subnet_routes is not None:
+            pulumi.set(__self__, "snat_subnet_routes", snat_subnet_routes)
+        if stateful_filtering is None:
+            stateful_filtering = False
+        if stateful_filtering is not None:
+            pulumi.set(__self__, "stateful_filtering", stateful_filtering)
+        if timeout is None:
+            timeout = '60s'
+        if timeout is not None:
+            pulumi.set(__self__, "timeout", timeout)
+        if track is None:
+            track = 'stable'
+        if track is not None:
+            pulumi.set(__self__, "track", track)
         if workload_identity is not None:
             pulumi.set(__self__, "workload_identity", workload_identity)
 
@@ -157,6 +259,30 @@ class BastionArgs:
         pulumi.set(self, "vpc_id", value)
 
     @_builtins.property
+    @pulumi.getter(name="acceptDNS")
+    def accept_dns(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Accept DNS configuration from the tailnet.
+        """
+        return pulumi.get(self, "accept_dns")
+
+    @accept_dns.setter
+    def accept_dns(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "accept_dns", value)
+
+    @_builtins.property
+    @pulumi.getter(name="acceptRoutes")
+    def accept_routes(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Accept subnet routes advertised by other tailnet nodes.
+        """
+        return pulumi.get(self, "accept_routes")
+
+    @accept_routes.setter
+    def accept_routes(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "accept_routes", value)
+
+    @_builtins.property
     @pulumi.getter
     def architecture(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
@@ -205,6 +331,42 @@ class BastionArgs:
         pulumi.set(self, "enable_ssh", value)
 
     @_builtins.property
+    @pulumi.getter(name="exitNode")
+    def exit_node(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        IP address or name of the exit node to use for outgoing traffic.
+        """
+        return pulumi.get(self, "exit_node")
+
+    @exit_node.setter
+    def exit_node(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "exit_node", value)
+
+    @_builtins.property
+    @pulumi.getter(name="exitNodeAllowLANAccess")
+    def exit_node_allow_lan_access(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Allow direct access to the local network while using an exit node.
+        """
+        return pulumi.get(self, "exit_node_allow_lan_access")
+
+    @exit_node_allow_lan_access.setter
+    def exit_node_allow_lan_access(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "exit_node_allow_lan_access", value)
+
+    @_builtins.property
+    @pulumi.getter(name="forceReauth")
+    def force_reauth(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Force reauthentication when running tailscale up.
+        """
+        return pulumi.get(self, "force_reauth")
+
+    @force_reauth.setter
+    def force_reauth(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "force_reauth", value)
+
+    @_builtins.property
     @pulumi.getter
     def hostname(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
@@ -229,6 +391,54 @@ class BastionArgs:
         pulumi.set(self, "instance_type", value)
 
     @_builtins.property
+    @pulumi.getter
+    def json(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Whether tailscale up emits JSON output.
+        """
+        return pulumi.get(self, "json")
+
+    @json.setter
+    def json(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "json", value)
+
+    @_builtins.property
+    @pulumi.getter(name="loginServer")
+    def login_server(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Tailscale control server URL.
+        """
+        return pulumi.get(self, "login_server")
+
+    @login_server.setter
+    def login_server(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "login_server", value)
+
+    @_builtins.property
+    @pulumi.getter(name="maxRetries")
+    def max_retries(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Maximum installation and authentication attempts. Must be at least 1.
+        """
+        return pulumi.get(self, "max_retries")
+
+    @max_retries.setter
+    def max_retries(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "max_retries", value)
+
+    @_builtins.property
+    @pulumi.getter(name="netfilterMode")
+    def netfilter_mode(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Netfilter management mode: on, off, or nodivert.
+        """
+        return pulumi.get(self, "netfilter_mode")
+
+    @netfilter_mode.setter
+    def netfilter_mode(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "netfilter_mode", value)
+
+    @_builtins.property
     @pulumi.getter(name="oauthClientSecret")
     def oauth_client_secret(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
@@ -239,6 +449,18 @@ class BastionArgs:
     @oauth_client_secret.setter
     def oauth_client_secret(self, value: Optional[pulumi.Input[_builtins.str]]):
         pulumi.set(self, "oauth_client_secret", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def operator(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Local Unix user allowed to operate tailscaled without sudo.
+        """
+        return pulumi.get(self, "operator")
+
+    @operator.setter
+    def operator(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "operator", value)
 
     @_builtins.property
     @pulumi.getter(name="peerRelaySettings")
@@ -266,6 +488,30 @@ class BastionArgs:
 
     @_builtins.property
     @pulumi.getter
+    def reset(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Reset unspecified preferences to defaults when running tailscale up.
+        """
+        return pulumi.get(self, "reset")
+
+    @reset.setter
+    def reset(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "reset", value)
+
+    @_builtins.property
+    @pulumi.getter(name="retryDelay")
+    def retry_delay(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Seconds between installation and authentication attempts. Must be non-negative.
+        """
+        return pulumi.get(self, "retry_delay")
+
+    @retry_delay.setter
+    def retry_delay(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "retry_delay", value)
+
+    @_builtins.property
+    @pulumi.getter
     def routes(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
         """
         The routes you'd like to advertise via tailscale.
@@ -275,6 +521,66 @@ class BastionArgs:
     @routes.setter
     def routes(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "routes", value)
+
+    @_builtins.property
+    @pulumi.getter(name="shieldsUp")
+    def shields_up(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Block incoming connections from other tailnet nodes.
+        """
+        return pulumi.get(self, "shields_up")
+
+    @shields_up.setter
+    def shields_up(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "shields_up", value)
+
+    @_builtins.property
+    @pulumi.getter(name="snatSubnetRoutes")
+    def snat_subnet_routes(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Source NAT traffic to advertised subnet routes.
+        """
+        return pulumi.get(self, "snat_subnet_routes")
+
+    @snat_subnet_routes.setter
+    def snat_subnet_routes(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "snat_subnet_routes", value)
+
+    @_builtins.property
+    @pulumi.getter(name="statefulFiltering")
+    def stateful_filtering(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Enable stateful filtering for forwarded packets.
+        """
+        return pulumi.get(self, "stateful_filtering")
+
+    @stateful_filtering.setter
+    def stateful_filtering(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "stateful_filtering", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def timeout(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Maximum time to wait for tailscale up, as a Go duration. Zero waits indefinitely.
+        """
+        return pulumi.get(self, "timeout")
+
+    @timeout.setter
+    def timeout(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "timeout", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def track(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Tailscale installation release track: stable or unstable.
+        """
+        return pulumi.get(self, "track")
+
+    @track.setter
+    def track(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "track", value)
 
     @_builtins.property
     @pulumi.getter(name="workloadIdentity")
@@ -295,20 +601,37 @@ class Bastion(pulumi.ComponentResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 accept_dns: Optional[pulumi.Input[_builtins.bool]] = None,
+                 accept_routes: Optional[pulumi.Input[_builtins.bool]] = None,
                  architecture: Optional[pulumi.Input[_builtins.str]] = None,
                  enable_app_connector: Optional[pulumi.Input[_builtins.bool]] = None,
                  enable_exit_node: Optional[pulumi.Input[_builtins.bool]] = None,
                  enable_ssh: Optional[pulumi.Input[_builtins.bool]] = None,
+                 exit_node: Optional[pulumi.Input[_builtins.str]] = None,
+                 exit_node_allow_lan_access: Optional[pulumi.Input[_builtins.bool]] = None,
+                 force_reauth: Optional[pulumi.Input[_builtins.bool]] = None,
                  high_availability: Optional[pulumi.Input[_builtins.bool]] = None,
                  hostname: Optional[pulumi.Input[_builtins.str]] = None,
                  instance_type: Optional[pulumi.Input[_builtins.str]] = None,
+                 json: Optional[pulumi.Input[_builtins.bool]] = None,
+                 login_server: Optional[pulumi.Input[_builtins.str]] = None,
+                 max_retries: Optional[pulumi.Input[_builtins.int]] = None,
+                 netfilter_mode: Optional[pulumi.Input[_builtins.str]] = None,
                  oauth_client_secret: Optional[pulumi.Input[_builtins.str]] = None,
+                 operator: Optional[pulumi.Input[_builtins.str]] = None,
                  peer_relay_settings: Optional[pulumi.Input[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']]] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None,
                  region: Optional[pulumi.Input[_builtins.str]] = None,
+                 reset: Optional[pulumi.Input[_builtins.bool]] = None,
+                 retry_delay: Optional[pulumi.Input[_builtins.int]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 shields_up: Optional[pulumi.Input[_builtins.bool]] = None,
+                 snat_subnet_routes: Optional[pulumi.Input[_builtins.bool]] = None,
+                 stateful_filtering: Optional[pulumi.Input[_builtins.bool]] = None,
                  subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 timeout: Optional[pulumi.Input[_builtins.str]] = None,
+                 track: Optional[pulumi.Input[_builtins.str]] = None,
                  vpc_id: Optional[pulumi.Input[_builtins.str]] = None,
                  workload_identity: Optional[pulumi.Input[Union['WorkloadIdentityArgs', 'WorkloadIdentityArgsDict']]] = None,
                  __props__=None):
@@ -316,20 +639,37 @@ class Bastion(pulumi.ComponentResource):
         Create a Bastion resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[_builtins.bool] accept_dns: Accept DNS configuration from the tailnet.
+        :param pulumi.Input[_builtins.bool] accept_routes: Accept subnet routes advertised by other tailnet nodes.
         :param pulumi.Input[_builtins.str] architecture: The CPU architecture for the bastion (x86_64 or arm64).
         :param pulumi.Input[_builtins.bool] enable_app_connector: Whether the bastion advertises itself as an app connector.
         :param pulumi.Input[_builtins.bool] enable_exit_node: Whether the subnet router can advertise itself as an exit node.
         :param pulumi.Input[_builtins.bool] enable_ssh: Whether to enable SSH access to the bastion.
+        :param pulumi.Input[_builtins.str] exit_node: IP address or name of the exit node to use for outgoing traffic.
+        :param pulumi.Input[_builtins.bool] exit_node_allow_lan_access: Allow direct access to the local network while using an exit node.
+        :param pulumi.Input[_builtins.bool] force_reauth: Force reauthentication when running tailscale up.
         :param pulumi.Input[_builtins.bool] high_availability: Whether the bastion should be highly available.
         :param pulumi.Input[_builtins.str] hostname: The hostname of the bastion.
         :param pulumi.Input[_builtins.str] instance_type: The EC2 instance type to use for the bastion.
+        :param pulumi.Input[_builtins.bool] json: Whether tailscale up emits JSON output.
+        :param pulumi.Input[_builtins.str] login_server: Tailscale control server URL.
+        :param pulumi.Input[_builtins.int] max_retries: Maximum installation and authentication attempts. Must be at least 1.
+        :param pulumi.Input[_builtins.str] netfilter_mode: Netfilter management mode: on, off, or nodivert.
         :param pulumi.Input[_builtins.str] oauth_client_secret: An OAuth Client Secret to use for authenticating Tailscale clients.
+        :param pulumi.Input[_builtins.str] operator: Local Unix user allowed to operate tailscaled without sudo.
         :param pulumi.Input[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']] peer_relay_settings: Settings for configuring this node as a peer relay server.
         :param pulumi.Input[_builtins.bool] public: Whether the bastion is going in public subnets.
         :param pulumi.Input[_builtins.str] region: The AWS region you're using.
+        :param pulumi.Input[_builtins.bool] reset: Reset unspecified preferences to defaults when running tailscale up.
+        :param pulumi.Input[_builtins.int] retry_delay: Seconds between installation and authentication attempts. Must be non-negative.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] routes: The routes you'd like to advertise via tailscale.
+        :param pulumi.Input[_builtins.bool] shields_up: Block incoming connections from other tailnet nodes.
+        :param pulumi.Input[_builtins.bool] snat_subnet_routes: Source NAT traffic to advertised subnet routes.
+        :param pulumi.Input[_builtins.bool] stateful_filtering: Enable stateful filtering for forwarded packets.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] subnet_ids: The subnet Ids to launch instances in.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] tailscale_tags: The tags to apply to the tailnet device andauth key. This tag should be added to your oauth key and ACL.
+        :param pulumi.Input[_builtins.str] timeout: Maximum time to wait for tailscale up, as a Go duration. Zero waits indefinitely.
+        :param pulumi.Input[_builtins.str] track: Tailscale installation release track: stable or unstable.
         :param pulumi.Input[_builtins.str] vpc_id: The VPC the Bastion should be created in.
         :param pulumi.Input[Union['WorkloadIdentityArgs', 'WorkloadIdentityArgsDict']] workload_identity: Authenticate using the EC2 instance role instead of a stored key. Mutually exclusive with oauthClientSecret.
         """
@@ -356,20 +696,37 @@ class Bastion(pulumi.ComponentResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 accept_dns: Optional[pulumi.Input[_builtins.bool]] = None,
+                 accept_routes: Optional[pulumi.Input[_builtins.bool]] = None,
                  architecture: Optional[pulumi.Input[_builtins.str]] = None,
                  enable_app_connector: Optional[pulumi.Input[_builtins.bool]] = None,
                  enable_exit_node: Optional[pulumi.Input[_builtins.bool]] = None,
                  enable_ssh: Optional[pulumi.Input[_builtins.bool]] = None,
+                 exit_node: Optional[pulumi.Input[_builtins.str]] = None,
+                 exit_node_allow_lan_access: Optional[pulumi.Input[_builtins.bool]] = None,
+                 force_reauth: Optional[pulumi.Input[_builtins.bool]] = None,
                  high_availability: Optional[pulumi.Input[_builtins.bool]] = None,
                  hostname: Optional[pulumi.Input[_builtins.str]] = None,
                  instance_type: Optional[pulumi.Input[_builtins.str]] = None,
+                 json: Optional[pulumi.Input[_builtins.bool]] = None,
+                 login_server: Optional[pulumi.Input[_builtins.str]] = None,
+                 max_retries: Optional[pulumi.Input[_builtins.int]] = None,
+                 netfilter_mode: Optional[pulumi.Input[_builtins.str]] = None,
                  oauth_client_secret: Optional[pulumi.Input[_builtins.str]] = None,
+                 operator: Optional[pulumi.Input[_builtins.str]] = None,
                  peer_relay_settings: Optional[pulumi.Input[Union['_root_inputs.PeerRelaySettingsArgs', '_root_inputs.PeerRelaySettingsArgsDict']]] = None,
                  public: Optional[pulumi.Input[_builtins.bool]] = None,
                  region: Optional[pulumi.Input[_builtins.str]] = None,
+                 reset: Optional[pulumi.Input[_builtins.bool]] = None,
+                 retry_delay: Optional[pulumi.Input[_builtins.int]] = None,
                  routes: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 shields_up: Optional[pulumi.Input[_builtins.bool]] = None,
+                 snat_subnet_routes: Optional[pulumi.Input[_builtins.bool]] = None,
+                 stateful_filtering: Optional[pulumi.Input[_builtins.bool]] = None,
                  subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  tailscale_tags: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 timeout: Optional[pulumi.Input[_builtins.str]] = None,
+                 track: Optional[pulumi.Input[_builtins.str]] = None,
                  vpc_id: Optional[pulumi.Input[_builtins.str]] = None,
                  workload_identity: Optional[pulumi.Input[Union['WorkloadIdentityArgs', 'WorkloadIdentityArgsDict']]] = None,
                  __props__=None):
@@ -383,6 +740,12 @@ class Bastion(pulumi.ComponentResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = BastionArgs.__new__(BastionArgs)
 
+            if accept_dns is None:
+                accept_dns = True
+            __props__.__dict__["accept_dns"] = accept_dns
+            if accept_routes is None:
+                accept_routes = False
+            __props__.__dict__["accept_routes"] = accept_routes
             if architecture is None:
                 architecture = 'x86_64'
             __props__.__dict__["architecture"] = architecture
@@ -395,6 +758,15 @@ class Bastion(pulumi.ComponentResource):
             if enable_ssh is None:
                 enable_ssh = True
             __props__.__dict__["enable_ssh"] = enable_ssh
+            if exit_node is None:
+                exit_node = ''
+            __props__.__dict__["exit_node"] = exit_node
+            if exit_node_allow_lan_access is None:
+                exit_node_allow_lan_access = False
+            __props__.__dict__["exit_node_allow_lan_access"] = exit_node_allow_lan_access
+            if force_reauth is None:
+                force_reauth = False
+            __props__.__dict__["force_reauth"] = force_reauth
             if high_availability is None:
                 high_availability = False
             if high_availability is None and not opts.urn:
@@ -402,7 +774,22 @@ class Bastion(pulumi.ComponentResource):
             __props__.__dict__["high_availability"] = high_availability
             __props__.__dict__["hostname"] = hostname
             __props__.__dict__["instance_type"] = instance_type
+            if json is None:
+                json = False
+            __props__.__dict__["json"] = json
+            if login_server is None:
+                login_server = 'https://controlplane.tailscale.com'
+            __props__.__dict__["login_server"] = login_server
+            if max_retries is None:
+                max_retries = 10
+            __props__.__dict__["max_retries"] = max_retries
+            if netfilter_mode is None:
+                netfilter_mode = 'on'
+            __props__.__dict__["netfilter_mode"] = netfilter_mode
             __props__.__dict__["oauth_client_secret"] = oauth_client_secret
+            if operator is None:
+                operator = ''
+            __props__.__dict__["operator"] = operator
             __props__.__dict__["peer_relay_settings"] = peer_relay_settings
             if public is None:
                 public = False
@@ -410,13 +797,34 @@ class Bastion(pulumi.ComponentResource):
             if region is None and not opts.urn:
                 raise TypeError("Missing required property 'region'")
             __props__.__dict__["region"] = region
+            if reset is None:
+                reset = False
+            __props__.__dict__["reset"] = reset
+            if retry_delay is None:
+                retry_delay = 10
+            __props__.__dict__["retry_delay"] = retry_delay
             __props__.__dict__["routes"] = routes
+            if shields_up is None:
+                shields_up = False
+            __props__.__dict__["shields_up"] = shields_up
+            if snat_subnet_routes is None:
+                snat_subnet_routes = True
+            __props__.__dict__["snat_subnet_routes"] = snat_subnet_routes
+            if stateful_filtering is None:
+                stateful_filtering = False
+            __props__.__dict__["stateful_filtering"] = stateful_filtering
             if subnet_ids is None and not opts.urn:
                 raise TypeError("Missing required property 'subnet_ids'")
             __props__.__dict__["subnet_ids"] = subnet_ids
             if tailscale_tags is None and not opts.urn:
                 raise TypeError("Missing required property 'tailscale_tags'")
             __props__.__dict__["tailscale_tags"] = tailscale_tags
+            if timeout is None:
+                timeout = '60s'
+            __props__.__dict__["timeout"] = timeout
+            if track is None:
+                track = 'stable'
+            __props__.__dict__["track"] = track
             if vpc_id is None and not opts.urn:
                 raise TypeError("Missing required property 'vpc_id'")
             __props__.__dict__["vpc_id"] = vpc_id

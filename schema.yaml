@@ -99,6 +99,74 @@ resources:
   tailscale-bastion:aws:Bastion:
     isComponent: true
     inputProperties:
+      track:
+        type: string
+        description: "Tailscale installation release track: stable or unstable."
+        default: stable
+      maxRetries:
+        type: integer
+        description: "Maximum installation and authentication attempts. Must be at least 1."
+        default: 10
+      retryDelay:
+        type: integer
+        description: "Seconds between installation and authentication attempts. Must be non-negative."
+        default: 10
+      json:
+        type: boolean
+        description: "Whether tailscale up emits JSON output."
+        default: false
+      loginServer:
+        type: string
+        description: "Tailscale control server URL."
+        default: https://controlplane.tailscale.com
+      reset:
+        type: boolean
+        description: "Reset unspecified preferences to defaults when running tailscale up."
+        default: false
+      timeout:
+        type: string
+        description: "Maximum time to wait for tailscale up, as a Go duration. Zero waits indefinitely."
+        default: 60s
+      forceReauth:
+        type: boolean
+        description: "Force reauthentication when running tailscale up."
+        default: false
+      acceptDNS:
+        type: boolean
+        description: "Accept DNS configuration from the tailnet."
+        default: true
+      acceptRoutes:
+        type: boolean
+        description: "Accept subnet routes advertised by other tailnet nodes."
+        default: false
+      shieldsUp:
+        type: boolean
+        description: "Block incoming connections from other tailnet nodes."
+        default: false
+      snatSubnetRoutes:
+        type: boolean
+        description: "Source NAT traffic to advertised subnet routes."
+        default: true
+      netfilterMode:
+        type: string
+        description: "Netfilter management mode: on, off, or nodivert."
+        default: "on"
+      statefulFiltering:
+        type: boolean
+        description: "Enable stateful filtering for forwarded packets."
+        default: false
+      exitNode:
+        type: string
+        description: "IP address or name of the exit node to use for outgoing traffic."
+        default: ""
+      exitNodeAllowLANAccess:
+        type: boolean
+        description: "Allow direct access to the local network while using an exit node."
+        default: false
+      operator:
+        type: string
+        description: "Local Unix user allowed to operate tailscaled without sudo."
+        default: ""
       hostname:
         type: string
         description: "The hostname of the bastion."

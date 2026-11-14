@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"encoding/base64"
 	"strings"
 	"sync"
 	"testing"
@@ -46,6 +47,10 @@ func TestBastionFederationResources(t *testing.T) {
 				}
 				if mode == "federated" {
 					args.WorkloadIdentity = &WorkloadIdentity{ClientID: pulumi.String("client"), Audience: pulumi.String("api.tailscale.com/client")}
+					args.AcceptDNS = pulumi.Bool(false).ToBoolOutput()
+					args.SNATSubnetRoutes = pulumi.Bool(false)
+					args.RetryDelay = pulumi.Int(0).ToIntOutput()
+					args.Track = pulumi.String("unstable").ToStringOutput()
 				} else if mode == "oauth" {
 					args.OauthClientSecret = pulumi.String("test-secret")
 				}
@@ -61,6 +66,21 @@ func TestBastionFederationResources(t *testing.T) {
 				counts[r.TypeToken]++
 				if r.TypeToken == "aws:iam/rolePolicy:RolePolicy" {
 					policy = r.Inputs["policy"].StringValue()
+				}
+				if r.TypeToken == "aws:ec2/launchTemplate:LaunchTemplate" {
+					data, err := base64.StdEncoding.DecodeString(r.Inputs["userData"].StringValue())
+					if err != nil {
+						t.Fatal(err)
+					}
+					expected := []string{`TRACK="stable"`, `--accept-dns="true"`, `--snat-subnet-routes="true"`, "retry_delay=10"}
+					if mode == "federated" {
+						expected = []string{`TRACK="unstable"`, `--accept-dns="false"`, `--snat-subnet-routes="false"`, "retry_delay=0"}
+					}
+					for _, setting := range expected {
+						if !strings.Contains(string(data), setting) {
+							t.Errorf("launch template missing %s", setting)
+						}
+					}
 				}
 			}
 			if mode == "federated" {

@@ -13,4 +13,25 @@ uses the default tailscaled configuration.
 To update, copy these four files and LICENSE from a reviewed upstream commit,
 update this pin, and run the AWS provider tests. The renderer rejects unknown
 template variables. The AWS wrapper fetches legacy credentials from SSM at boot,
-removes the temporary credential file, and fails if authentication retries exhaust.
+removes the temporary credential file, and fails if authentication retries exhaust
+or a `tailscale set` command fails.
+
+The AWS Bastion exposes the installation and setup options as inputs:
+
+| Inputs | Defaults |
+| --- | --- |
+| `track`, `maxRetries`, `retryDelay` | `stable`, `10`, `10` seconds |
+| `json`, `reset`, `forceReauth` | `false` |
+| `loginServer`, `timeout` | `https://controlplane.tailscale.com`, `60s` |
+| `acceptDNS`, `snatSubnetRoutes` | `true` |
+| `acceptRoutes`, `shieldsUp`, `statefulFiltering`, `exitNodeAllowLANAccess` | `false` |
+| `netfilterMode` | `on` (`off` and `nodivert` also supported) |
+| `exitNode`, `operator` | empty (unset) |
+
+`hostname`, `tailscaleTags`, `routes`, `enableSSH`, `enableExitNode`,
+`enableAppConnector`, and `peerRelaySettings` supply the remaining node settings.
+Authentication variables are managed through `oauthClientSecret`,
+`workloadIdentity`, or the automatically generated tailnet key. AWS workload
+identity obtains its token automatically rather than accepting a static ID token.
+The default generated tailnet key requires the Tailscale provider; a custom
+`loginServer` must support the selected authentication mechanism.

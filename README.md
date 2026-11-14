@@ -46,7 +46,21 @@ Tailscale 1.94+). Nodes remain ephemeral and preauthorized.
 `workloadIdentity` and `oauthClientSecret` are mutually exclusive. Omitting both
 retains provider-created auth keys. AWS bootstrap uses pinned, embedded scripts
 from [terraform-cloudinit-tailscale](https://github.com/tailscale/terraform-cloudinit-tailscale),
-installs the current stable Tailscale release, and supports both CPU architectures.
+installs the current stable Tailscale release by default, and supports both CPU architectures.
+
+### AWS Tailscale settings
+
+AWS bastions accept the embedded upstream installation and node settings directly:
+
+- Installation: `track` (`stable` or `unstable`), `maxRetries`, `retryDelay` (seconds).
+- Connection: `loginServer`, `timeout` (for example `60s`), `json`, `reset`, `forceReauth`.
+- Networking: `acceptDNS`, `acceptRoutes`, `shieldsUp`, `snatSubnetRoutes`,
+  `netfilterMode`, `statefulFiltering`, `exitNode`, `exitNodeAllowLANAccess`.
+- Local management: `operator` (Unix username).
+
+See the [input defaults and upstream mappings](provider/pkg/provider/aws/cloudinit/README.md).
+For example, set `acceptRoutes: true` to use other advertised subnet routes or
+`snatSubnetRoutes: false` to preserve source addresses on routed traffic.
 
 ### Can you add support for X
 
