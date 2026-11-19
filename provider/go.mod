@@ -7,7 +7,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pulumi/pulumi-aws/sdk/v7 v7.55.0
 	github.com/pulumi/pulumi-azure/sdk/v6 v6.40.2
-	github.com/pulumi/pulumi-dotnet/pulumi-language-dotnet/v3 v3.118.0
+	github.com/pulumi/pulumi-dotnet/pulumi-language-dotnet/v3 v3.119.0
 	github.com/pulumi/pulumi-kubernetes/sdk/v4 v4.34.3
 	github.com/pulumi/pulumi-tailscale/sdk v0.30.0
 	github.com/pulumi/pulumi-tls/sdk/v5 v5.6.3
