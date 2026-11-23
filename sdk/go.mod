@@ -5,7 +5,7 @@ go 1.26.10
 require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/pulumi/pulumi-kubernetes/sdk/v4 v4.34.3
-	github.com/pulumi/pulumi/sdk/v3 v3.276.0
+	github.com/pulumi/pulumi/sdk/v3 v3.277.0
 )
 
 require (
